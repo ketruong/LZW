@@ -13,7 +13,7 @@ void prune(codeTable * table) {
 // if the table has space, add to the table 
 // if there is no space and the prune flag is enabled, prune
 void addorPrune(codeTable * table, unsigned int pref, unsigned int c, int p) {
-    if (isFull() && p) prune(table);
+    if (isFull()) {if(p) prune(table);}
     else insertTable(table, pref, c);
 }
 
