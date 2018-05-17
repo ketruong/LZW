@@ -6,6 +6,8 @@
 #include "trie.h"
 #include "code.h"
 
+extern unsigned int bits; 
+
 /* LZW Algorithm - Encode
 
    1. Create the table 
@@ -15,8 +17,8 @@
    4. Get Char until EOF 
     a. If the number of codes is greater thatn 2^nbits and less than 2^maxbits
         1. nbits = nbits + 1
-    b. If the (CODE, Char) pair is in the Array
-        1. set the code to be the index in the Array
+    b. If the (CODE, Char) pair is in the hashTable 
+        1. set the code to be the index in the array 
     c. Else 
         *** For the Escape Flag only ***
         1. If the code is empty, this means that that the escape flag was specified
@@ -36,5 +38,5 @@
    6. Output any lower bits left over
 
 */
-void encode();
+void encode(int maxbits, int p, int e);
 #endif
