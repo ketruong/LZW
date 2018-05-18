@@ -1,0 +1,68 @@
+			    PARTIAL RESERVE LIST
+    CPSC 323a - Introduction to Systems Programming and Computer Organization
+			    Stanley C. Eisenstat
+
+General Reading (Highly Recommended)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ Jon Bentley, "Programming Pearls", 2nd edition, Addison-Wesley, 2000
+   [Internet via Orbis]
+
+ Brian W. Kernighan and Rob Pike, "The UNIX Programming Environment", Prentice-
+   Hall, 1984 [QA76.6 K495]
+
+ Brian W. Kernighan and Rob Pike, "The Practice of Programming", Addison-
+   Wesley, 1999 [Internet via Orbis]
+
+ Steve Maguire, "Writing Solid Code: Microsoft's Techniques for Developing
+   Bug-free C Programs", Microsoft Press, 1993 [QA76.73 C15 M335X]
+
+ Diomidis Spinellis, "Code Reading: The Open Source Perspective", Addison-
+   Wesley, 2003 [Internet via Orbis]
+
+Computer Architecture
+~~~~~~~~~~~~~~~~~~~~~
+ Randal Bryant and David O'Hallaron, "Computer Systems: A Programmer's
+   Perspective", 3rd edition, Pearson, 2016 [QA76.5 B795X 2016]
+
+ John L. Hennessy and David A. Patterson, "Computer Architecture: A
+   Quantitative Approach", 5th edition, Morgan Kaufman, 2011
+   [QA76.9 A73 P377 2011 and Internet via Orbis]
+
+ David A. Patterson and John L. Hennessy, "Computer Organization and Design:
+   The Hardware/Software Interface", 4rd edition, Morgan Kaufmann, 2009
+   [Internet via Orbis]
+
+ Andrew S. Tanenbaum, "Structured Computer Organization", 5th edition,
+   Prentice-Hall, 2005 [QA76.6 T38X 2005]
+
+Unix Systems Programming
+~~~~~~~~~~~~~~~~~~~~~~~~
+ Graham Glass and King Ables, "LINUX for Programmers and Users",
+   Prentice-Hall, 2006 [QA76.76.O63 G582X 2006]
+
+ Michael K. Johnson and Erik W. Troan, "Linux Application Development",
+   2nd edition, Addison-Wesley, 2005 [Internet via Orbis]
+
+ M. Tim Jones, "GNU/Linux application programming", 2nd edition, Charles
+   River Media, 2008 [Internet via Orbis]
+
+ Michael Kerrisk, "The Linux Programming Interface: A Linux and UNIX System
+   Programming Handbook", Starch Press, 2010 [Internet via Orbis]
+
+ Robert Love, "Linux System Programming", Cambridge, 2007 [Internet via Orbis]
+
+ Neil Matthew and Richard Stones, "Beginning Linux Programming", 4th edition,
+   Wrox, 2007 (QA76.76.O63 M37157 and Internet via Orbis)
+
+ Arnold Robbins, "Linux Programming by Example: The Fundamentals",
+   Prentice-Hall, 2004 [Internet via Orbis]
+
+ Marc J. Rochkind, "Advanced Unix Programming", 2nd edition, Addison-Wesley,
+   2004 [QA76.76 O63 R645]
+
+ W. Richard Stevens and Stephen A. Rago, "Advanced Programming in the UNIX
+   Environment", 3rd edition, Addison-Wesley, 2005 [Internet via Orbis]
+
+ Paul S. Wang, "Mastering Linux", CRC Press, 2011 [QA76.76 O63 W365143]
+
+								CS-323-08/24/16

@@ -1,0 +1,127 @@
+								    Fall 2017
+
+Reading Assignments for CPSC 323
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Note:  The on-line version of Matthew and Stones is not
+paginated.  For those using it, I have annotated each
+reading with the chapter and section(s) (and in some
+cases subsection(s)) in which those pages are contained.
+
+Thus to reach the reading, click on the title of the
+chapter in the list of links, which inserts a list of
+sections immediately under the title.  If no subsection
+is specified below, read the entire page.  Otherwise
+just scroll down to the subsection and read to the end
+of it.
+
+
+Date   Reading (Topic)
+~~~~   ~~~~~~~~~~~~~~~
+08/30  HP5 Appendix J, pp.   2-  3 Ripple-carry adders
+       HP5 Appendix J, pp.   7-  8 Signed numbers
+       HP5 Appendix J: pp.  37- 41 Carry-lookahead adders
+       MS, pp. 377-392 make
+	   [Chapter 9, Problems of Multiple Source Files]
+	   [Chapter 9, The make Command and Makefiles]
+
+09/01  MS, pp.  94- 96 Linux file structure
+	   [Chapter 3, Linux File Structure]
+       MS, pp. 106-108 stat() & lstat()
+	   [Chapter 3, Low-Level File Access: Other System Calls ...]
+       MS, pp. 109-120 Standard I/O Library
+	   [Chapter 3, The Standard I/O Library]
+	   [Chapter 3, Formatted Input and Output]
+       MS, pp. 120-122 File & directory maintenance
+	   [Chapter 3, File and Directory Maintenance]
+       MS, pp. 122-126 Scanning directories
+	   [Chapter 3, Scanning Directories]
+       MS, pp. 392-406 Revision control systems [optional]
+	   [Chapter 9, Source Code Control]
+       MS, pp. 430-445 Debugging and gdb [optional]
+	   [Chapter 10, General Debugging Techniques]
+	   [Chapter 10, Debugging with gdb]
+
+09/06  HP5 Appendix J: pp.  13- 16 Floats
+       HP5 Appendix J: pp.  62- 65 Pitfalls & history
+
+09/11  Welch's paper (available on class web site)
+
+09/18  LZW handout (handout & available on class web site)
+
+09/25  Hamming's paper (recommended, available on class web site)
+
+10/02  HP5 Appendix B: pp.   1- 15 Caches
+       HP5 Appendix B: pp.  22- 23 Compulsory/capacity/conflict misses
+       HP5 Appendix D: pp.   1-  5 Introduction to disks (optional)
+       HP5 Appendix D: pp.   6- 10 RAID
+       HP5 Chapter  2: pp. 102-104 Flash memory
+			     
+10/04  HP5 Chapter 1:  pp.   1-  9 Overview
+       HP5 Chapter 2:  pp.  72- 78 Memory hierarchy
+       HP5 Chapter 1:  pp.  17- 21 Trends in technology (optional)
+       HP5 Chapter 1:  pp.  27- 33 Trends in cost (optional)
+       HP5 Chapter 2:  pp.  96-102 SRAM & DRAM technology (optional)
+
+10/09  HP5 Appendix C: pp.   2-  3 Pipelining
+       HP5 Chapter 1:  pp.   9- 10 Parallel architectures
+       HP5 Chapter 1:  pp.  46- 48 Amdahl's Law
+       HP5 Chapter 4:  pp. 262-271 Vector machines
+       HP5 Chapter 4:  pp. 282-285 SIMD
+       HP5 Chapter 5:  pp. 344-353 MIMD
+       HP5 Appendix F: pp.  29- 44 Networks (optional)
+
+10/23  MS, pp. 109-120 Standard I/O Library
+	   [Chapter 3, The Standard I/O Library]
+	   [Chapter 3, Formatted Input and Output]
+       MS, pp.  96-108 Systems-level I/O
+	   [Chapter 3, System Calls and Device Drivers]
+	   [Chapter 3, Library Functions]
+	   [Chapter 3, Low-Level File Access]
+
+10/25  MS, pp. 461-464 Processes
+	   [Chapter 11, What Is a Process]
+	   [Chapter 11, Process Structure: Introduction]
+	   [Chapter 11, Process Structure: The Process Table]
+	   [Chapter 11, Process Structure: Viewing Processes]
+       MS, pp. 468-480 exec() and fork()
+	   [Chapter 11, Starting New Processes]
+       MS, pp. 481-484 signals
+	   [Chapter 11, Signals: Introduction]
+       MS, pp. 531-540 pipes and dup()
+	   [Chapter 13, The Pipe Call]
+	   [Chapter 13, Parent and Child Processes]
+
+10/30  Example of pipes (handout & available on class web site)
+       HP5 Appendix B: pp.  40- 57 Virtual memory
+       HP5 Chapter 2:  pp.  87- 90 Thrashing
+
+11/01  MS, pp.  23- 30 bash (variables and quoting)
+	   [Chapter 2, The Shell as a Programming Language]
+	   [Chapter 2, Shell Syntax: Variables]
+       MS, pp.  43- 45 bash (&& and ||)
+	   [Chapter 2, Shell Syntax: The AND List]
+	   [Chapter 2, Shell Syntax: The OR List]
+       MS, pp.  73- 74 bash (here documents)
+	   [Chapter 2, Shell Syntax: Here Documents]
+       MS, pp. 144-148 Environment variables in C
+	   [Chapter 4, Environment Variables]
+       MS, pp. 156-157 Temporary files
+	   [Chapter 4, Temporary Files]
+
+11/13  HP5 Chapter  1: pp.  11- 15 Overview of ISA
+       HP5 Appendix A: pp.   1- 24 Instruction Set Architecture
+       HP5 Appendix C: pp.   2- 30 Pipelining instructions & hazards
+	      
+11/15  HP5 Chapter 3:  pp. 162-167 Branch prediction
+
+
+Texts
+~~~~~
+HP5: John L. Hennessy and David A. Patterson, "Computer Architecture: A
+       Quantitative Approach", 5th edition, Morgan Kaufman, 2011
+
+MS:  Neil Matthew and Richard Stones, "Beginning Linux Programming",
+      4th edition, Wrox, 2007
+
+Last modified 09/29/17

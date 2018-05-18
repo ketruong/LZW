@@ -1,0 +1,138 @@
+			 Twenty-Four Important Points:
+		   Guidelines for Grading Programming Style
+
+	By relieving the brain of all unnecessary work, a good notation
+	sets it free to concentrate on more advanced problems, and in
+	effect increases the mental power of the race.
+	  -- Alfred North Whitehead, An Introduction to Mathematics,
+	       Henry Holt and Company, 1911, p. 59
+
+Comments
+
+ 1) Each file should begin with a comment giving the name of the file, a
+    brief description of its contents, and the name of the programmer.
+
+ 2) Each function definition should begin with a comment stating the meaning of
+    each of its parameters (by name); the value it returns (if any); what it
+    does (including in abnormal cases); and whether it references or modifies
+    any external state (i.e., global variables or targets of pointer arguments).
+    This should be enough to indicate how to call the function without having
+    to read the code.  If the function is a public part of a module whose
+    interface is specified in a .h file, then these comments should appear
+    there instead.
+
+ 3) Each data type (i.e., struct, union, or enum) should be accompanied by a
+    comment stating the meaning of each of its fields / values (by name).
+
+ 4) Each function should have enough internal comments to explain how it does
+    what it does.  But most code should be nearly self-explanatory (or should
+    be rewritten to be that clear), so it is possible to lose credit for
+    EXTREME overcommenting (see Kernighan & Pike, p. 23, for examples).
+
+
+Whitespace
+
+ 5) Lines should be indented to emphasize the control structure of the program,
+    and functions are part of that structure.  The specifics (i.e., how much to
+    indent a given line) are less important than that the rule be applied
+    consistently, both within each function and across different functions and
+    files.  Aside: Many programmers use 4 spaces or 1 tab per nesting level.
+
+ 6) Spaces, tabs, and blank lines should be used to make code more readable.
+    For example, spaces around operators should be used to break up long
+    expressions; blank lines around syntactic constructs such as for-loops
+    should be used to emphasize the roles of different blocks of code; and
+    whitespace should be used to keep code and comments visually separate.
+
+
+Braces
+
+ 7) While the particular brace style (i.e., when and where braces are used) is
+    not important, some style should be followed religiously.
+
+
+Global Variables and Functions
+
+ 8) Global variables should be used sparingly and only with good reason.  In
+    particular, they should never be used solely for the purpose of returning
+    multiple values from a function.
+
+ 9) Global variables should have names that are descriptive enough to remind
+    the reader of their meaning and distinctive enough (e.g., first letter
+    capitalized or camelCased) to indicate that they are not local variables.
+
+10) Each global variable should be described in a comment.
+
+11) When a global variable or function is used in a .c file other than the
+    one in which it is defined, it should be declared in a .h file that is
+    #include'd in both source files.  When a global variable or function
+    (other than main()) is only used within a single module, it should be
+    declared static.
+Macroexpansion
+
+12) Symbolic constants (i.e., macros with no arguments) should be used
+    whenever a value appears either explicitly or implicitly more than once
+    in the program, unless that value is obvious from context (e.g., 0 to
+    initialize a counter, +1 or -1 to update a loop variable, etc.).  In some
+    cases they should be used even when the number appears only once.
+
+    An alternative is to use constant variables, e.g.,
+
+	const int MaximumNumberOfItems = 100;
+
+    which are typed and can be made global / static global / local to limit
+    their scope.
+
+13) Symbolic constants and macros should have names that are descriptive enough
+    to remind the reader of their meaning and distinctive enough (e.g., all
+    capitals with underscores between words) to indicate that that they are not
+    local variables or functions.
+
+14) Each symbolic constant and macro should be described in a comment.
+
+
+Variables
+
+15) Variables should generally be given descriptive names.  Two exceptions are
+    loop variables and temporaries (e.g., a variable used only to swap the
+    values of two others).
+
+16) Each significant variable should be described in a comment.
+
+
+General Code Organization
+
+17) Programs should be written in a modular fashion, grouping similar things
+    together.  Even when there is only one source file, the #define's, structs,
+    typedefs, global variables, and functions therein should be grouped
+    logically (vs. scattered randomly throughout the file).
+
+18) A source file should never #include a .c file or any other file that
+    contains executable code (vs. just declarations).
+
+19) Large blocks of code that appear more than once should be considered for
+    abstraction (aka, refactored) as functions, thus avoiding duplicated logic.
+
+20) Constructions should be kept parallel when possible.  For example, if most
+    cases of a switch statement just call a function and break, then the other
+    cases should not contain large blocks of code (vs. moving that code into a
+    new function to make the structure more consistent).
+
+21) A function should have one logical purpose, that can be explained in a
+    simple sentence.  For example, the Swiss army knife (or any other an
+    all-in-one tool) would be a poor candidate for a function.
+
+22) Functions that never return a value (through the name of the function)
+    should be declared void.  Functions that return values should always do
+    so (or exit()).
+
+23) Programs must compile under "gcc -std=c99 -pedantic -Wall" without
+    generating ANY warning messages.
+
+24) Lines in the program should not be more than eighty characters wide when
+    tabs are expanded to sequences of four blanks (e.g., with "expand -t 4").
+
+"There are many valid, differing styles to use, but the one rule that must not
+be violated is self-consistency."
+
+								CS-323-08/24/15

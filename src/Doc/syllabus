@@ -1,0 +1,135 @@
+								      Fall 2017
+	      CPSC 323 - Introduction to Systems Programming
+			   and Computer Organization
+Instructor
+~~~~~~~~~~
+  Dana Angluin, AKW 414 <dana.angluin@yale.edu>
+    Office hours: TBA and by appointment
+
+Teaching Fellows (Office Hours: TBA (in the Zoo Annex))
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Lucas Paul <lucas.paul@yale.edu>
+
+ULAs (Office Hours: TBA (in the Zoo Annex))
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Eli Baum, Annie Chen, Valerie Chen, Lee Danilek,
+  Andrew Jin, Justin Shi, Ted Tuckman, Eric Yu
+
+Textbooks
+~~~~~~~~~
+  John L. Hennessy and David A. Patterson, "Computer Architecture:
+    A Quantitative Approach", 5th edition, Morgan Kaufman, 2011 (on-line @ Orbis)
+
+  Neil Matthew and Richard Stones, "Beginning Linux Programming", 4th edition,
+    Wrox, 2007 (on-line @ Orbis)
+
+Coursework
+~~~~~~~~~~
+  The class will NOT meet during reading period.
+
+  There will be 6 assignments requiring an average of 6-9 hours per week (or an
+  average of 15-25 hours per C assignment, somewhat less per non-C assignment).
+  There will be in-class examinations on Monday, October 16th, and Wednesday,
+  December 6th.  There will be no examination during final exam period.
+
+  Homework is ~70% of the final grade; the examinations are the remaining ~30%.
+
+Grading
+~~~~~~~
+  Programs will be submitted electronically and checked using test scripts:  a
+  public script, which will generally be available at least one week before the
+  assignment is due; and a more comprehensive private script, which will be
+  used to assign a grade.  C programs may also be evaluated for style.
+
+Late Homework Policy
+~~~~~~~~~~~~~~~~~~~~
+  Programs should be submitted electronically by 2:00 am on the day specified
+  in the assignment.  Late work not authorized by a Dean's excuse will be
+  assessed a penalty of 5% per calendar day or part thereof and may not be
+  graded at all if more than ten days late or after solutions are released.
+  The submit-times of the sources determine when the program was submitted.
+
+  Note:  If a Dean's excuse would authorize an assignment to be submitted more
+    than two weeks late or after solutions are released, then the student may
+    be asked to complete an equivalent assignment instead.
+
+Homework/Examination Schedule (tentative)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  What          Value   When Due    Spec    Script  Topic
+  ~~~~          ~~~~~   ~~~~~~~~    ~~~~    ~~~~~~  ~~~~~~~~~
+  Homework #1     60    09/15 (F)   08/30   09/08   nfind
+  Homework #2     50    09/29 (F)   09/13   09/22   Parsing
+  Homework #3     50    10/13 (F)   09/27   10/06   Scripting
+  Exam #1               10/16 (M)                   -
+  Homework #4     60    11/03 (F)   10/11   10/27   LZW
+  Homework #5     60    11/17 (F)   11/01   11/10   Shell
+  Exam #2               12/06 (W)                   -
+  Homework #6     40    12/14 (R)   11/15   12/07   Networking
+   
+Resources
+~~~~~~~~~
+  Directory:    /home/classes/cs323/*
+		  (handouts; test scripts; other files)
+  Web Page:     http://zoo.cs.yale.edu/classes/cs323
+		  (handouts; links; available only within yale.edu domain)
+  Mailing List: http://mailman.cs.yale.edu/mailman/listinfo/cs323
+		  (general course announcements: please subscribe!)
+  Staff Email:  cs323staff@cs.yale.edu
+                  (reaches instructor, TF and ULAs with questions)
+Computing Facility
+~~~~~~~~~~~~~~~~~~
+  Zoo: 38 Intel Xeon E5-2650 workstations and a server running Redhat Linux
+
+  Apply for a CPSC 323 course account at http://zoo.cs.yale.edu/accounts.html
+
+Topics Covered/Emphasized (tentative)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Systems programming in a high level language
+    user-level interfaces to a typical operating system (LINUX)
+    writing programs (e.g., a shell) that interact with the operating system
+
+  Elementary machine architecture / computer organization
+    computer arithmetic and general structure/organization of machines
+    approaches to parallelism (vector, SIMD, MIMD, networks)
+    instruction set architectures and pipelining instruction execution
+
+  Operating systems
+    implications of concurrency
+    implementation of semaphores at machine level (a la Dijkstra)
+    implementation and ramifications of virtual memory and caches
+
+  Other
+    data compression; error detection and correction; computer networks
+
+General Statement on Collaboration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Programming, like composition, is an individual creative process in which you
+  must reach your own understanding of the problem and discover a path to its
+  solution.  During this time, discussions with others (including the instruc-
+  tional staff) are encouraged.  (But see the Gilligan's Island Rule below.)
+   
+  However, when the time comes to write code, such discussions are no longer
+  appropriate---the program must be your own personal creation (although
+  you may ask the instructional staff for help in writing and debugging).
+   
+  Since code reuse is an important part of programming, you may incorporate
+  published code (e.g., from text books or the net) in your programs, provided
+  you give proper attribution in your source and in your log file AND THE BULK
+  OF THE CODE SUBMITTED IS YOUR OWN.
+
+  DO NOT UNDER ANY CIRCUMSTANCES COPY ANOTHER PERSON'S CODE OR GIVE A COPY
+  OF YOUR CODE TO ANOTHER PERSON---to do so is a clear violation of ethical/
+  academic standards that, when discovered, will be referred to the Executive
+  Committee of Yale College for disciplinary action.  Modifying code to conceal
+  copying only compounds the offense.
+
+The Gilligan's Island Rule
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+  When discussing an assignment with other students, you may write on a board
+  or a piece of paper, but you may not take any written or electronic record
+  away from the discussion.  Moreover, you must engage in a full hour of mind-
+  numbing activity (e.g., watching back-to-back episodes of Gilligan's Island)
+  before you work on the assignment again.  This will ensure that you can
+  reconstruct what you learned from the discussion, by yourself, using your own
+  brain.
+								CS-323-08/28/17

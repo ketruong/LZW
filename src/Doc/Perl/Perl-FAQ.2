@@ -1,0 +1,672 @@
+Newsgroups: comp.lang.perl.announce,comp.lang.perl.misc,comp.answers,news.answers
+Path: yale!news3.near.net!paperboy.wellfleet.com!news-feed-1.peachnet.edu!umn.edu!spool.mu.edu!howland.reston.ans.net!newsjunkie.ans.net!news.ptd.net!spp
+From: spp@peach.epix.net
+Subject: comp.lang.perl.* FAQ 2/5 - Information Sources
+X-Nntp-Posting-Host: cs1-12.pcn.ptd.net
+Message-ID: <SPP.95Sep5191114@icarus.sunfire.com>
+Followup-To: poster
+Sender: news@postoffice.ptd.net (News Master)
+Organization: ProLog - PenTeleData, Inc.
+Date: Tue, 5 Sep 1995 23:11:14 GMT
+Approved: news-answers-request@MIT.EDU
+Lines: 658
+Xref: yale comp.lang.perl.announce:116 comp.lang.perl.misc:5180 comp.answers:13179 news.answers:49623
+
+
+
+Archive-name: perl-faq/part2
+Version: $Id: part2,v 2.9 1995/05/15 15:44:29 spp Exp spp $
+Posting-Frequency: bi-weekly
+Last Edited: Mon Aug 21 22:44:30 1995 by spp (Stephen P Potter) on temples.syrinx.com
+
+This posting contains answers to general information questions, mostly of 
+about information sources.
+
+2.1) Is there a USENET group for Perl?
+
+    Yes there is: comp.lang.perl.misc.  This group, which currently can get
+    up to 150 messages per day, contains all kinds of discussions about
+    Perl; everything from bug reports to new features to the history to
+    humour and trivia.  This is the best source of information about
+    anything Perl related, especially what's new with Perl5.  Because of
+    its vast array of topics, it functions as both a comp.lang.* style
+    newsgroup (providing technical information) and also as a rec.* style
+    newsgroup, kind of a support group for Perl addicts (PerlAnon?).  There
+    is also the group comp.lang.perl.announce, a place specifically for
+    announcements related to perl (new releases, the FAQ, new modules,
+    etc).
+
+    Larry is a frequent poster to this group as well as most (all?) of the
+    seasoned Perl programmers.  Questions will be answered by some of the
+    most knowledgable Perl Hackers, often within minutes of a question
+    being posted (give or take distribution times).
+
+
+2.2) Have any books or magazine articles been published about Perl?
+
+    There are a number of books either available or planned.  Mostly
+    chronologically, they are:
+
+         Programming Perl (the Camel Book):
+	     Author: Larry Wall and Randal Schwartz
+	     Publisher: O'Reilly and Associates
+             ISBN 0-937175-64-1  (English)
+             ISBN 4-89052-384-7  (Japanese)
+	     ISBN 3-446-17257-2	 (German)  (Programmieren in Perl)
+			(translator: Hanser Verlag)
+
+    This is probably the most well known and most useful book for 4.036 and
+    earlier.  This part of O'Reilly's hugely successful "Nutshell Handbook"
+    series.  Besides serving as a reference guide for Perl, it also contains
+    tutorial material and is a great source of examples and cookbook
+    procedures, as well as wit and wisdom, tricks and traps, pranks and
+    pitfalls.  The code examples contained therein are available from
+    ftp://ftp.ora.com/pub/examples/nutshell/programming_perl/perl.tar.Z or
+    ftp://ftp.cis.ufl.edu/pub/perl/ora/programming_perl.  Corrections and
+    additions to the book can be found in the Perl4 man page right before
+    the BUGS section under the heading ERRATA AND ADDENDA. 
+
+         Learning Perl (the Llama Book):
+             ISBN 1-56592-042-2      (English)
+	     ISBN 4-89502-678-1      (Japanese)
+	     ISBN 2-84177-005-2      (French)
+	     ISBN 3-930673-08-8      (German)
+
+    Another of O'Reilly's "Nutshell Handbooks", by Randal Schwartz.  This
+    book is a smaller, gentler introduction to perl and is based off of
+    Randal's perl classes.  While in general this is a good book for
+    learning perl (like it's title), early printings did contain many typos
+    and don't cover some of the more interesting features of perl.  Please
+    check the errata sheet at ftp.ora.com, as well as the on-line examples.
+    
+    If you can't find these books in your local technical bookstore, they 
+    may be ordered directly from O'Reilly by calling 1-800-998-9938 if in
+    North America and 1-707-829-0515 otherwise.
+   
+    Johan Vromans* created a beautiful reference guide.  The reference
+    guide comes with the Camel book in a nice, glossy format.  The LaTeX
+    (source) and PostScript (ready to print) versions are available for FTP
+    from ftp.cs.ruu.nl:/pub/DOC/perlref-4.036.1.tar.Z in Europe or from
+    ftp.cis.ufl.edu:/pub/perl/doc/perlref-4.036.tar.gz in the United
+    States.  Obsolete versions in TeX or troff may still be available, but
+    these versions don't print as nicely.  See also:
+
+        [] ftp://ftp.uu.net/languages/perl/perlref-4.036.1.tar.gz
+        [] ftp://ftp.cs.ruu.nl/pub/DOC/perlref-4.036.1.tar.gz
+        [] ftp://ftp.khoros.unm.edu/pub/perl/perlref-4.036.1.tar.gz
+
+    Johan has also updated and released a reference guide based on version
+    5.000.  This is available from the same places as the 4.036 guide.
+    This version is also available from prep.gnu.ai.mit.edu in the /pub/gnu
+    section along with the perl5 source.  It may be added to the standard
+    perl5 distribution sometime after 5.002.  If you are using version
+    5.000, you will want to get this version rather than the 4.036 version.
+
+    Larry routinely carries around a camel stamp to use when autographing
+    copies of his book.  If you can catch him at a conference you can
+    usually get him to sign your book for you.
+
+    Prentice Hall also has two perl books.  The first is ``Perl by
+    Example'' by Ellie Quigley. (385 pages, $26.96, ISBN 0-13-122839-0) A
+    perl tutorial (perl4); every feature is presented via an annotated
+    example and sample output.  Reviews of this book have varied widely.
+    Many new perl users have used this book with much success, while many
+    "veteran" programmers have had many complaints about it.
+
+    The second book is called ``Software Engineering with Perl'' by Carl
+    Dichter and Mark Pease.  Randal Schwartz was a technical reviewer for
+    this book and notes this:
+
+	SEwP is not meant as instruction in the Perl language, but rather
+	as an example of how Perl may be used to assist in the semi-formal 
+	software engineering development cycles.  There's a lot of Perl
+	code that's fairly well commented, but most of the book describes
+	software engineering methodologies.  For the perl-challenged,
+	there's a *light* treatment of the language as well, but they refer
+	to the llama and the camel for the real meat.
+
+    SAMS Publishing also has a Perl book available, as part of their "Teach
+    Yourself in 21 Days" series, called "Teach Yourself Perl in 21 Days".
+    ISBN 0-672-30586-0 Price: $29.95, 841 Pages.  This book is the first
+    book to have a section devoted to version 5.000, although it was
+    written during an alpha stage and may not necessarily reflect current
+    reality.
+
+    Please note that none of the above books are perfect, all have some
+    inaccurances and typos.  The two which Larry is directly associated
+    with (the O'Reilly books) are probably the most technically correct,
+    but also the most dated.  Carefully looking over any book you are
+    considering purchasing will save you much time, money, and frustration.
+
+    Starting in the March, 1995 edition of ``Unix Review''. Randal
+    Schwartz* has been authoring a bi-monthly Perl column.  This has so
+    far been an introductory tutorial.
+
+    Larry Wall has published a 3-part article on perl in Unix World
+    (August through October of 1991), and Rob Kolstad also had a 3-parter
+    in Unix Review (May through July of 1990).  Tom Christiansen also has
+    a brief overview article in the trade newsletter Unix Technology
+    Advisor from November of 1989.  You might also investigate "The Wisdom
+    of Perl" by Gordon Galligher from SunExpert magazine;  April 1991
+    Volume 2 Number 4.  The Dec 92 Computer Language magazine also
+    contains a cover article on Perl, "Perl: the Programmers Toolbox".
+
+    Many other articles on Perl have been recently published.  If you 
+    have references, especially on-line copies, please mail them to 
+    the FAQ maintainer for inclusion is this notice.
+
+    The USENIX LISA (Large Installations Systems Administration) Conference
+    have for several years now included many papers of tools written in
+    Perl.  Old proceedings of these conferences are available; look in
+    your current issue of ";login:" or send mail to office@usenix.org 
+    for further information.
+
+    Japan seems to be jumping with Perl books.  If you can read japanese
+    here are a few you might be interested in.  Thanks to Jeffrey Friedl*
+    and Ken Lunde* for this list (NOTE: my screen cannot handle japanese
+    characters, so this is all in English for the moment  NOTE2: These
+    books are written in Japanese, these titles are just translations):
+
+	Title: Welcome to Perl Country	(Perl-no Kuni-he Youkoso)
+	Authors: Kaoru Maeda, Hiroshi Koyama, Yasushi Saito and Arihito
+		 Fuse
+    	Pages: 268+9	    	    	Publisher: Science Company	
+    	Pub. Date: April 25, 1993   	ISBN: 4-7819-0697-4 		
+    	Price: 2472Y	    	    	Author Email: maeda@src.ricoh.co.jp
+	Comments: Written during the time the Camel book was being 
+	translated.  A useful introduction, but uses jperl (Japanese Perl)
+	which is not necessarily compatible.
+
+	Title: How to Write Perl    	(Perl Shohou)
+	Author: Toshiyuki Masui
+    	Pages: 352  	    	    	Publisher: ASCII Corporation	
+    	Pub. Date: July 1, 1993	    	ISBN: 4-7561-0281-6		
+    	Price: 3200Y	    	    	Author Email: masui@shocsl.sharp.co.jp
+	Comments: More advanced than "Welcome.." and not meant as an
+	introduction.  Uses the standard perl and has examples for handling
+	Japanese text.
+
+	Title: Introduction to Perl 	(Nyuumon Perl)
+	Author: Shinji Kono
+    	Pages: 203  	    	    	Publisher: ASCII Corporation	
+    	Date: July 11, 1994 	    	ISBN: 4-7561-0292-1		
+    	Price: 1800Y	    	    	Author Email: kono@csl.sony.co.jp
+	Comments: Uses the interactive Perl debugger to explain how things
+	work.
+
+	Title: Perl Programming 
+	Authors: L Wall & R Schwartz	Translator: Yoshiyuki Kondo
+    	Pages: 637+32	    	    	Publisher: Softbank Corporation	
+    	Pub. Date: February 28, 1993	ISBN: 4-89052-384-7		
+    	Price: 4500Y	    	    	Author Email: cond@lsi-j.co.jp
+	Comments: Official Japanese translation of the Camel book,
+    	"Programming Perl".  Somewhat laced with translator notes to
+    	explain the humour.  The most useful book.  Also includes the Perl
+    	Quick Reference -- in Japanese!
+
+
+2.3) When will the Camel and Llama books be updated?
+
+    As of August, 1995, ORA has contracted with Stephen to handle the
+    Camel update.  According to the accepted timeline, the first draft
+    is to be finished by the end of April, 1996.  The tutorial sections
+    are being cut some, and the book will take on much more of a reference
+    style.  Don't worry, it will still contain it's distinctive humor and
+    flair.
+
+    There are no current plans to update the Llama.  For the most part,
+    it serves as a good introduction for both major versions of perl.  
+    There may be some minor editing to it, but probably nothing major.  
+    If anything, it is more likely that a third book (working title:
+    Learning More Perl) will be written as a tutorial for the new perl5
+    paradigm.
+
+2.4) What FTP resources are available?
+
+    Since 1993, several ftp sites have sprung up for Perl and Perl related
+    items.  The site with the biggest repository of Perl scripts right now
+    seems to be ftp.cis.ufl.edu [128.227.100.198] in /pub/perl.  The
+    scripts directory has an INDEX with over 400 lines in it, each
+    describing what the script does.  The src directory has sources and/or
+    binaries for a number of different perl ports, including MS-Dos,
+    Macintosh and Windows/NT.  This is maintained by the Computing Staff at
+    UF*.  
+
+	Note:  European users please use the site src.doc.ic.ac.uk
+	[149.169.2.1] in /pub/computing/programming/languages/perl/
+	The link speed would be a lot better for all.  Contact
+	L.McLoughlin@doc.ic.ac.uk for more information.  It is updated
+	daily. 
+
+    There are also a number of other sites.  I'll add more of them as I get
+    information on them.
+    [site maintainers: if you want to add a blurb here, especially if you
+    have something unique, please let me know. -spp]
+
+    The Comprehensive Perl Archive Network (CPAN) is in heavy development.
+    Once the main site and its mirrors are fully operational, this answer
+    will change to reflect it's existance.
+
+
+2.5) What WWW/gopher resources are available?
+
+    The World Wide Web is exploding with new Perl sites all the time.  Some
+    of the more notable ones are:  
+	http://www.cis.ufl.edu/perl
+	http://www.metronet.com/1h/perlinfo, which has a great section on
+		Perl5. 
+	http://www.eecs.nwu.edu/perl/perl.html
+        http://web.nexor.co.uk/perl/perl.html, a great site for European
+		and UK users.
+
+
+2.6) Can people who don't have access to USENET get comp.lang.perl.misc?
+
+    "Perl-Users" is the mailing list version of the comp.lang.perl.misc
+    newsgroup.  If you're not lucky enough to be on USENET you can post to
+    comp.lang.perl.misc by sending to one of the following addresses.
+    Which one will work best for you depends on which nets your site is
+    hooked into.  Ask your local network guru if you're not certain.
+
+    Internet: PERL-USERS@VIRGINIA.EDU
+              Perl-Users@UVAARPA.VIRGINIA.EDU
+
+    BitNet: Perl@Virginia
+
+    uucp: ...!uunet!virginia!perl-users
+
+    The Perl-Users list is bidirectionally gatewayed with the USENET
+    newsgroup comp.lang.perl.misc.  This means that VIRGINIA functions as a
+    reflector.  All traffic coming in from the non-USENET side is
+    immediately posted to the newsgroup.  Postings from the USENET side are
+    periodically digested and mailed out to the Perl-Users mailing list.  A
+    digest is created and distributed at least once per day, more often if
+    traffic warrants.
+
+    All requests to be added to or deleted from this list, problems,
+    questions, etc., should be sent to:
+
+    Internet: Perl-Users-Request@Virginia.EDU
+              Perl-Users-Request@uvaarpa.Virginia.EDU
+
+    BitNet: Perl-Req@Virginia
+
+    uucp: ...!uunet!virginia!perl-users-request
+
+    Coordinator: Marc Rouleau <mer6g@VIRGINIA.EDU>
+
+
+2.7) Are archives of comp.lang.perl.misc available?
+
+    Yes, there are.  ftp.cis.ufl.edu:/pub/perl/comp.lang.perl.*/monthly has
+    an almost complete collection dating back to 12/89 (missing 08/91
+    through 12/93).  They are kept as one large file for each month.
+
+    A more sophisticated query and retrieval mechanism is desirable.
+    Preferably one that allows you to retrieve article using a fast-access
+    indices, keyed on at least author, date, subject, thread (as in "trn")
+    and probably keywords.  Right now, the MH pick command works for this,
+    but it is very slow to select on 18000 articles.
+
+    If you have, or know where I can find, the missing sections, please let
+    perlfaq@perl.com know.
+
+
+2.8) Is there a WAIS server for comp.lang.perl.*?
+
+    Yes there is.  Set your WAIS client to 
+    archive.orst.edu:9000/comp.lang.perl.*.  According to their
+    introduction, they have a complete selection from 1989 on.
+
+    Bill Middleton <wjm@feenix.metronet.com> offers this:
+
+    "I have setup a perl script retrieval service and WaisSearch here at
+    feenix.  To check it out, just point your gopher at us, and select the
+    appropriate menu option.  The WaisSearch is of the iubio type, which
+    means you can do boolean searching.  Thus you might try something
+    like:
+
+	caller
+	ioctl and fcntl
+	grep and socket not curses
+
+    and other things to see examples of how other folks have done this
+    or that.  This service is still under construction, but I'd like to
+    get feedback, if you have some time.
+
+    There's also a WaisSearch into all the RFC's and some other fairly
+    nifty stuff."
+
+
+2.9) What other sources of information about Perl or training are available?
+
+    There is a #Perl channel on IRC (Internet Relay Chat) where Tom and
+    Randal have been known to hang out.  Here you can get immediate answers
+    to questions from some of the most well-known Perl Hackers.
+
+    The perl5-porters (perl5-porters@nicoh.com) mailing list was created to
+    aid in communication among the people working on perl5.  However, it
+    has overgrown this function and now also handles a good deal of traffic
+    about perl internals.
+
+2.10) Where can I get training classes on Perl?
+
+    USENIX, LISA, SUG, WCSAS, AUUG, FedUnix and Europen sponsor tutorials
+    of varying lengths on Perl at the System Administration and General
+    Conferences.  These public classes are typically taught by Tom
+    Christiansen*.  
+
+    In part, Tom and Randal teach Perl to help keep bread on their tables
+    long enough while they continue their pro bono efforts of documenting
+    perl (Tom keeps writing more man pages for it :-) and expanding the
+    perl toolkit through extension libraries, work which they enjoy doing
+    as it's fun and helps out the whole world, but which really doesn't
+    pay the bills.  Such is the nature of free(ly available) software.
+    Send mail to <perlclasses@perl.com> for details and availability.
+
+    Tom is also available to teach on-site classes, included courses on
+    advanced perl and perl5.  Classes run anywhere from one day to week
+    long sessions and cover a wide range of subject matter.  Classes can
+    include lab time with exercises, a generally beneficial aspect.  If you
+    would like more information regarding Perl classes or when the next
+    public appearances are, please contact Tom directly at 1.303.444.3212.
+
+    Randal Schwartz* provides a 2-day lecture-only and a 4-5 day lecture-lab
+    course based on his popular book "Learning Perl".  For details, contact
+    Randal directly via email or at 1.503.777.0095.
+    
+    Internet One provides a 2 day "Introduction to Perl"  and  2  day
+    "Advanced Perl" workshop. The 50% hands-on and 50% lecture format
+    allow attendees to write several programs  themselves.   Supplied
+    are  the user manuals, reference copies of Larry Wall's "Program-
+    ming Perl", and a UNIX directory of  all  training  examples  and
+    labs. To obtain outlines, pricing, or scheduling information, use
+    the following:
+
+        o Phone: 1.303.444.1993
+        o Email: info@InternetOne.COM
+        o See our Ad in the "SysAdmin" magazine
+        o View the outlines via the Web: http://www.InternetOne.COM/
+
+
+2.11) What companies use or ship Perl?
+
+    At this time, the known list of companies that ship Perl includes at
+    least the following, although some have snuck it into /usr/contrib or
+    its moral equivalent: 
+
+	BSDI
+	Comdisco Systems
+	CONVEX Computer Corporation
+	Crosspoint Solutions
+    	Data General
+	Dell
+	DRD Corporation
+	IBM (SP systems)
+	Intergraph
+	Kubota Pacific 
+	Netlabs
+	SGI (without taintperl)
+	Univel
+
+    Some companies ship it on their "User Contributed Software Tape",
+    such as DEC and HP.  Apple Computer has shipped the MPW version of
+    Macintosh Perl on one of their Developer CDs (Essentials*Tools*Objects 
+    #11) (and they included it under "Essentials" :-)
+
+    Many other companies use Perl internally for purposes of tools
+    development, systems administration, installation scripts, and test
+    suites.  Rumor has it that the large workstation vendors (the TLA set)
+    are seriously looking into shipping Perl with their standard systems
+    "soon".
+
+    People with support contracts with their vendors are actively 
+    encouraged to submit enhancement requests that Perl be shipped 
+    as part of their standard system.  It would, at the very least,
+    reduce the FTP load on the Internet. :-)
+
+    If you know of any others, please send them in.
+
+
+2.12) Is there commercial, third-party support for Perl?
+
+    Not really.  Although perl is included in the GNU distribution, at last
+    check, Cygnus does not offer support for it.  However, it's unclear
+    whether they've ever been offered sufficient financial incentive to do
+    so.  Feel free to try.
+
+    On the other hand, you do have comp.lang.perl.misc as a totally gratis
+    support mechanism.  As long as you ask "interesting" questions, you'll
+    probably get plenty of help. :-) 
+
+    While some vendors do ship Perl with their platforms, that doesn't mean
+    they support it on arbitrary other platforms.  And in fact, all they'll
+    probably do is forward any bug reports on to Larry.  In practice, this
+    is far better support than you could hope for from nearly any vendor.
+
+    If you purchase a product from Netlabs (the company Larry works for),
+    you actually can get a support contract that includes Perl.
+
+    The companies who won't use something unless they can pay money for it
+    will be left out.  Often they're motivated by wanting someone whom they
+    could sue.  If all they want is someone to help them out with Perl
+    problems, there's always the net.  And if they really want to pay
+    someone for that help, well, any of a number of the regular Perl
+    "dignitaries" would appreciate the money.  ;-)
+
+    If companies want "commercial support" for it badly enough, speak up --
+    something might be able to be arranged. 
+
+
+2.13) What is a JAPH?  What does "Will hack perl for ..." mean?
+
+    These are the "just another perl hacker" signatures that some people
+    sign their postings with.  About 100 of the of the earlier ones are
+    available from the various FTP sites.
+
+    When people started running out of tricky and interesting JAPHs, some
+    of them turned to writing "Will hack perl for ..." quotes.  While
+    sometimes humourous, they just didn't have the flair of the JAPHs and
+    have since almost completely vanished.
+
+
+2.14) Where can I get a list of Larry Wall witticisms?
+
+    Over a hundred quips by Larry, from postings of his or source code,
+    can be found in many of the FTP sites or through the World Wide Web at
+    "ftp://ftp.cis.ufl.edu/pub/perl/misc/lwall-quotes"
+
+
+2.15) What are the known bugs?
+
+    This is *NOT* a complete list, just some of the more common bugs that
+    tend to bite people.
+
+    5.001:
+	op.c: Inconsistent parameter definition for pad_findlex - fixed
+	    in 5.001a, get development patches a-l.
+
+	walk.c: redeclaration of emit_split - fixed in perl5.001a, get
+	    development patches a-l.
+
+	On linux systems "make test" fails on "op/exec Failed test 5".  This
+	    is a known bug with bash, not perl.  You can get a new version 
+	    of bash.
+
+	Also on linux systems, "make test" hangs on lib/anydbm if you include
+	    NDBM in the extentions.  Do not include NDBM.
+
+	Another linux problem is getting Dynamic Loading to work.  You must
+	    use dld-2.3.6 (the newest version at the time of writing) to
+	    use Dynamic Loading.
+
+    - All versions of h2ph previous to the one supplied with perl5.001 tended
+    to generate improper header files.  Something such as:
+
+        #if __GNUC__
+    
+    was incorrectly translated into
+
+    	if ( &__GNUC__ ) {
+
+    instead of 
+
+    	if ( defined(&__GNUC__) ? &__GNUC__ : 0 ) {
+
+    Perl5 binaries compiled on SunOS4 exhibit strange behaviour on SunOS5.
+	For example, backticks do not work in the scripts.  You need to
+	compile perl for both architectures, even with Binary Compatibility.
+
+
+2.16) Where should I post bugs?
+
+    Before posting about a bug, please make sure that you are using the
+    most recent versions of perl (currently 4.036 and 5.001) available.
+    Please also check at the major archive sites to see if there are any
+    development patches available (usually named something like
+    perl5.001a.patch or patch5.001a - the patch itself, or
+    perl5.001a.tar.gz - a prepatched distribution).  If you are not using
+    one of these versions, chances are you will be told to upgrade because   
+    the bug has already been fixed.
+
+    If you are reporting a bug in perl5, the best place to send your bug
+    is <perlbug@perl.com>, which is currently just an alias for
+    <perl5-porters@nicoh.com>.  In the past, there have been problems with
+    the perlbug address.  If you have problems with it, please send your
+    bug directly to <perl5-porters@nicoh.com>.  You may subscribe to the list
+    in the customary fashion via mail to <perl5-porters-request@nicoh.com>.
+    Feel free to post your bugs to the comp.lang.perl.misc newsgroup as
+    well, but do make sure they still go to the mailing list.
+
+    If you are posting a bug with a non-Unix port, a non-standard Module
+    (such as Tk, Sx, etc) please see the documentation that came with it
+    to determine the correct place to post bugs.
+
+    To enhance your chances of getting any bug you report fixed:
+
+    1. Make sure you are using a production version of perl.  Alpha and
+       Beta version problems have probably already been reported and
+       fixed.
+
+    2. Try to narrow the problem down to as small a piece of code as
+       possible.  If you can get it down to 1 line of Perl then so much
+       the better.
+
+    3. Include a copy of the output from the myconfig script from the
+       Perl source distribution in your posting.
+
+2.17) Where should I post source code?
+
+    You should post source code to whichever group is most appropriate,
+    but feel free to cross-post to comp.lang.perl.misc.  If you want to
+    cross-post to alt.sources, please make sure it follows their
+    posting standards, including setting the Followups-To header
+    line to NOT include alt.sources; see their FAQ for details.
+
+
+2.18) Where can I learn about object-oriented Perl programming?
+
+    The perlobj(1) man page is a good place to start, and then you can
+    check out the excellent perlbot(1) man page written by the dean of perl
+    o-o himself, Dean Roehrich.  Areas covered include the following:
+
+    	Idx  Subsections in perlobj.1          Lines
+         1   NAME                                  2
+         2   DESCRIPTION                          16
+         3   An Object is Simply a Reference      60
+         4   A Class is Simply a Package          31
+         5   A Method is Simply a Subroutine      34
+         6   Method Invocation                    75
+         7   Destructors                          14
+         8   Summary                               7
+
+        Idx  Subsections in perlbot.1          Lines
+         1   NAME                                  2
+         2   INTRODUCTION                          9
+         3   Instance Variables                   43
+         4   Scalar Instance Variables            21
+         5   Instance Variable Inheritance        35
+         6   Object Relationships                 33
+         7   Overriding Superclass Methods        49
+         8   Using Relationship with Sdbm         45
+         9   Thinking of Code Reuse              111
+
+    The section on instance variables should prove very helpful to those
+    wondering how to get data inheritance in perl. 
+
+
+2.19) Where can I learn about linking C with Perl? [h2xs, xsubpp]
+
+    While it used to be deep magic, how to do this is now revealed in the
+    perlapi(1), perlguts(1), and perlcall(1) man pages, which treat with
+    this matter extensively.  You should also check the many extensions
+    that people have written (see question 1.19), many of which do this
+    very thing.
+
+
+2.20) What is perl.com?
+
+    Perl.com is just Tom's domain name, registered as dedicated to "Perl
+    training and consulting".  While not a full ftp site (he hasn't got
+    the bandwidth (yet)), it does have some interesting bits, most of which
+    are replicated elsewhere.  It serves as a clearinghouse for certain
+    perl related mailing lists.  The following aliases work:
+
+    	perl-packrats:          The archivist list
+      	perl-porters:           The porters list
+    	perlbook:               The Camel/Llama/Alpaca writing committee
+    	perlbugs:               The bug list (perl-porters for now)
+    	perlclasses:            Info on Perl training
+    	perlfaq:                Submissions/Errata to the Perl FAQ
+    	    	    	    	(Tom and Steve)
+    	perlrefguide:           Submissions/Errata to the Perl RefGuide
+    	    	    	    	(Johan) 
+
+2.21) What do the asterisks (*) throughout the FAQ stand for?
+
+    To keep from cluttering up the FAQ and for easy reference all email
+    addresses have been collected in this location.  For each person
+    listed, I offer my thanks for their input and help.
+
+    * Larry Wall	    <lwall@netlabs.com>
+    * Tom Christiansen	    <tchrist@wraeththu.cs.colorado.edu>
+    * Stephen P Potter	    <spp@vx.com>
+    * Andreas Koenig	    <k@franz.ww.TU-Berlin.DE>
+    * Bill Eldridge	    <bill@cognet.ucla.edu>
+    * Buzz Moschetti	    <buzz@bear.com>
+    * Casper H.S. Dik	    <casper@fwi.uva.nl>
+    * David Muir Sharnoff   <muir@tfs.com>
+    * Dean Roehrich         <roehrich@ironwood.cray.com>
+    * Dominic Giampaolo     <dbg@sgi.com>,
+    * Frederic Chauveau     <fmc@pasteur.fr>
+    * Gene Spafford         <spaf@cs.purdue.edu>
+    * Guido van Rossum	    <guido@cwi.nl>
+    * Henk P Penning	    <henkp@cs.ruu.nl>
+    * Jeff Friedl	    <jfriedl@omron.co.jp>
+    * Johan Vromans	    <jv@NL.net>
+    * John Dallman	    <jgd@cix.compulink.co.uk>
+    * John Lees		    <lees@pixel.cps.msu.edu>
+    * John Ousterhout	    <ouster@eng.sun.com>
+    * Jon Biggar	    <jon@netlabs.com>
+    * Ken Lunde	    	    <lunde@mv.us.adobe.com>
+    * Malcolm Beattie	    <mbeattie@sable.ox.ac.uk>
+    * Matthias Neeracher    <neeri@iis.ee.ethz.ch>
+    * Michael D'Errico	    <mike@software.com>
+    * Nick Ing-Simmons	    <Nick.Ing-Simmons@tiuk.ti.com>
+    * Randal Schwartz	    <merlyn@stonehenge.com>
+    * Roberto Salama	    <rs@fi.gs.com>
+    * Steven L Kunz	    <skunz@iastate.edu>
+    * Theodore C. Law	    <TEDLAW@TOROLAB6.VNET.IBM.COM>
+    * Thomas R. Kimpton	    <tom@dtint.dtint.com>
+    * Timothy Murphy	    <tim@maths.tcd.ie>
+    * UF Computer Staff	    <consult@cis.ufl.edu>
+
+
+
+
+
+--
+Stephen P Potter        Pencom Systems Administration         AMP Incorporated
+spp@peach.epix.net	spp@psa.pencom.com	          steve.potter@amp.com
+Home: 717-540-0131	Pager: 1-800-759-8888, 547-9561     Work: 717-986-5401
+                Systems Administation: It's a Kind of Magic

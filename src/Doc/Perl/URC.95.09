@@ -1,0 +1,291 @@
+Unix Review Column 4 (September 1995)
+
+Perl has a substantial collection of data recognizing and capturing operators
+and features.  In this column, I'm going to build a parser for a small somewhat
+free-form database, like a mailing list.
+
+First, let's take a look at some sample data:
+
+	Name: Randal L. Schwartz
+	Company: Stonehenge Consulting Services
+	Street: 4470 SW Hall Suite 107
+	City: Beaverton
+	State: Oregon
+	Zip: 97005
+	Phone: 503-777-0095
+	
+	Name: John Big-booty
+	City: San Angeles
+	State: California
+	Zip: 93021
+	Phone: 291-555-2213
+	
+	Company: Lips, Inc.
+	Street: 4221 Wayback Lane
+	City: Springfield
+	State: Kansas
+	Zip: 65554
+
+Each entry is delimited from the next by a blank line.  Note that not all fields
+are present in each entry, so we'll have to consider that when we're reading it
+in to a database.  (Please note that these entries are for illustrative purposes
+only -- any similarity to actual persons, living or dead, is merely a
+coincidence.)
+
+I'm going to put the data into a list of associative arrays.  (This is not
+possible in earlier versions of Perl, so if these examples don't work, make sure
+you have Perl version 5.000 or later.) Each associative array represents one
+entry from the database.  The keys of the associative array are the names of the
+fields (like "Name" or "City") with the values being the corresponding data.
+
+First, we'll need to break the data up into entries.  The simplest way is to
+take advantage of "paragraph mode" while reading the file.  In paragraph mode,
+each "line" read from the file is actually any number of lines up to the next
+blank line or end of file.  (Isn't it convenient that there's a Perl mode to
+read this kind of data?  Some would probably accuse me of selecting this
+structure to match the Perl mode, but I'm not telling.  :-) Paragraph mode is
+selected by setting $/ to an empty string:
+
+	#!/usr/bin/perl
+	$/ = "";
+	while (<>) {
+		## one entry per $_ here
+	}
+
+Wow, we're almost done (not!).  The text in $_ will now look like a number of
+lines that are separated by \n.  We need to parse this data, which is most
+easily done using multi-line match mode.  Multi-line match mode (indicated by a
+trailing m on the regular expression) allows the caret (^) to match not only the
+beginning of the string, but also just after any embedded newline in the string.
+Now, to grab the Name, Street, and City fields, it'd look like this:
+
+	#!/usr/bin/perl
+	$/ = "";
+	while (<>) {
+		%entry = (); # initialize empty entry
+		if (/^Name: (.*)/m) {
+			$entry{"Name"} = $1;
+		}
+		if (/^Street: (.*)/m) {
+			$entry{"Street"} = $1;
+		}
+		if (/^City: (.*)/m) {
+			$entry{"City"} = $1;
+		}
+		## save %entry here
+	}
+
+As you can see, the code for parsing the entry is looking rather repetitive, and
+I haven't even done all of the fieldnames yet.  This was my first approach, so
+let me throw it away and try something more general.
+
+It's easier to think of the data as "field:  value", and grab both at the same
+time.  Let's try that direction:
+
+	#!/usr/bin/perl
+	$/ = "";
+	while (<>) {
+		# for each entry:
+		%entry = (); # initialize
+		foreach (split /\n/) {
+			# for each line in entry:
+			$entry{$1} = $2
+				if /^(.*): (.*)$/;
+		}
+		## save %entry here
+	}
+
+Ahh!  This is getting close.  However, there's a bug here.  Can you tell what it
+is before reading ahead?  Nope?  Well, suppose the value contains a colon, as
+in:
+
+	Company: White Elephants: A division of Trunks-R-Us
+
+The first .* will match all the way up to the second colon, because regular
+expression quantifiers are greedy by default.  To fix that, just put a ? after
+that first colon, which says to match as few characters as possible (be
+"stingy") rather than as many as possible ("greedy").  (To save space, I won't
+repeat the program part -- just look for the change in later revisions.)
+
+Note that the order of data, or omission of some of the fields, is irrelevant.
+I could put the city before the name, or whatever.
+
+Now I have a valid %entry for each entry.  All I have to do is save it.  I can't
+save the actual associative array into a list, but I can save a pointer to the
+associative array using a reference.  At first thought, you might think to do
+this:
+
+	#!/usr/bin/perl
+	$/ = "";
+	@entries = (); # master list
+	while (<>) {
+		# for each entry:
+		%entry = (); # initialize
+		foreach (split /\n/) {
+			# for each line in entry:
+			$entry{$1} = $2
+				if /^(.*): (.*)$/;
+		}
+		# save %entry to @entries:
+		push @entries, \%entry;
+	}
+
+And this will indeed make a list of references to associative arrays.  However,
+it's a list of references to the same associative array, %entry!  What we need
+instead is to make a new anonymous associative array for each of the entries.
+There's a couple of ways we can do that.  One is to use the data from %entry
+inside the initialization of a brand new associative array:
+
+	#!/usr/bin/perl
+	$/ = "";
+	@entries = (); # master list
+	while (<>) {
+		# for each entry:
+		%entry = (); # initialize
+		foreach (split /\n/) {
+			# for each line in entry:
+			$entry{$1} = $2
+				if /^(.*): (.*)$/;
+		}
+		# save %entry to @entries:
+		push @entries, {%entry};
+	}
+
+The other, probably spiffier way is to create a new anonymous associative array
+to begin with, and get rid of %entry altogether:
+
+	#!/usr/bin/perl
+	$/ = "";
+	@entries = (); # master list
+	while (<>) {
+		# for each entry:
+		$ref_entry = {}; # anon hash
+		foreach (split /\n/) {
+			# for each line in entry:
+			$$ref_entry{$1} = $2
+				if /^(.*): (.*)$/;
+		}
+		# save this entry to @entries:
+		push @entries, $ref_entry;
+	}
+
+I like this one better, even though the syntax of de-referencing the reference
+to the anonymous associative array gets slightly uglier in the middle of the
+loop.  The syntax $$ref_entry{$1} says to use $ref_entry as the "name" of an
+associative array, and look at the key for $1 in that associative array.
+
+Whichever you prefer, we now have what we started out to get -- a list of
+references to (anonymous) associative arrays representing the original data
+entries.
+
+For my first trick, I'll print the data in a mailing list form.  To do this,
+I'll have to walk through the data, looking for things with complete addresses.
+Let's give it a whirl:
+
+	#!/usr/bin/perl
+	[parsing code from above goes here]
+	foreach $ref (@entries) {
+		$name = $$ref{"Name"};
+		$company = $$ref{"Company"};
+		$street = $$ref{"Street"};
+		$city = $$ref{"City"};
+		$state = $$ref{"State"};
+		$zip = $$ref{"Zip"};
+		next unless defined $address;
+		print "$name\n$street\n";
+		print "$city, $state $zip\n";
+	}
+
+Here, I'm looking for entries that have an address, because there are entries
+in my database for which I have only a phone number.  Those funky
+$$ref{"Something"} things are once again using $ref as the "name" of an
+associative array.  Recall that each element of the @entries list is a
+reference to an associative array.
+
+The entries here will come out in the order that I've defined them.  What if I
+want them in zip code order?  No problem (well, no major problem) -- just sort
+the entries list before using it:
+
+	#!/usr/bin/perl
+	[parsing code from above]
+	@entries = sort {
+		$$a{"Zip"} <=> $$b{"Zip"}
+	} @entries;
+	[printing code from above]
+
+Here, I'm using a user-defined (that'd be me) sort to rearrange the contents of
+the @entries list.  A user-defined sort routine is handed two elements of the
+list to be sorted (here, @entries) as $a and $b.  Since each of the elements are
+references to an associative array, I can dereference them to get the "Zip"
+field from each one.
+
+If I wanted something more complicated, like state first, and then city within
+state, it's just a small matter of typing a little more:
+
+	#!/usr/bin/perl
+	[parsing code from above]
+	@entries = sort {
+		$$a{"State"} cmp $$b{"State"} or
+		$$a{"City"} cmp $$b{"City"}
+	} @entries;
+	[printing code from above]
+
+Here, the left part of the or operator will be evaluated first.  If the cmp
+returns -1 or +1, then the right part of the or operator can be skipped.  This
+happens when the states differ.  If the states are the same, then the right part
+of the or operator must be evaluated (because the left part is 0, which is
+false), yielding the comparison between cities (a difficult task to do in real
+life).
+
+For my last trick, I'll give you the entire program that prints only the phone
+numbers for persons or companies for which we have phone numbers, sorted by
+phone number:
+
+	#!/usr/bin/perl
+	$/ = "";
+	@entries = (); # master list
+	while (<>) {
+		# for each entry:
+		$ref_entry = {}; # anon hash
+		foreach (split /\n/) {
+			# for each line in entry:
+			$$ref_entry{$1} = $2
+				if /^(.*): (.*)$/;
+		}
+		# save this entry to @entries:
+		push @entries, $ref_entry;
+	}
+	@entries = sort {
+		$$a{"Phone"} cmp $$b{"Phone"}
+	} @entries;
+	foreach $ref (@entries) {
+		$phone = $$ref{"Phone"};
+		next unless defined $phone;
+		$name = $$ref{"Name"};
+		$company = $$ref{"Company"};
+		print "$name ($company) $phone\n";
+	}
+
+This is just built up from pieces from the previous snippets, hacked just
+slightly to meet the new goal.
+
+Perl's richness of language features, while possibly initially intimidating, can
+yield tremendous flexibility in the long run if you take the time to explore
+them.  Hopefully, you've seen a few new cool tricks in this column.  Keep
+reading for future cool tricks and basic techniques.
+
+
+Randal L.  Schwartz has been a computer science professional for over 17 years.
+He has authored two books on Perl, and provides Unix consulting and Perl
+training throughout the United States.  He can be reached at
+merlyn@stonehenge.com or +1 503 777 0095, and welcomes questions or comments
+about Perl, downhill snow skiing, small planes, Unix, or Karaoke, but not
+necessarily in that order.  His World Wide Web homepage is located at
+http://www.teleport.com/~merlyn/.
+
+This text is copyright by Miller-Freeman, Inc, and is used with their
+permission.  Further distribution or use is not permitted.
+
+This text has appeared in an edited form in Unix Review magazine.  However, the
+version you are reading here is as the author originally submitted the article
+for publication, not after their editors applied their (ahem) creativity.

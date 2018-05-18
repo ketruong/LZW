@@ -1,0 +1,192 @@
+Unix Review Column 3 (July 1995)
+
+One of Perl's many strengths is its ability to easily manipulate text strings.
+This is particularly handy because text string manipulation forms the core of
+most quick-and-dirty applications in a typical UNIX tools environment.
+
+Many of Perl's operations for manipulating text center around the "regular
+expression".  Many people I've talked to consider regular expressions a scary
+thing -- a dark, voodoo-like language spoken only by the most adept cogniscenti,
+and then only in hushed tones.  Hopefully, in the next few paragraphs, I'll
+bring the art of regular expressions out into the light.  (Of course, my
+cogniscenti card will then expire, but such is the risk I must take.)
+
+A regular expression is nothing more than a template that selects a class of
+strings that match, distinguishing them from a class of strings that don't
+match.  For example, the regular expression /abc/ matches all strings that have
+the letters a, b, and c in that order.  (See?  That wasn't all that scary.)
+Specifying a literal list of characters to match as a substring is a common
+thing in a perl program:
+
+	foreach $i (@somelist) {
+		if ($i =~ /abc/) {
+			print "$i contains abc\n";
+		}
+	}
+
+In this case, the elements of @somelist are examined one at a time.  Each
+element that matches the regular expression "abc" is printed -- that is, it
+contains abc somewhere in the string.
+
+Regular expressions can do more than simply check for an exact matching
+substring.  Often, they contain wildcard constructs.  These wildcard constructs
+allow the regular expression to match any of a possible list of characters in a
+particular position.  For example, the "." character in a regular expression
+corresponds to any character in the string (except newline).  This means that
+the regular expression "a.c" matches not only abc, but also acc and adc and afc
+and azc and a+c and ...  well, you get the picture.
+
+If you want to be a little more picky, you can give a "character class" (which
+contrary to popular opinion, is not a place where bits go to learn how to form
+shapes on a screen).  Character classes are enclosed in square brackets.  The
+character class [a-z] in a regular expression matches any letter of the alphabet
+(as long as it is lowercase).  So, [b-f].d matches bed and fed and cad, but not
+kid.  The character class [aeiou] matches just the vowels.
+
+Character classes can describe what you don't want to match, as well as what you
+do want to match, simply by including a up-arrow as the first character within
+the brackets.  For example, the character class [^a-z] says that anything except
+the alphabet is acceptable.  So, "a[^a-z]c" matches a+c and a*c and a=c, but not
+abc or agc.
+
+Even with characters and character classes, you still aren't matching things of
+varying lengths.  If you wanted to match any number of any characters between an
+"a" and a "c", you'll need to start using quantifiers.  A quantifier appears
+after a regular expression construct, and allows the construct to occur multiple
+times, as restricted by the quantifier.
+
+One common quantifier is the asterisk (*).  This quantifier (available in nearly
+all Unix utilities that use regular expressions) means "zero or more of the
+immediately preceeding thing".  So, fre*d means frd or fred or freed or freeed
+or....  Note that this is different from what the shell does with a star -- the
+shell's idea of a star is dot-star in a regular expression, like ".*".
+
+Slightly less common, but equally useful, is the plus (+), which means "one or
+more of the immediately preceeding things".  So fre+d means fred or freed or
+freeed, but not frd.
+
+And then there's the question mark (?), which means "the preceeding thing is
+optional" or "zero or one of the immediately preceeding thing".  So, ab?c is ac
+or abc, but not abbc.  (And Ab?a could never match that old Swedish rock group,
+Abba.) Note once again that the question mark in a regular expression is not the
+same as the question mark as interpreted by the shell.  A question mark in the
+shell is equivalent to a dot (.) in a regular expression.
+
+With just these features of regular expressions, we could spend a lot of time
+matching particular strings, and ignoring others.  But even more cool things
+become possible when we can remember parts of the string that match parts of the
+regular expression.  This is accomplished through parentheses, which trigger
+memory.  You can put any number of properly balanced parentheses into a regular
+expression.  When the string is being compared to the regular expression, and
+part of the string matches a part of the regular expression enclosed in a pair
+of parentheses, that portion of the string is remembered in "memory".  This
+memory is available in two ways:  within the same regular expression using the
+backslash notation, or later in the program (until the next regular expression
+match) using the read-only numbered scalar variables.
+
+For example, let's say we're parsing the output from the Unix who command:
+
+	merlyn   tty14   May 01 14:42 (netserver5.omni.net)
+
+We want to capture the username (the first column), and the ttyname (the second
+column), but we didn't care about the rest.  If the data is in $wholine, we get
+something like this:
+
+	if ($wholine =~ /([a-z]+) +([a-z0-9]+)/) {
+		$user = $1;
+		$tty = $2;
+	}
+
+The first set of parentheses causes the username (matching the [a-z]+) to be
+remembered in $1 if the string matches.  This value is captured later into the
+$user variable.  Likewise, the ttyname is captured into $2 and then $tty.
+
+These character classes look ugly, and will actually break on usernames that
+contain numbers.  Perl provides some common character class abbreviations to
+help with the noise level.  \s is any whitespace character (like space, tab, or
+newline), while \S is any non-whitespace character (whatever \s isn't).
+
+So, more generally written:
+
+	if ($wholine =~ /(\S+)\s+(\S+)/) {
+		$user = $1;
+		$tty = $2;
+	}
+
+Here, we gained a lot of generality, and improved readability at the same time.
+Even simpler, the $1 and $2 can be formed into a list, and assigned directly to
+$user and $tty as a list:
+
+	if ($wholine =~ /(\S+)\s+(\S+)/) {
+		($user,$tty) = ($1,$2);
+	}
+
+For a further optimization, if we presume that the data is in $_, we can use the
+fact that the match operator matches against $_ by default, and get:
+
+	if (/(\S+)\s+(\S+)/) {
+		($user,$tty) = ($1,$2);
+	}
+
+This shortens up the program a bit.  But wait, there's more!  The result of the
+match operator in a list context is a list just like ($1,$2) here.  So, we can
+put the assignment in as part of the match:
+
+	if (($user,$tty) = /(\S+)\s+(\S+)/) {
+		# (it matched)
+	}
+
+Now we don't even have anything in the body of the if!  We're ready to use $user
+and $tty!
+
+Let's take the output of who, one line at a time, and count the number of times
+each user is logged in, and show who is logged in more than once:
+
+	foreach $_ (`who`) { # one line each
+		($user,$tty) = /(\S+)\s+(\S+)/;
+		$count{$user}++; # note count
+		$where{$user}{$tty}++; # note ttys
+	}
+	foreach (sort keys %count) {
+		if ($count{$_} > 1) {
+			print "user $_ is logged in at: ";
+			@where = sort keys %{$where{$_}};
+			print "@where\n";
+		}
+	}
+
+The first loop gathers the data.  Each line from the output of who (a particular
+login session) is parsed to reveal the username and tty.  The username is then
+counted into an associative array called %count, so that we may know multiple
+logins of the same user.  Also, the details of both $username and $tty are
+recorded into an associative array of associative arrays called %where.  (This
+feature is not available in older versions of Perl, so if you're trying this and
+it doesn't work, upgrade!)
+
+Once the first loop is complete, we'll have login counts in %count, and the
+details in %where.  The second loop scans the %count array using the sorted keys
+of %count (usernames).  If the particular value for a user in the %count array
+is more than one, that user is logged in more than once.  In that case, the user
+is printed, along with all the places that the user is logged in at.  (The
+notation %{$where{$_}} gives the associative array referenced at the associative
+array element $where{$_} -- yes, it is ugly syntax, but no worse than the rest
+of Perl.)
+
+In future columns, I'll continue to cover interesting uses and features of
+regular expressions.  Keep watching!
+
+
+Randal L.  Schwartz has been a computer science professional for over 17 years.
+He has authored two books on Perl, and provides Unix consulting and Perl
+training throughout the United States.  He can be reached at
+merlyn@stonehenge.com or +1 503 777 0095, and welcomes questions or comments
+about Perl, downhill snow skiing, small planes, Unix, or Karaoke, but not
+necessarily in that order.  His World Wide Web homepage is located at
+http://www.teleport.com/~merlyn/.
+
+This text is copyright by Miller-Freeman, Inc, and is used with their
+permission.  Further distribution or use is not permitted.
+
+This text has appeared in an edited form in Unix Review magazine.  However, the
+version you are reading here is as the author originally submitted the article
+for publication, not after their editors applied their (ahem) creativity.

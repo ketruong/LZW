@@ -1,0 +1,282 @@
+Unix Review Column 1 (March 1995)
+
+Perl is rapidly becoming a key tool in the typical system administrator and
+systems programmer's bag of tricks.
+
+However, it's easy to become frightened by the 211 pages of typeset
+documentation that come with latest release of Perl (version 5).  You may find
+yourself asking the questions "Where do I start?" and "How much of this do I
+need to know to write Perl code?"
+
+Well, one of the easiest things to do is to watch someone else attack a simple
+problem.  For example, take a typical system administration task of assigning a
+new user a unique user ID number.  For this, you must discover the highest user
+ID number currently assigned to anyone on your system, and then select the next
+higher number.
+
+We'll build up to the task at hand by looking at some simpler problems and their
+solutions.
+
+First, let's look at printing the first column of the output of the who command,
+just for grins.
+
+	who | perl -ne '@F = split; print "$F[0]\n";'
+
+
+The output of who becomes the input for Perl.  The -n switch tells Perl to
+execute some code line-by-line, placing each line into the $_ variable.  The -e
+switch gives the code, and we can (and often do) combine the switches as shown.
+
+In this case, we have two Perl statements:  a split operation, and a print.  The
+split operation breaks up the contents of $_ into a list of words (considering
+whitespace as the delimiter between words).  The array @F receives this list.
+
+The print operation then displays the value of the first element of that array
+followed by a newline (\n).  Note that the first element of @F is accessed via
+$F[0], because the elements are numbered starting at zero (much like a C array
+type).
+
+You can save yourself a little bit of typing by moving the split to a command
+line argument instead:
+
+	who | perl -ane 'print "$F[0]\n"'
+
+Note the addition of -a switch here, which tells Perl to split the contents of
+$_ into @F automatically, just as we had done in the previous example
+explicitly.
+
+To save a little more typing, we can add the -l switch, which does two things at
+once:
+
+1. it removes the newline from the $_ variable before our code can see it (our
+   code so far has not cared whether or not this newline exists), and
+
+2. it glues a newline back onto the string on the way out.
+
+That makes our little command-line example look like this:.
+
+	who | perl -lane 'print $F[0]'
+
+And, to save even a tiny bit more typing, let's change the -n switch to a -p
+switch, which tells Perl to print the contents of whatever is left over in $_ at
+the end of the code:
+
+	who | perl -lape '$_ = $F[0]'
+
+Well, OK, so it saves you only one character.  But that's still one character,
+and that could still be a significant savings if you save one character a day
+for the next five years.  Well, maybe not.
+
+The equivalent Perl script for the previous invocation of Perl looks something
+like this:
+
+	#!/usr/bin/perl
+	$\ = $/;                # from -l
+	while (<>) {            # from -p
+		chop;           # from -l
+		@F = split;     # from -a
+		$_ = $F[0];     # argument to -e
+		print;          # from -p
+	}
+
+As you can see, there's quite a bit of code generated for just a few characters
+on the command line.
+
+The $\ variable gives a terminator suffix for each "print" operation, much like
+the ORS variable in Awk.  By default, it is empty, meaning that prints are left
+pretty much as you ask for them.
+
+Here we are setting it to the value of $/, which is the input record separator
+(like RS in Awk).  By default, this value is "\n".  This makes the output
+separator the same as the input separator, so that a print will automatically
+have a newline appended to it.
+
+Well, enough of that who command.  Let's move on to the real task:  parsing
+through the password file to find the highest user ID.
+
+The password file differs from the output of who in that the columns are
+delimited by colons rather than whitespace.  No problem -- just give Perl a
+different delimiter character:
+
+	perl -aF: -lne 'print $F[0]' /etc/passwd
+
+and this does indeed give us a list of usernames on standard output.  The -F
+switch defines a colon for the delimiter.  Note that I've moved the -a switch up
+against the -F switch because to me they logically go together -- field
+separators don't make any sense unless you are splitting.
+
+If you are running Yellow Pages, er, I mean Network Information Services, you'll
+probably need to pull from there instead of the password file to get any
+interesting results:
+
+	ypcat passwd | perl -aF: -lne 'print $F[0]'
+
+Here, the ypcat command yields a password-like file on its standard output,
+which the perl command gleefully slurps up as if it were consuming the local
+/etc/passwd file.
+
+But, these are the user names, not the user ID numbers.  That's over in column
+3, found in $F[2] (again, offset by one because we start counting at zero).
+Just a simple edit, and we've got it.
+
+	perl -aF: -lne 'print $F[2]' /etc/passwd
+
+Now we've got a list of numbers.  That's getting closer.  We need to determine
+the maximum number, and print one higher than that.
+
+For this, we'll use a scalar variable called $max.  Initially, $max is
+undefined, which looks like a zero when we compare it with other numbers.  So,
+the job is to compare each user number to $max, setting $max to the number if it
+is higher:
+
+	perl -aF: -lne '$max = $F[2] if $max < $F[2]; print $max' /etc/passwd
+
+Here, we assign values to $max as long as the condition is true.  In this case,
+the condition of
+
+	$max < $F[2]
+
+is evaluated for each iteration of the loop, and if the result is true, the
+assignment takes place.  This is one place in Perl where the logic flow goes
+right to left instead of left to right.
+
+This is now getting uncomfortably long, so let's translate this into the
+equivalent script:
+
+	#!/usr/bin/perl
+	$\ = $/;
+	while (<>) {
+		chop;
+		@F = split /:/;
+		$max = $F[2] if $max < $F[2];
+		print $max;
+	}
+
+OK, this is closer.  However, we still need to feed /etc/passwd into the script,
+which is a bit of a burden on the invoker.  Let's open the /etc/passwd file
+directly from within the program.
+
+	#!/usr/bin/perl
+	open(PASSWD,"/etc/passwd");
+	$\ = $/;
+	while (<PASSWD>) {
+		chop;
+		@F = split /:/;
+		$max = $F[2] if $max < $F[2];
+		print $max;
+	}
+
+Here, the open() directive creates a filehandle opened on the /etc/passwd file
+for reading.
+
+And for you YP'ers, the equivalent solution is really just a couple more
+characters:
+
+	#!/usr/bin/perl
+	open(PASSWD,"ypcat passwd|");
+	$\ = $/;
+	while (<PASSWD>) {
+		chop;
+		@F = split /:/;
+		$max = $F[2] if $max < $F[2];
+		print $max;
+	}
+
+Perl nicely uses the output of the command as if it were a file.  The presence
+of a command (rather than a filename) is indicated by the trailing vertical bar.
+This is reminiscent of the pipe that this command used when we were writing the
+command-line version of this program.
+
+The output of these last few programs has been a series of numbers, representing
+the highest user ID found so far.  What we really want is the very last number
+printed.  No, I take that back.  What we really, really want is one more than
+that number.  So, what does this do to the program?  Simple -- just move the
+print outside the loop:
+
+	#!/usr/bin/perl
+	open(PASSWD,"/etc/passwd"); # or YP equivalent
+	$\ = $/;
+	while (<PASSWD>) {
+		chop;
+		@F = split /:/;
+		$max = $F[2] if $max < $F[2];
+	}
+	print $max + 1;
+
+Don't forget that +1, to get one more than the previous maximum.
+
+Whew!  We could stick this script into a file, turn on the file's execute bit,
+put it somewhere in our $PATH, and whenever we need a new user number, just
+invoke it between backquotes, and we'd have the right number.
+
+Or, nearly the right number.  As it turns out, some systems (like SunOS, on
+which I was testing this) have a user ID called nobody that has a very very high
+user ID.  If you'd been running this program on your system and kept getting
+answers like 65535, that's what's happening.
+
+So, we need to exclude anything over a threshold from our maximum calculation.
+And how do we do that?
+
+Well, the $max shouldn't be set if $F[2] exceeds our threshold (say, 30000).
+That means that the if part gets just a bit more complicated:
+
+	#!/usr/bin/perl
+	open(PASSWD,"/etc/passwd"); # or YP equivalent
+	$\ = $/;
+	while (<PASSWD>) {
+		chop;
+		@F = split /:/;
+		$max = $F[2] if $F[2] < 30000 and $max < $F[2];
+	}
+	print $max + 1;
+
+Now, we've got it nailed (I hope).  It works on SunOS at least.
+
+So, this little task didn't turn out to be extremely little, but at least we got
+it down to under a dozen lines of Perl code.  If you don't mind long command
+lines, we can actually put this back into a command-line form:
+
+	perl -aF: -lne '$m=$F[2] if $F[2]<30000 and $m<$F[2];
+		END { print $m+1 }' /etc/passwd
+
+The cute feature here is that an END block of statements is automatically moved
+outside the implicit loop, putting it where we would have stuck it in the
+full-blown script.
+
+If you are new to Perl, you'll probably want a good book on the subject.  There
+are two books I'd recommend, although I'm somewhat biased towards them, because
+I had a hand in writing both.
+
+Learning Perl (O'Reilly and Associates, ISBN 1-56592-042-2) is a gentle
+introduction to the language, along with exercises and annotated answers.  It's
+targeted for the "familiar with UNIX but not by any means a Guru" crowd,
+although you should definitely have had some programming background before
+cracking the book open.
+
+Programming Perl (O'Reilly and Associates, ISBN 0-937175-64-1) is a hefty
+comprehensive reference for the entire language, co-authored by the creator of
+Perl, Larry Wall.  You'll also find some smattering of tutorial information, and
+plenty of long, practical examples.  However, it's targeted more at the Guru
+crowd, and might fly over your head occasionally if you haven't been hacking
+UNIX since 1977 like I have.
+
+There's also a very nice Usenet newsgroup called comp.lang.perl, with heavy
+participation by the Perl wizards, including Larry Wall (and yours truly).  If
+you don't have easy access to Usenet, you can send email to
+perl-users-request@virginia.edu and ask to be put on a mailing list instead.
+
+
+Randal L. Schwartz has been a computer science professional for over 17 years.
+He has authored two books on Perl, and provides Unix consulting and Perl
+training throughout the United States.  He can be reached at
+merlyn@stonehenge.com or +1 503 777 0095, and welcomes questions or comments
+about Perl, downhill snow skiing, small planes, Unix, or Karaoke, but not
+necessarily in that order.  His World Wide Web homepage is located at
+>http://www.teleport.com/~merlyn/.
+
+This text is copyright by Miller-Freeman, Inc, and is used with their
+permission.  Further distribution or use is not permitted.
+
+This text has appeared in an edited form in Unix Review magazine.  However, the
+version you are reading here is as the author originally submitted the article
+for publication, not after their editors applied their (ahem) creativity.

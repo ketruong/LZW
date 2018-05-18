@@ -1,0 +1,1130 @@
+Newsgroups: comp.lang.perl.announce,comp.lang.perl.misc,comp.answers,news.answers
+Path: yale!news3.near.net!paperboy.wellfleet.com!news-feed-1.peachnet.edu!umn.edu!spool.mu.edu!howland.reston.ans.net!newsjunkie.ans.net!news.ptd.net!spp
+From: spp@peach.epix.net
+Subject: comp.lang.perl.* FAQ 5/5 - External Program Interaction
+X-Nntp-Posting-Host: cs1-12.pcn.ptd.net
+Message-ID: <SPP.95Sep5192429@icarus.sunfire.com>
+Followup-To: poster
+Sender: news@postoffice.ptd.net (News Master)
+Organization: ProLog - PenTeleData, Inc.
+Date: Tue, 5 Sep 1995 23:24:29 GMT
+Approved: news-answers-request@MIT.EDU
+Lines: 1116
+Xref: yale comp.lang.perl.announce:117 comp.lang.perl.misc:5182 comp.answers:13180 news.answers:49624
+
+
+Archive-name: perl-faq/part5
+Version: $Id: part5,v 2.8 1995/05/15 15:47:16 spp Exp spp $
+Posting-Frequency: bi-weekly
+
+This posting contains answers to the following questions about Array, Shell
+and External Program Interactions with Perl: 
+
+
+5.1) What is the difference between $array[1] and @array[1]?
+
+    Always make sure to use a $ for single values and @ for multiple ones. 
+    Thus element 2 of the @foo array is accessed as $foo[1], not @foo[1],
+    which is a list of length one (not a scalar), and is a fairly common
+    novice mistake.  Sometimes you can get by with @foo[1], but it's
+    not really doing what you think it's doing for the reason you think
+    it's doing it, which means one of these days, you'll shoot yourself
+    in the foot; ponder for a moment what these will really do:
+        @foo[0] = `cmd args`;
+        @foo[1] = <FILE>;
+    Just always say $foo[1] and you'll be happier.
+
+    This may seem confusing, but try to think of it this way:  you use the
+    character of the type which you *want back*.  You could use @foo[1..3] for
+    a slice of three elements of @foo, or even @foo{A,B,C} for a slice of
+    of %foo.  This is the same as using ($foo[1], $foo[2], $foo[3]) and
+    ($foo{A}, $foo{B}, $foo{C}) respectively.  In fact, you can even use
+    lists to subscript arrays and pull out more lists, like @foo[@bar] or
+    @foo{@bar}, where @bar is in both cases presumably a list of subscripts.
+
+
+5.2) How can I make an array of arrays or other recursive data types?
+
+
+    In Perl5, it's quite easy to declare these things.  For example 
+
+        @A = (
+            [ 'ww' .. 'xx'  ], 
+            [ 'xx' .. 'yy'  ], 
+            [ 'yy' .. 'zz'  ], 
+            [ 'zz' .. 'zzz' ], 
+        );
+
+    And now reference $A[2]->[0] to pull out "yy".  These may also nest
+    and mix with tables:
+
+        %T = (
+            key0, { k0, v0, k1, v1 },   
+            key1, { k2, v2, k3, v3 },   
+            key2, { k2, v2, k3, [ 'a' .. 'z' ] },    
+        );
+    
+    Allowing you to reference $T{key2}->{k3}->[3] to pull out 'd'.
+
+    Perl4 is infinitely more difficult.  Remember that Perl[0..4] isn't
+    about nested data structures.  It's about flat ones, so if you're
+    trying to do this, you may be going about it the wrong way or using the
+    wrong tools.  You might try parallel arrays with common subscripts. 
+
+    But if you're bound and determined, you can use the multi-dimensional
+    array emulation of $a{'x','y','z'}, or you can make an array of names
+    of arrays and eval it.
+
+    For example, if @name contains a list of names of arrays, you can get
+    at a the j-th element of the i-th array like so: 
+
+        $ary = $name[$i];
+        $val = eval "\$$ary[$j]";
+
+    or in one line
+
+        $val = eval "\$$name[$i][\$j]";
+
+    You could also use the type-globbing syntax to make an array of *name
+    values, which will be more efficient than eval.  Here @name hold a list
+    of pointers, which we'll have to dereference through a temporary
+    variable. 
+
+    For example:
+
+        { local(*ary) = $name[$i]; $val = $ary[$j]; }
+
+    In fact, you can use this method to make arbitrarily nested data
+    structures.  You really have to want to do this kind of thing badly to
+    go this far, however, as it is notationally cumbersome. 
+
+    Let's assume you just simply *have* to have an array of arrays of
+    arrays.  What you do is make an array of pointers to arrays of
+    pointers, where pointers are *name values described above.  You  
+    initialize the outermost array normally, and then you build up your
+    pointers from there.  For example:
+
+        @w = ( 'ww' .. 'xx' );
+        @x = ( 'xx' .. 'yy' );
+        @y = ( 'yy' .. 'zz' );
+        @z = ( 'zz' .. 'zzz' );
+
+        @ww = reverse @w;
+        @xx = reverse @x;
+        @yy = reverse @y;
+        @zz = reverse @z;
+
+    Now make a couple of arrays of pointers to these:
+
+        @A = ( *w, *x, *y, *z );
+        @B = ( *ww, *xx, *yy, *zz );
+
+    And finally make an array of pointers to these arrays:
+
+        @AAA = ( *A, *B );
+
+    To access an element, such as AAA[i][j][k], you must do this:
+
+        local(*foo) = $AAA[$i];
+        local(*bar) = $foo[$j];
+        $answer = $bar[$k];
+
+    Similar manipulations on associative arrays are also feasible.
+
+    You could take a look at recurse.pl package posted by Felix Lee*, which
+    lets you simulate vectors and tables (lists and associative arrays) by
+    using type glob references and some pretty serious wizardry.
+
+    In C, you're used to creating recursive datatypes for operations like
+    recursive decent parsing or tree traversal.  In Perl, these algorithms
+    are best implemented using associative arrays.  Take an array called
+    %parent, and build up pointers such that $parent{$person} is the name
+    of that person's parent.  Make sure you remember that $parent{'adam'}
+    is 'adam'. :-) With a little care, this approach can be used to
+    implement general graph traversal algorithms as well. 
+
+
+5.3) How do I make an array of structures containing various data types?
+
+    This answer will work under perl5 only.  Did we mention that you should
+    upgrade?  There is a perl4 solution, but you are using perl5 now,
+    anyway, so there's no point in posting it.  Right?
+
+    The best way to do this is to use an associative array to model your
+    structure, then either a regular array (AKA list) or another
+    associative array (AKA hash, table, or hash table) to store it.
+
+        %foo = (
+                   'field1'        => "value1",
+                   'field2'        => "value2",
+                   'field3'        => "value3",
+                   ...
+               );
+        ...
+
+        @all = ( \%foo, \%bar, ... );
+
+        print $all[0]{'field1'};
+
+    Or even
+
+        @all = (
+           {
+               'field1'        => "value1",
+               'field2'        => "value2",
+               'field3'        => "value3",
+               ...
+           },
+           {
+               'field1'        => "value1",
+               'field2'        => "value2",
+               'field3'        => "value3",
+               ...
+           },
+           ...
+        )
+
+    Note that if you want an associative array of lists, you'll want to make
+    assignments like
+
+        $t{$value} = [ @bar ];
+
+    And with lists of associative arrays, you'll use
+
+        %{$a[$i]} = %old;
+
+    Study these for a while, and in an upcoming FAQ, we'll explain them fully:
+
+        $table{'some key'}    =   @big_list_o_stuff;   # SCARY #0
+        $table{'some key'}    =  \@big_list_o_stuff;   # SCARY #1
+        @$table{'some key'}   =   @big_list_o_stuff;   # SCARY #2
+        @{$table{'some key'}} =   @big_list_o_stuff;   # ICKY RANDALIAN CODE
+        $table{'some key'}    = [ @big_list_o_stuff ]; # same, but NICE
+
+    And while you're at it, take a look at these:
+
+        $table{"051"}         = $some_scalar;          # SCARY #3
+        $table{"0x51"}        = $some_scalar;          # ditto
+        $table{051}           = $some_scalar;          # ditto
+        $table{0x51}          = $some_scalar;          # ditto
+        $table{51}            = $some_scalar;          # ok, i guess
+        $table{"51"}          = $some_scalar;          # better
+
+        $table{\@x}           = $some_scalar;          # SCARY #4
+        $table{[@x]}          = $some_scalar;          # ditto
+        $table{@x}            = $some_scalar;          # SCARY #5 (cf #0)
+
+
+    See perlref(1) for details.
+
+
+5.4) How can I extract just the unique elements of an array?
+
+    There are several possible ways, depending on whether the
+    array is ordered and you wish to preserve the ordering.
+
+    a) If @in is sorted, and you want @out to be sorted:
+
+        $prev = 'nonesuch';
+        @out = grep($_ ne $prev && (($prev) = $_), @in);
+
+       This is nice in that it doesn't use much extra memory, 
+       simulating uniq's behavior of removing only adjacent
+       duplicates.
+
+    b) If you don't know whether @in is sorted:
+
+        undef %saw;
+        @out = grep(!$saw{$_}++, @in);
+
+    c) Like (b), but @in contains only small integers:
+
+        @out = grep(!$saw[$_]++, @in);
+
+    d) A way to do (b) without any loops or greps:
+
+        undef %saw;
+        @saw{@in} = ();
+        @out = sort keys %saw;  # remove sort if undesired
+
+    e) Like (d), but @in contains only small positive integers:
+
+        undef @ary;
+        @ary[@in] = @in;
+        @out = sort @ary;
+
+
+5.5) How can I tell whether an array contains a certain element?
+
+    There are several ways to approach this.  If you are going to make
+    this query many times and the values are arbitrary strings, the
+    fastest way is probably to invert the original array and keep an
+    associative array lying about whose keys are the first array's values.
+
+        @blues = ('turquoise', 'teal', 'lapis lazuli');
+        undef %is_blue;
+        for (@blues) { $is_blue{$_} = 1; }
+
+    Now you can check whether $is_blue{$some_color}.  It might have been
+    a good idea to keep the blues all in an assoc array in the first place.
+
+    If the values are all small integers, you could use a simple
+    indexed array.  This kind of an array will take up less space:
+
+        @primes = (2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31);
+        undef @is_tiny_prime;
+        for (@primes) { $is_tiny_prime[$_] = 1; }
+
+    Now you check whether $is_tiny_prime[$some_number].
+
+    If the values in question are integers instead of strings, you can save
+    quite a lot of space by using bit strings instead: 
+
+        @articles = ( 1..10, 150..2000, 2017 );
+        undef $read;
+        grep (vec($read,$_,1) = 1, @articles);
+    
+    Now check whether vec($read,$n,1) is true for some $n.
+
+
+5.6) How do I sort an associative array by value instead of by key?
+
+    You have to declare a sort subroutine to do this, or use an inline
+    function.  Let's assume you want an ASCII sort on the values of the
+    associative array %ary.  You could do so this way:
+
+        foreach $key (sort by_value keys %ary) {
+            print $key, '=', $ary{$key}, "\n";
+        } 
+        sub by_value { $ary{$a} cmp $ary{$b}; }
+
+    If you wanted a descending numeric sort, you could do this:
+
+        sub by_value { $ary{$b} <=> $ary{$a}; }
+
+    You can also inline your sort function, like this, at least if 
+    you have a relatively recent patchlevel of perl4 or are running perl5:
+
+        foreach $key ( sort { $ary{$b} <=> $ary{$a} } keys %ary ) {
+            print $key, '=', $ary{$key}, "\n";
+        } 
+
+    If you wanted a function that didn't have the array name hard-wired
+    into it, you could so this:
+
+        foreach $key (&sort_by_value(*ary)) {
+            print $key, '=', $ary{$key}, "\n";
+        } 
+        sub sort_by_value {
+            local(*x) = @_;
+            sub _by_value { $x{$a} cmp $x{$b}; } 
+            sort _by_value keys %x;
+        } 
+
+    If you want neither an alphabetic nor a numeric sort, then you'll 
+    have to code in your own logic instead of relying on the built-in
+    signed comparison operators "cmp" and "<=>".
+
+    Note that if you're sorting on just a part of the value, such as a
+    piece you might extract via split, unpack, pattern-matching, or
+    substr, then rather than performing that operation inside your sort
+    routine on each call to it, it is significantly more efficient to
+    build a parallel array of just those portions you're sorting on, sort
+    the indices of this parallel array, and then to subscript your original
+    array using the newly sorted indices.  This method works on both
+    regular and associative arrays, since both @ary[@idx] and @ary{@idx}
+    make sense.  See page 245 in the Camel Book on "Sorting an Array by a
+    Computable Field" for a simple example of this.
+
+    For example, here's an efficient case-insensitive comparison:
+
+        @idx = ();
+        for (@data) { push (@idx, "\U$_") }
+        @sorted = @data[ sort { $idx[$a] cmp $idx[$b] } 0..$#data];
+
+
+5.7) How can I know how many entries are in an associative array?
+
+    While the number of elements in a @foobar array is simply @foobar when
+    used in a scalar, you can't figure out how many elements are in an
+    associative array in an analogous fashion.  That's because %foobar in
+    a scalar context returns the ratio (as a string) of number of buckets
+    filled versus the number allocated.  For example, scalar(%ENV) might
+    return "20/32".  While perl could in theory keep a count, this would
+    break down on associative arrays that have been bound to dbm files.
+
+    However, while you can't get a count this way, one thing you *can* use
+    it for is to determine whether there are any elements whatsoever in
+    the array, since "if (%table)" is guaranteed to be false if nothing
+    has ever been stored in it.  
+
+    As of perl4.035, you can says
+
+        $count = keys %ARRAY;
+
+    keys() when used in a scalar context will return the number of keys,
+    rather than the keys themselves.
+
+
+5.8) What's the difference between "delete" and "undef" with %arrays?
+
+    Pictures help...  here's the %ary table:
+
+              keys  values
+            +------+------+
+            |  a   |  3   |
+            |  x   |  7   |
+            |  d   |  0   |
+            |  e   |  2   |
+            +------+------+
+
+    And these conditions hold
+
+            $ary{'a'}                       is true
+            $ary{'d'}                       is false
+            defined $ary{'d'}               is true
+            defined $ary{'a'}               is true
+            exists $ary{'a'}                is true (perl5 only)
+            grep ($_ eq 'a', keys %ary)     is true
+
+    If you now say 
+
+            undef $ary{'a'}
+
+    your table now reads:
+            
+
+              keys  values
+            +------+------+
+            |  a   | undef|
+            |  x   |  7   |
+            |  d   |  0   |
+            |  e   |  2   |
+            +------+------+
+
+    and these conditions now hold; changes in caps:
+
+            $ary{'a'}                       is FALSE
+            $ary{'d'}                       is false
+            defined $ary{'d'}               is true
+            defined $ary{'a'}               is FALSE
+            exists $ary{'a'}                is true (perl5 only)
+            grep ($_ eq 'a', keys %ary)     is true
+
+    Notice the last two: you have an undef value, but a defined key!
+
+    Now, consider this:
+
+            delete $ary{'a'}
+
+    your table now reads:
+
+              keys  values
+            +------+------+
+            |  x   |  7   |
+            |  d   |  0   |
+            |  e   |  2   |
+            +------+------+
+
+    and these conditions now hold; changes in caps:
+
+            $ary{'a'}                       is false
+            $ary{'d'}                       is false
+            defined $ary{'d'}               is true
+            defined $ary{'a'}               is false
+            exists $ary{'a'}                is FALSE (perl5 only)
+            grep ($_ eq 'a', keys %ary)     is FALSE
+
+    See, the whole entry is gone!
+
+
+5.9) Why don't backticks work as they do in shells?  
+
+    Several reasons.  One is because backticks do not interpolate within
+    double quotes in Perl as they do in shells.  
+    
+    Let's look at two common mistakes:
+
+         $foo = "$bar is `wc $file`";  # WRONG
+
+    This should have been:
+
+         $foo = "$bar is " . `wc $file`;
+
+    But you'll have an extra newline you might not expect.  This
+    does not work as expected:
+
+      $back = `pwd`; chdir($somewhere); chdir($back); # WRONG
+
+    Because backticks do not automatically eat trailing or embedded
+    newlines.  The chop() function will remove the last character from
+    a string.  This should have been:
+
+          chop($back = `pwd`); chdir($somewhere); chdir($back);
+
+    You should also be aware that while in the shells, embedding
+    single quotes will protect variables, in Perl, you'll need 
+    to escape the dollar signs.
+
+        Shell: foo=`cmd 'safe $dollar'`
+        Perl:  $foo=`cmd 'safe \$dollar'`;
+        
+
+5.10) How come my converted awk/sed/sh script runs more slowly in Perl?
+
+    The natural way to program in those languages may not make for the fastest
+    Perl code.  Notably, the awk-to-perl translator produces sub-optimal code;
+    see the a2p man page for tweaks you can make.
+
+    Two of Perl's strongest points are its associative arrays and its regular
+    expressions.  They can dramatically speed up your code when applied
+    properly.  Recasting your code to use them can help a lot.
+
+    How complex are your regexps?  Deeply nested sub-expressions with {n,m} or
+    * operators can take a very long time to compute.  Don't use ()'s unless
+    you really need them.  Anchor your string to the front if you can.
+
+    Something like this:
+        next unless /^.*%.*$/; 
+    runs more slowly than the equivalent:
+        next unless /%/;
+
+    Note that this:
+        next if /Mon/;
+        next if /Tue/;
+        next if /Wed/;
+        next if /Thu/;
+        next if /Fri/;
+    runs faster than this:
+        next if /Mon/ || /Tue/ || /Wed/ || /Thu/ || /Fri/;
+    which in turn runs faster than this:
+        next if /Mon|Tue|Wed|Thu|Fri/;
+    which runs *much* faster than:
+        next if /(Mon|Tue|Wed|Thu|Fri)/;
+
+    There's no need to use /^.*foo.*$/ when /foo/ will do.
+
+    Remember that a printf costs more than a simple print.
+
+    Don't split() every line if you don't have to.
+
+    Another thing to look at is your loops.  Are you iterating through 
+    indexed arrays rather than just putting everything into a hashed 
+    array?  For example,
+
+        @list = ('abc', 'def', 'ghi', 'jkl', 'mno', 'pqr', 'stv');
+
+        for $i ($[ .. $#list) {
+            if ($pattern eq $list[$i]) { $found++; } 
+        } 
+
+    First of all, it would be faster to use Perl's foreach mechanism
+    instead of using subscripts:
+
+        foreach $elt (@list) {
+            if ($pattern eq $elt) { $found++; } 
+        } 
+
+    Better yet, this could be sped up dramatically by placing the whole
+    thing in an associative array like this:
+
+        %list = ('abc', 1, 'def', 1, 'ghi', 1, 'jkl', 1, 
+                 'mno', 1, 'pqr', 1, 'stv', 1 );
+        $found += $list{$pattern};
+    
+    (but put the %list assignment outside of your input loop.)
+
+    You should also look at variables in regular expressions, which is
+    expensive.  If the variable to be interpolated doesn't change over the
+    life of the process, use the /o modifier to tell Perl to compile the
+    regexp only once, like this:
+
+        for $i (1..100) {
+            if (/$foo/o) {
+                &some_func($i);
+            } 
+        } 
+
+    Finally, if you have a bunch of patterns in a list that you'd like to 
+    compare against, instead of doing this:
+
+        @pats = ('_get.*', 'bogus', '_read', '.*exit', '_write');
+        foreach $pat (@pats) {
+            if ( $name =~ /^$pat$/ ) {
+                &some_func();
+                last;
+            }
+        }
+
+    If you build your code and then eval it, it will be much faster.
+    For example:
+
+        @pats = ('_get.*', 'bogus', '_read', '.*exit', '_write');
+        $code = <<EOS
+                while (<>) { 
+                    study;
+EOS
+        foreach $pat (@pats) {
+            $code .= <<EOS
+                if ( /^$pat\$/ ) {
+                    &some_func();
+                    next;
+                }
+EOS
+        }
+        $code .= "}\n";
+        print $code if $debugging;
+        eval $code;
+
+
+
+5.11) How can I call my system's unique C functions from Perl?
+
+    If these are system calls and you have the syscall() function, then
+    you're probably in luck -- see the next question.  If you're using a 
+    POSIX function, and are running perl5, you're also in luck: see
+    POSIX(3m).  For arbitrary library functions, however, it's not quite so 
+    straight-forward.  See "Where can I learn about linking C with Perl?".
+
+
+5.12) Where do I get the include files to do ioctl() or syscall()? [h2ph]
+
+    [Note: as of perl5, you probably want to just use h2xs instead, at
+    least, if your system supports dynamic loading.]
+
+    These are generated from your system's C include files using the h2ph
+    script (once called makelib) from the Perl source directory.  This will
+    make files containing subroutine definitions, like &SYS_getitimer, which
+    you can use as arguments to your function.
+
+    You might also look at the h2pl subdirectory in the Perl source for how to
+    convert these to forms like $SYS_getitimer; there are both advantages and
+    disadvantages to this.  Read the notes in that directory for details.  
+   
+    In both cases, you may well have to fiddle with it to make these work; it
+    depends how funny-looking your system's C include files happen to be.
+
+    If you're trying to get at C structures, then you should take a look
+    at using c2ph, which uses debugger "stab" entries generated by your
+    BSD or GNU C compiler to produce machine-independent perl definitions
+    for the data structures.  This allows to you avoid hardcoding
+    structure layouts, types, padding, or sizes, greatly enhancing
+    portability.  c2ph comes with the perl distribution.  On an SCO
+    system, GCC only has COFF debugging support by default, so you'll have
+    to build GCC 2.1 with DBX_DEBUGGING_INFO defined, and use -gstabs to
+    get c2ph to work there.
+
+    See the file /pub/perl/info/ch2ph on convex.com via anon ftp 
+    for more traps and tips on this process.
+
+
+5.13) Why do setuid Perl scripts complain about kernel problems?
+
+    This message:
+
+    YOU HAVEN'T DISABLED SET-ID SCRIPTS IN THE KERNEL YET!
+    FIX YOUR KERNEL, PUT A C WRAPPER AROUND THIS SCRIPT, OR USE -u AND UNDUMP!
+
+    is triggered because setuid scripts are inherently insecure due to a
+    kernel bug.  If your system has fixed this bug, you can compile Perl
+    so that it knows this.  Otherwise, create a setuid C program that just
+    execs Perl with the full name of the script.  Here's what the
+    perldiag(1) man page says about this message:
+
+        YOU HAVEN'T DISABLED SET-ID SCRIPTS IN THE KERNEL YET!
+          (F) And you probably never will, since you probably don't have
+          the sources to your kernel, and your vendor probably doesn't
+          give a rip about what you want.  Your best bet is to use the
+          wrapsuid script in the eg directory to put a setuid C wrapper
+          around your script.
+
+
+5.14) How do I open a pipe both to and from a command?
+
+    In general, this is a dangerous move because you can find yourself in a
+    deadlock situation.  It's better to put one end of the pipe to a file.
+    For example:
+
+        # first write some_cmd's input into a_file, then 
+        open(CMD, "some_cmd its_args < a_file |");
+        while (<CMD>) {
+
+        # or else the other way; run the cmd
+        open(CMD, "| some_cmd its_args > a_file");
+        while ($condition) {
+            print CMD "some output\n";
+            # other code deleted
+        } 
+        close CMD || warn "cmd exited $?";
+
+        # now read the file
+        open(FILE,"a_file");
+        while (<FILE>) {
+
+    If you have ptys, you could arrange to run the command on a pty and
+    avoid the deadlock problem.  See the chat2.pl package in the
+    distributed library for ways to do this.
+
+    At the risk of deadlock, it is theoretically possible to use a
+    fork, two pipe calls, and an exec to manually set up the two-way
+    pipe.  (BSD system may use socketpair() in place of the two pipes,
+    but this is not as portable.)  The open2 library function distributed
+    with the current perl release will do this for you.
+
+    This assumes it's going to talk to something like adb, both writing to
+    it and reading from it.  This is presumably safe because you "know"
+    that commands like adb will read a line at a time and output a line at
+    a time.  Programs like sort or cat that read their entire input stream
+    first, however, are quite apt to cause deadlock.
+
+    There's also an open3.pl library that handles this for stderr as well.
+
+
+5.15) How can I capture STDERR from an external command?
+
+    There are three basic ways of running external commands:
+
+        system $cmd;
+        $output = `$cmd`;
+        open (PIPE, "cmd |");
+
+    In the first case, both STDOUT and STDERR will go the same place as
+    the script's versions of these, unless redirected.  You can always put
+    them where you want them and then read them back when the system
+    returns.  In the second and third cases, you are reading the STDOUT
+    *only* of your command.  If you would like to have merged STDOUT and
+    STDERR, you can use shell file-descriptor redirection to dup STDERR to
+    STDOUT:
+
+        $output = `$cmd 2>&1`;
+        open (PIPE, "cmd 2>&1 |");
+
+    Another possibility is to run STDERR into a file and read the file 
+    later, as in 
+
+        $output = `$cmd 2>some_file`;
+        open (PIPE, "cmd 2>some_file |");
+
+    Note that you *cannot* simply open STDERR to be a dup of STDOUT 
+    in your perl program and avoid calling the shell to do the redirection.
+    This doesn't work:
+
+        open(STDERR, ">&STDOUT");
+        $alloutput = `cmd args`;  # stderr still escapes
+    
+    Here's a way to read from both of them and know which descriptor
+    you got each line from.  The trick is to pipe only STDOUT through
+    sed, which then marks each of its lines, and then sends that
+    back into a merged STDOUT/STDERR stream, from which your Perl program
+    then reads a line at a time:
+
+        open (CMD, 
+          "(cmd args | sed 's/^/STDOUT:/') 2>&1 |");
+
+        while (<CMD>) {
+          if (s/^STDOUT://)  {
+              print "line from stdout: ", $_;
+          } else {
+              print "line from stderr: ", $_;
+          }
+        }
+
+    Be apprised that you *must* use Bourne shell redirection syntax in
+    backticks, not csh!  For details on how lucky you are that perl's
+    system() and backtick and pipe opens all use Bourne shell, fetch the
+    file from convex.com called /pub/csh.whynot -- and you'll be glad that
+    perl's shell interface is the Bourne shell.
+
+    There's an &open3 routine out there which was merged with &open2 in
+    perl5 production. 
+
+
+5.16) Why doesn't open return an error when a pipe open fails?
+
+    These statements:
+
+        open(TOPIPE, "|bogus_command") || die ...
+        open(FROMPIPE, "bogus_command|") || die ...
+
+    will not fail just for lack of the bogus_command.  They'll only
+    fail if the fork to run them fails, which is seldom the problem.
+
+    If you're writing to the TOPIPE, you'll get a SIGPIPE if the child
+    exits prematurely or doesn't run.  If you are reading from the
+    FROMPIPE, you need to check the close() to see what happened.
+
+    If you want an answer sooner than pipe buffering might otherwise
+    afford you, you can do something like this:
+
+        $kid = open (PIPE, "bogus_command |");   # XXX: check defined($kid)
+        (kill 0, $kid) || die "bogus_command failed";
+
+    This works fine if bogus_command doesn't have shell metas in it, but
+    if it does, the shell may well not have exited before the kill 0.  You
+    could always introduce a delay:
+
+        $kid = open (PIPE, "bogus_command </dev/null |");
+        sleep 1;
+        (kill 0, $kid) || die "bogus_command failed";
+
+    but this is sometimes undesirable, and in any event does not guarantee
+    correct behavior.  But it seems slightly better than nothing.
+
+    Similar tricks can be played with writable pipes if you don't wish to
+    catch the SIGPIPE.
+
+
+5.##) How do I capture the exit status from an external program?
+
+    Perl provides a builtin variable which holds the status of the last
+    backtick command: $?.  Here is exactly what the perlvar page says about
+    this variable:
+
+     $?      The status returned by the last pipe close, backtick
+             (``) command, or system() operator.  Note that this
+             is the status word returned by the wait() system
+             call, so the exit value of the subprocess is
+             actually ($? >> 8).  Thus on many systems, $? & 255
+             gives which signal, if any, the process died from,
+             and whether there was a core dump.  (Mnemonic:
+             similar to sh and ksh.)
+
+
+5.17) Why can't my perl program read from STDIN after I gave it ^D (EOF) ?
+
+    Because some stdio's set error and eof flags that need clearing.
+
+    Try keeping around the seekpointer and go there, like this:
+         $where = tell(LOG);
+         seek(LOG, $where, 0);
+
+    If that doesn't work, try seeking to a different part of the file and
+    then back.  If that doesn't work, try seeking to a different part of
+    the file, reading something, and then seeking back.  If that doesn't
+    work, give up on your stdio package and use sysread.  You can't call
+    stdio's clearerr() from Perl, so if you get EINTR from a signal
+    handler, you're out of luck.  Best to just use sysread() from the
+    start for the tty.
+
+
+5.18) How can I translate tildes in a filename?
+
+    Perl doesn't expand tildes -- the shell (ok, some shells) do.
+    The classic request is to be able to do something like:
+
+        open(FILE, "~/dir1/file1");
+        open(FILE, "~tchrist/dir1/file1");
+
+    which doesn't work.  (And you don't know it, because you 
+    did a system call without an "|| die" clause! :-)
+
+    If you *know* you're on a system with the csh, and you *know*
+    that Larry hasn't internalized file globbing, then you could
+    get away with 
+
+        $filename = <~tchrist/dir1/file1>;
+
+    but that's pretty iffy.
+
+    A better way is to do the translation yourself, as in:
+
+        $filename =~ s#^~(\w+)(/.*)?$#(getpwnam($1))[7].$2#e;
+
+    More robust and efficient versions that checked for error conditions,
+    handed simple ~/blah notation, and cached lookups are all reasonable
+    enhancements.
+
+
+5.19) How can I convert my shell script to Perl?
+
+    Larry's standard answer is to send it through the shell to perl filter,
+    otherwise known at tchrist@perl.com.  Contrary to popular belief, Tom
+    Christiansen isn't a real person.  He is actually a highly advanced 
+    artificial intelligence experiment written by a graduate student at the
+    University of Colorado.  Some of the earlier tasks he was programmed to
+    perform included:
+
+        * monitor comp.lang.perl.misc and collect statistics on which
+	  questions were asked with which frequency and to respond to them
+	  with stock answers.  Tom's programming has since outgrown this
+	  paltry task, and it was assigned to an undergraduate student from
+	  the University of Florida.  After all, we all know that students
+	  from UF aren't able to do much more than documentation anyway.
+	  Against all odds, that undergraduate student has become a
+	  professional system administrator, perl programmer, and now
+	  author of the second edition of "Programming Perl".
+        * convert shell programs to perl programs
+
+    (This *IS* a joke... please quit calling me and asking about it!)
+
+    Actually, there is no automatic machine translator.  Even if there
+    were, you wouldn't gain a lot, as most of the external programs would 
+    still get called.  It's the same problem as blind translation into C:
+    you're still apt to be bogged down by exec()s.  You have to analyze
+    the dataflow and algorithm and rethink it for optimal speedup.  It's
+    not uncommon to see one, two, or even three orders of magnitude of
+    speed difference between the brute-force and the recoded approaches.
+
+
+5.20) Can I use Perl to run a telnet or ftp session?
+
+    Sure, you can connect directly to them using sockets, or you can run a
+    session on a pty.  In either case, Randal's chat2 package, which is
+    distributed with the perl source, will come in handly.  It address
+    much the same problem space as Don Libes's expect package does.  Two
+    examples of using managing an ftp session using chat2 can be found on
+    convex.com in /pub/perl/scripts/ftp-chat2.shar .
+
+    Caveat lector: chat2 is documented only by example, may not run on
+    System V systems, and is subtly machine dependent both in its ideas
+    of networking and in pseudottys.  See also question 4.21, "Why doesn't
+    my sockets program work under System V (Solaris)?"
+
+    Randal also has code showing an example socket session for handling the
+    telnet protocol to get a weather report.  This can be found at
+    ftp.cis.ufl.edu:/pub/perl/scripts/getduatweather.pl.
+ 
+    Gene Spafford* has a nice ftp library package that will help with ftp.
+ 
+
+5.21) Why do I sometimes get an "Arguments too long" error when I use <*>?
+
+    As of perl4.036, there is a certain amount of globbing that is passed
+    out to the shell and not handled internally.  The following code (which
+    will, roughly, emulate "chmod 0644 *")
+
+        while (<*>) {
+            chmod 0644, $_;
+        }
+
+    is the equivalent of
+
+        open(FOO, "echo * | tr -s ' \t\r\f' '\\012\\012\\012\\012'|");
+        while (<FOO>) {
+            chop;
+            chmod 0644, $_;
+        }
+
+    Until globbing is built into Perl, you will need to use some form of
+    non-globbing work around.
+
+    Something like the following will work:
+
+        opendir(DIR,'.');
+        chmod 0644, grep(/\.c$/, readdir(DIR));
+        closedir(DIR);
+    
+    This example is taken directly from "Programming Perl" page 78.
+
+    If you've installed tcsh as /bin/csh, you'll never have this problem.
+
+5.22) How do I do a "tail -f" in Perl?
+
+    Larry says that the solution is to put a call to seek in yourself. 
+    First try
+
+            seek(GWFILE, 0, 1);
+
+    The statement seek(GWFILE, 0, 1); doesn't change the current position,
+    but it does clear the end-of-file condition on the handle, so that the
+    next <GWFILE> makes Perl try again to read something.
+
+    If that doesn't work (depends on your stdio implementation), then
+    you need something more like this:
+
+
+    for (;;) {
+        for ($curpos = tell(GWFILE); $_ = <GWFILE>; $curpos = tell(GWFILE)) {
+            # search for some stuff and put it into files
+        }
+        sleep for a while
+        seek(GWFILE, $curpos, 0);
+    }
+
+
+5.23) Is there a way to hide perl's command line from programs such as "ps"?
+
+    Generally speaking, if you need to do this you're either using poor
+    programming practices or are far too paranoid for your own good.  If you
+    need to do this to hide a password being entered on the command line,
+    recode the program to read the password from a file or to prompt for
+    it. (see question 4.24)  Typing a password on the command line is
+    inherently insecure as anyone can look over your shoulder to see it.
+
+    If you feel you really must overwrite the command line and hide it, you
+    can assign to the variable "$0".  For example:
+
+        #!/usr/local/bin/perl
+        $0 = "Hidden from prying eyes";
+
+        open(PS, "ps |") || die "Can't PS: $!";
+        while (<PS>) {
+            next unless m/$$/;
+            print
+        }
+
+    It should be noted that some OSes, like Solaris 2.X, read directly from
+    the kernel information, instead of from the program's stack, and hence
+    don't allow you to change the command line.
+
+
+5.24) I {changed directory, modified my environment} in a perl script.  How
+      come the change disappeared when I exited the script?  How do I get
+      my changes to be visible?
+
+    In the strictest sense, it "can't" be done.  However, there is special
+    shell magic which may allow you to do it.  I suggest checking out
+    comp.unix.shell and reading the comp.unix.questions FAQ.
+
+    When perl is started, you are creating a child process.  Due to the way
+    the Unix system is designed, children cannot permanently affect their
+    parent shells.
+
+    When a child process is created, it inherits a copy of its parents
+    environment (variables, current directory, etc).  When the child
+    changes this environment, it is changing the copy and not the original,
+    so the parent isn't affected.
+
+    If you must change the parent from within a perl script, you could try
+    having it write out a shell script or a C-shell script and then using
+    ". script" or "source script" (sh, Csh, respectively)
+    
+
+5.25) How can I use pass a filehandle to a function, or make a list of 
+      filehandles?
+
+    If you've ever tried to use a variable for a filehandle, you may well
+    have had some problems.  This is just revealing one of the icky places
+    in perl: filehandles aren't first-class citizens the way everything
+    else is, and it really gets in the way sometimes.  
+
+    Of course, it's just fine to say
+
+        $fh = "/some/path";
+        open($fh, "< $fh");
+        print $fh "string\n";
+
+    But you'll still get into trouble for trying:
+
+        $fharray[$i] = "/some/path";
+        open($fharray[$i], "< $fharray[$i]");
+        print $fharray[$i] "stuff\n";
+
+    You can also do this:
+
+        $tmp_fh = $fharray[$i];
+        print $tmp_fh "stuff\n";
+
+    But this is ok:
+
+        print { $fharray[$i] } "stuff\n";
+
+    There are about four ways of passing in a filehandle.  The way
+    everyone tries is just to pass it as a string.  
+
+        printit(Some_Handle);
+
+    Unfortunately, that doesn't work so well, because the package that
+    the printit() function is executing in may in fact not be the
+    one that the handle was opened it:
+
+    A simple fix would be to pass it in fully qualified;
+
+        printit(main::Some_Handle);
+
+    because if you don't, the function is going to have to do 
+    some crazy thing like this:
+
+    CODE 1:
+
+        sub printit {
+            my $fh = shift;
+            my $package = (caller)[0];
+            $fh =~ s/^[^':]+$/$package::$&/;
+            while (<$fh>) {
+                print;
+            } 
+        } 
+     
+    A better solution is to pass a typeglob instead:
+
+    CODE 2:
+
+        printit(*Some_Handle);
+        sub printit {
+            local *FH = shift;
+            while (<FH>) {
+                print;
+            } 
+        }
+
+    However, it turns out that you don't have to use a typeglob inside
+    the function.  This also works:
+
+    CODE 3:
+
+        printit(*Some_Handle);
+        sub printit {
+            my $fh = shift;
+            while (<$fh>) {
+                print;
+            } 
+        }
+
+    As does this even, in case you want to make an object by blessing
+    your reference:
+
+    CODE 4:
+
+        printit(\*Some_Handle);
+        sub printit {
+            my $fh = shift;
+            while (<$fh>) {
+                print;
+            } 
+        }
+
+    I used to think that you had to use 1 or preferably 2, but apparently
+    you can get away with number 3 and 4 as well.  This is nice because it
+    avoids ever assigning to a typeglob as we do it 2, which is a bit
+    risky.
+
+    Some other problems with #1: if you're using strict subs, then you
+    aren't going to be able to do that: the strict subs will gets you.
+    Instead, you'll have to pass in 'main::Some_Handle', but then down in
+    your function, you'll get blown away by strict refs, because you'll be
+    using a string a symbol.  So really, the best way is to pass the
+    typeglob (or occasionally a reference to the same).
+
+5.26) How can open a file with a leading ">" or trailing blanks?
+
+    Normally perl ignores trailing blanks in filenames, and interprets
+    certain leading characters (or a trailing "|") to mean something
+    special.  To avoid this, you might want to use a routine like this.
+    It makes non-fullpathnames into explicit relative ones, and tacks
+    a trailing null byte on the name to make perl leave it alone:
+
+        sub safe_filename {
+          local($_) = shift;
+          m#^/# ? "$_\0" : "./$_\0";
+        }
+        $fn = &safe_filename("<<<something really wicked   ");
+        open(FH, "> $fn") || "couldn't open $fn: $!";
+
+
+5.27) How can I tell if a variable is tainted?
+
+    This function works reasonably well to figure out whether a variable
+    will be disliked by the taint checks automatically enabled by setuid
+    execution:
+
+        sub tainted {
+            ! eval { join('',@_), kill 0; 1; };
+        }
+
+    and in particular, never does any system calls.
+--
+Stephen P Potter        Pencom Systems Administration         AMP Incorporated
+spp@peach.epix.net	spp@psa.pencom.com	          steve.potter@amp.com
+Home: 717-540-0131	Pager: 1-800-759-8888, 547-9561     Work: 717-986-5401
+                Systems Administation: It's a Kind of Magic

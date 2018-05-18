@@ -1,0 +1,2338 @@
+%!PS-Adobe-1.0
+%%Creator: powered:sce (Stan Eisenstat)
+%%Title: stdin (ditroff)
+%%CreationDate: Mon Feb 12 10:21:41 1996
+%%EndComments
+%!
+% Start of psdit.pro -- prolog for ditroff translator
+% Copyright (c) 1985,1987 Adobe Systems Incorporated. All Rights Reserved. 
+% GOVERNMENT END USERS: See Notice file in TranScript library directory
+% -- probably /usr/lib/ps/Notice
+% RCS: $Header: psdit.pro,v 2.2 87/11/17 16:40:42 byron Rel $
+/reencsmalldict 12 dict def
+/ReEncodeSmall
+  { reencsmalldict begin
+    /newcodesandnames exch def
+    /newfontname exch def
+    /basefontname exch def
+    /basefontdict basefontname findfont def
+    /newfont basefontdict maxlength dict def
+    basefontdict
+      { exch dup /FID ne
+	  { dup /Encoding eq
+	    { exch dup length array copy
+		newfont 3 1 roll put }
+	    { exch newfont 3 1 roll put }
+	    ifelse }
+	  { pop pop }
+	  ifelse
+       } forall
+    newfont /FontName newfontname put
+    newcodesandnames aload pop
+    newcodesandnames length 2 idiv
+      { newfont /Encoding get 3 1 roll put}
+      repeat
+    newfontname newfont definefont pop
+    end
+   } def
+
+/NLSvec [
+    8#200 /florin
+    8#201 /fi
+    8#202 /fl
+    8#203 /endash
+    8#204 /dagger
+    8#205 /daggerdbl
+    8#206 /perthousand
+    8#207 /breve
+    8#210 /dotaccent
+    8#211 /ogonek
+    8#212 /caron
+    8#213 /emdash
+    8#214 /Lslash
+    8#215 /OE
+    8#216 /dotlessi
+    8#217 /lslash
+    8#220 /oe
+    8#221 /grave
+    8#222 /quotedblleft
+    8#223 /quotedblright
+    8#224 /fraction
+    8#225 /quotesingle
+    8#226 /circumflex
+    8#227 /tilde
+    8#241 /exclamdown
+    8#242 /cent
+    8#243 /sterling
+    8#244 /currency
+    8#245 /yen
+    8#246 /brokenbar
+    8#247 /section
+    8#250 /dieresis
+    8#251 /copyright
+    8#252 /ordfeminine
+    8#253 /guillemotleft
+    8#254 /logicalnot
+    8#255 /hyphen
+    8#256 /registered
+    8#257 /macron
+    8#260 /ring
+    8#261 /plusminus
+    8#262 /twosuperior
+    8#263 /threesuperior
+    8#264 /acute
+    8#265 /mu
+    8#266 /paragraph
+    8#267 /periodcentered
+    8#270 /cedilla
+    8#271 /onesuperior
+    8#272 /ordmasculine
+    8#273 /guillemotright
+    8#274 /onequarter
+    8#275 /onehalf
+    8#276 /threequarters
+    8#277 /questiondown
+    8#300 /Agrave
+    8#301 /Aacute
+    8#302 /Acircumflex
+    8#303 /Atilde
+    8#304 /Adieresis
+    8#305 /Aring
+    8#306 /AE
+    8#307 /Ccedilla
+    8#310 /Egrave
+    8#311 /Eacute
+    8#312 /Ecircumflex
+    8#313 /Edieresis
+    8#314 /Igrave
+    8#315 /Iacute
+    8#316 /Icircumflex
+    8#317 /Idieresis
+    8#320 /Eth
+    8#321 /Ntilde
+    8#322 /Ograve
+    8#323 /Oacute
+    8#324 /Ocircumflex
+    8#325 /Otilde
+    8#326 /Odieresis
+    8#327 /multiply
+    8#330 /Oslash
+    8#331 /Ugrave
+    8#332 /Uacute
+    8#333 /Ucircumflex
+    8#334 /Udieresis
+    8#335 /Yacute
+    8#336 /Thorn
+    8#337 /germandbls
+    8#340 /agrave
+    8#341 /aacute
+    8#342 /acircumflex
+    8#343 /atilde
+    8#344 /adieresis
+    8#345 /aring
+    8#346 /ae
+    8#347 /ccedilla
+    8#350 /egrave
+    8#351 /eacute
+    8#352 /ecircumflex
+    8#353 /edieresis
+    8#354 /igrave
+    8#355 /iacute
+    8#356 /icircumflex
+    8#357 /idieresis
+    8#360 /eth
+    8#361 /ntilde
+    8#362 /ograve
+    8#363 /oacute
+    8#364 /ocircumflex
+    8#365 /otilde
+    8#366 /odieresis
+    8#367 /divide
+    8#370 /oslash
+    8#371 /ugrave
+    8#372 /uacute
+    8#373 /ucircumflex
+    8#374 /udieresis
+    8#375 /yacute
+    8#376 /thorn
+    8#377 /ydieresis
+  ] def
+/Odict 10 dict def
+/O{
+   Odict begin
+   /maxwidth 0 def /chars exch def
+   chars {
+	/code exch def
+	( ) dup 0 code put
+	stringwidth pop dup
+	maxwidth gt {/maxwidth exch def} {pop} ifelse
+    } forall
+    currentpoint /y exch def /x exch def
+    chars {
+	/code exch def
+	( ) dup 0 code put dup
+	stringwidth pop
+	maxwidth sub 2 div neg 0 rmoveto
+	show x y moveto
+    } forall
+    maxwidth 0 rmoveto
+    end
+} def
+/$DITroff 140 dict def $DITroff begin
+/fontnum 1 def /fontsize 10 def /fontheight 10 def /fontslant 0 def
+/PB{save /psv exch def currentpoint translate
+  resolution 72 div dup neg scale 0 0 moveto}def
+/PE{psv restore}def
+/m1 matrix def /m2 matrix def /m3 matrix def /oldmat matrix def
+/tan{dup sin exch cos div}bind def
+/point{resolution 72 div mul}bind def
+/dround	{transform round exch round exch itransform}bind def
+/xT{/devname exch def}def
+/xr{/mh exch def /my exch def /resolution exch def}def
+/xp{}def
+/xs{docsave restore end}def
+/xt{}def
+/xf{/fontname exch def /slotno exch def fontnames slotno get fontname eq not
+ {fonts slotno fontname findfont put fontnames slotno fontname put}if}def
+/xff{/NLfontname exch def
+ /fontname exch def /slotno exch def fontnames slotno get fontname eq not
+ {fontname NLfontname NLSvec ReEncodeSmall
+  fonts slotno NLfontname findfont put fontnames slotno fontname put}if}def
+/xH{/fontheight exch def F}bind def
+/xS{/fontslant exch def F}bind def
+/s{/fontsize exch def /fontheight fontsize def F}bind def
+/f{/fontnum exch def F}bind def
+/F{fontheight 0 le {/fontheight fontsize def}if
+   fonts fontnum get fontsize point 0 0 fontheight point neg 0 0 m1 astore
+   fontslant 0 ne{1 0 fontslant tan 1 0 0 m2 astore m3 concatmatrix}if
+   makefont setfont .04 fontsize point mul 0 dround pop setlinewidth}bind def
+/X{exch currentpoint exch pop moveto show}bind def
+/N{3 1 roll moveto show}bind def
+/Y{exch currentpoint pop exch moveto show}bind def
+/S /show load def
+/ditpush{}def/ditpop{}def
+/AX{3 -1 roll currentpoint exch pop moveto 0 exch ashow}bind def
+/AN{4 2 roll moveto 0 exch ashow}bind def
+/AY{3 -1 roll currentpoint pop exch moveto 0 exch ashow}bind def
+/AS{0 exch ashow}bind def
+/MX{currentpoint exch pop moveto}bind def
+/MY{currentpoint pop exch moveto}bind def
+/MXY /moveto load def
+/cb{pop}def	% action on unknown char -- nothing for now
+/n{}def/w{}def
+/p{pop showpage pagesave restore /pagesave save def}def
+/abspoint{currentpoint exch pop add exch currentpoint pop add exch}def
+/dstroke{currentpoint stroke moveto}bind def
+/Dl{2 copy gsave rlineto stroke grestore rmoveto}bind def
+/arcellipse{oldmat currentmatrix pop
+ currentpoint translate 1 diamv diamh div scale /rad diamh 2 div def
+ rad 0 rad -180 180 arc oldmat setmatrix}def
+/Dc{gsave dup /diamv exch def /diamh exch def arcellipse dstroke 
+    grestore diamh 0 rmoveto}def
+/De{gsave /diamv exch def /diamh exch def arcellipse dstroke
+    grestore diamh 0 rmoveto}def
+/Da{currentpoint /by exch def /bx exch def /fy exch def /fx exch def
+   /cy exch def /cx exch def /rad cx cx mul cy cy mul add sqrt def
+   /ang1 cy neg cx neg atan def /ang2 fy fx atan def cx bx add cy by add
+   2 copy rad ang1 ang2 arcn stroke exch fx add exch fy add moveto}def
+/Barray 200 array def % 200 values in a wiggle
+/D~{mark}def
+/D~~{counttomark Barray exch 0 exch getinterval astore /Bcontrol exch def pop
+ /Blen Bcontrol length def Blen 4 ge Blen 2 mod 0 eq and
+ {Bcontrol 0 get Bcontrol 1 get abspoint /Ycont exch def /Xcont exch def
+  Bcontrol 0 2 copy get 2 mul put Bcontrol 1 2 copy get 2 mul put
+  Bcontrol Blen 2 sub 2 copy get 2 mul put
+  Bcontrol Blen 1 sub 2 copy get 2 mul put
+  /Ybi /Xbi currentpoint 3 1 roll def def 0 2 Blen 4 sub
+  {/i exch def
+   Bcontrol i get 3 div Bcontrol i 1 add get 3 div
+   Bcontrol i get 3 mul Bcontrol i 2 add get add 6 div
+   Bcontrol i 1 add get 3 mul Bcontrol i 3 add get add 6 div
+   /Xbi Xcont Bcontrol i 2 add get 2 div add def
+   /Ybi Ycont Bcontrol i 3 add get 2 div add def
+   /Xcont Xcont Bcontrol i 2 add get add def
+   /Ycont Ycont Bcontrol i 3 add get add def
+   Xbi currentpoint pop sub Ybi currentpoint exch pop sub rcurveto
+  }for dstroke}if}def
+end
+/ditstart{$DITroff begin
+ /nfonts 60 def			% NFONTS makedev/ditroff dependent!
+ /fonts[nfonts{0}repeat]def
+ /fontnames[nfonts{()}repeat]def
+/docsave save def
+}def
+
+% character outcalls
+/oc {/pswid exch def /cc exch def /name exch def
+   /ditwid pswid fontsize mul resolution mul 72000 div def
+   /ditsiz fontsize resolution mul 72 div def
+   ocprocs name known{ocprocs name get exec}{name cb}
+   ifelse}def
+/fractm [.65 0 0 .6 0 0] def
+/fraction
+ {/fden exch def /fnum exch def gsave /cf currentfont def
+  cf fractm makefont setfont 0 .3 dm 2 copy neg rmoveto
+  fnum show rmoveto currentfont cf setfont(\224)show setfont fden show 
+  grestore ditwid 0 rmoveto} def
+/oce {grestore ditwid 0 rmoveto}def
+/dm {ditsiz mul}def
+/ocprocs 50 dict def ocprocs begin
+(14){(1)(4)fraction}def
+(12){(1)(2)fraction}def
+(34){(3)(4)fraction}def
+(13){(1)(3)fraction}def
+(23){(2)(3)fraction}def
+(18){(1)(8)fraction}def
+(38){(3)(8)fraction}def
+(58){(5)(8)fraction}def
+(78){(7)(8)fraction}def
+(sr){gsave .05 dm .16 dm rmoveto(\326)show oce}def
+(is){gsave 0 .15 dm rmoveto(\362)show oce}def
+(->){gsave 0 .02 dm rmoveto(\256)show oce}def
+(<-){gsave 0 .02 dm rmoveto(\254)show oce}def
+(==){gsave 0 .05 dm rmoveto(\272)show oce}def
+end
+% DIThacks fonts for some special chars
+50 dict dup begin
+/FontType 3 def
+/FontName /DIThacks def
+/FontMatrix [.001 0.0 0.0 .001 0.0 0.0] def
+/FontBBox [-220 -280 900 900] def% a lie but ...
+/Encoding 256 array def
+0 1 255{Encoding exch /.notdef put}for
+Encoding
+ dup 8#040/space put %space
+ dup 8#110/rc put %right ceil
+ dup 8#111/lt put %left  top curl
+ dup 8#112/bv put %bold vert
+ dup 8#113/lk put %left  mid curl
+ dup 8#114/lb put %left  bot curl
+ dup 8#115/rt put %right top curl
+ dup 8#116/rk put %right mid curl
+ dup 8#117/rb put %right bot curl
+ dup 8#120/rf put %right floor
+ dup 8#121/lf put %left  floor
+ dup 8#122/lc put %left  ceil
+ dup 8#140/sq put %square
+ dup 8#141/bx put %box
+ dup 8#142/ci put %circle
+ dup 8#143/br put %box rule
+ dup 8#144/rn put %root extender
+ dup 8#145/vr put %vertical rule
+ dup 8#146/ob put %outline bullet
+ dup 8#147/bu put %bullet
+ dup 8#150/ru put %rule
+ dup 8#151/ul put %underline
+ pop
+/DITfd 100 dict def
+/BuildChar{0 begin
+ /cc exch def /fd exch def
+ /charname fd /Encoding get cc get def
+ /charwid fd /Metrics get charname get def
+ /charproc fd /CharProcs get charname get def
+ charwid 0 fd /FontBBox get aload pop setcachedevice
+ 40 setlinewidth
+ newpath 0 0 moveto gsave charproc grestore
+ end}def
+/BuildChar load 0 DITfd put
+%/UniqueID 5 def
+/CharProcs 50 dict def
+CharProcs begin
+/space{}def
+/.notdef{}def
+/ru{500 0 rls}def
+/rn{0 750 moveto 500 0 rls}def
+/vr{20 800 moveto 0 -770 rls}def
+/bv{20 800 moveto 0 -1000 rls}def
+/br{20 770 moveto 0 -1040 rls}def
+/ul{0 -250 moveto 500 0 rls}def
+/ob{200 250 rmoveto currentpoint newpath 200 0 360 arc closepath stroke}def
+/bu{200 250 rmoveto currentpoint newpath 200 0 360 arc closepath fill}def
+/sq{80 0 rmoveto currentpoint dround newpath moveto
+    640 0 rlineto 0 640 rlineto -640 0 rlineto closepath stroke}def
+/bx{80 0 rmoveto currentpoint dround newpath moveto
+    640 0 rlineto 0 640 rlineto -640 0 rlineto closepath fill}def
+/ci{355 333 rmoveto currentpoint newpath 333 0 360 arc
+    50 setlinewidth stroke}def
+
+/lt{20 -200 moveto 0 550 rlineto currx 800 2cx s4 add exch s4 a4p stroke}def
+/lb{20 800 moveto 0 -550 rlineto currx -200 2cx s4 add exch s4 a4p stroke}def
+/rt{20 -200 moveto 0 550 rlineto currx 800 2cx s4 sub exch s4 a4p stroke}def
+/rb{20 800 moveto 0 -500 rlineto currx -200 2cx s4 sub exch s4 a4p stroke}def
+/lk{20 800 moveto 20 300 -280 300 s4 arcto pop pop 1000 sub
+    currentpoint stroke moveto
+    20 300 4 2 roll s4 a4p 20 -200 lineto stroke}def
+/rk{20 800 moveto 20 300 320 300 s4 arcto pop pop 1000 sub
+    currentpoint stroke moveto
+    20 300 4 2 roll s4 a4p 20 -200 lineto stroke}def
+/lf{20 800 moveto 0 -1000 rlineto s4 0 rls}def
+/rf{20 800 moveto 0 -1000 rlineto s4 neg 0 rls}def
+/lc{20 -200 moveto 0 1000 rlineto s4 0 rls}def
+/rc{20 -200 moveto 0 1000 rlineto s4 neg 0 rls}def
+end
+
+/Metrics 50 dict def Metrics begin
+/.notdef 0 def
+/space 500 def
+/ru 500 def
+/br 0 def
+/lt 250 def
+/lb 250 def
+/rt 250 def
+/rb 250 def
+/lk 250 def
+/rk 250 def
+/rc 250 def
+/lc 250 def
+/rf 250 def
+/lf 250 def
+/bv 250 def
+/ob 350 def
+/bu 350 def
+/ci 750 def
+/bx 750 def
+/sq 750 def
+/rn 500 def
+/ul 500 def
+/vr 0 def
+end
+
+DITfd begin
+/s2 500 def /s4 250 def /s3 333 def
+/a4p{arcto pop pop pop pop}def
+/2cx{2 copy exch}def
+/rls{rlineto stroke}def
+/currx{currentpoint pop}def
+/dround{transform round exch round exch itransform} def
+end
+end
+/DIThacks exch definefont pop
+
+ditstart
+(psc)xT
+576 1 1 xr
+1(Times-Roman)(Times-Roman-NLS)xff 1 f
+2(Times-Italic)(Times-Italic-NLS)xff 2 f
+3(Times-Bold)(Times-Bold-NLS)xff 3 f
+4(Times-BoldItalic)(Times-BoldItalic-NLS)xff 4 f
+5(Helvetica)(Helvetica-NLS)xff 5 f
+6(Helvetica-Bold)(Helvetica-Bold-NLS)xff 6 f
+7(Courier)(Courier-NLS)xff 7 f
+8(Courier-Bold)(Courier-Bold-NLS)xff 8 f
+9(Symbol)xf 9 f
+10(DIThacks)xf 10 f
+10 s
+1 f
+/xi {0 72 11.00 mul translate 72 resolution div dup neg scale 0 0 moveto
+/fontnum 1 def /fontsize 10 def /fontheight 10 def /fontslant 0 def F
+/pagesave save def}def
+%%EndProlog
+xi
+
+%%Page: 1 1
+10 s 0 xH 0 xS 1 f
+8 s
+3 f
+12 s
+1519 816(The)N
+1701(Ten)X
+1883 -0.6534(Commandments)AX
+2577(for)X
+2722(C)X
+2815 -0.8375(Programmers)AX
+2040 912 -0.4306(\(Annotated)AN
+2524 -0.5804(Edition\))AX
+2 f
+10 s
+2211 1104(Henry)N
+2429(Spencer)X
+1 f
+432 1564(1)N
+632(Thou)X
+833(shalt)X
+1015(run)X
+2 f
+1154(lint)X
+1 f
+1293(frequently)X
+1654(and)X
+1802(study)X
+2008(its)X
+2116(pronouncements)X
+2676(with)X
+2850(care,)X
+3035(for)X
+3162(verily)X
+3381(its)X
+3489(perception)X
+3858(and)X
+4006(judgement)X
+4375(oft)X
+632 1660(exceed)N
+872(thine.)X
+9 s
+776 1780(This)N
+922(is)X
+988(still)X
+1114(wise)X
+1263(counsel,)X
+1519(although)X
+1789(many)X
+1967(modern)X
+2205(compilers)X
+2507(search)X
+2709(out)X
+2819(many)X
+2997(of)X
+3075(the)X
+3181(same)X
+3347(sins,)X
+3495(and)X
+3617(there)X
+3779(are)X
+3885(often)X
+4052(problems)X
+776 1860(with)N
+2 f
+926(lint)X
+1 f
+1045(being)X
+1228(aged)X
+1387(and)X
+1514(in\201rm,)X
+1731(or)X
+1814(unavailable)X
+2169(in)X
+2248(strange)X
+2478(lands.)X
+2688(There)X
+2878(are)X
+2988(other)X
+3158(tools,)X
+3338(such)X
+3492(as)X
+3574(Saber)X
+3756(C,)X
+3844(useful)X
+4042(to)X
+4120(similar)X
+776 1940(ends.)N
+776 2060(``Frequently'')N
+1205(means)X
+1410(thou)X
+1559(shouldst)X
+1820(draw)X
+1984(thy)X
+2097(daily)X
+2262(guidance)X
+2543(from)X
+2704(it,)X
+2783(rather)X
+2972(than)X
+3117(hoping)X
+3338(thy)X
+3451(code)X
+3608(will)X
+3740(achieve)X
+2 f
+3982(lint)X
+1 f
+('s)S
+4152(bless-)X
+776 2140(ing)N
+891(by)X
+986(a)X
+1041(sudden)X
+1268(act)X
+1375(of)X
+1458(repentance)X
+1793(at)X
+1868(the)X
+1979(last)X
+2102(minute.)X
+2361(De-linting)X
+2679(a)X
+2734(program)X
+3001(which)X
+3198(has)X
+3316(never)X
+3498(been)X
+2 f
+3656(lint)X
+1 f
+(ed)S
+3842(before)X
+4048(is)X
+4118(often)X
+4288(a)X
+776 2220(cleaning)N
+1041(of)X
+1122(the)X
+1231(stables)X
+1449(such)X
+1603(as)X
+1685(thou)X
+1835(wouldst)X
+2084(not)X
+2198(wish)X
+2355(on)X
+2449(thy)X
+2563(worst)X
+2744(enemies.)X
+3038(Some)X
+3224(observe,)X
+3488(also,)X
+3644(that)X
+3774(careful)X
+3996(heed)X
+4154(to)X
+4232(the)X
+776 2300(words)N
+969(of)X
+2 f
+1047(lint)X
+1 f
+1161(can)X
+1279(be)X
+1365(quite)X
+1527(helpful)X
+1749(in)X
+1823(debugging.)X
+776 2420(``Study'')N
+1066(doth)X
+1220(not)X
+1338(mean)X
+1520(mindless)X
+1802(zeal)X
+1944(to)X
+2026(eradicate)X
+2313(every)X
+2500(byte)X
+2651(of)X
+2 f
+2738(lint)X
+1 f
+2861(output\213if)X
+3188(for)X
+3299(no)X
+3398(other)X
+3573(reason,)X
+3806(because)X
+4061(thou)X
+4216(just)X
+776 2500(canst)N
+943(not)X
+1054(shut)X
+1193(it)X
+1251(up)X
+1341(about)X
+1519(some)X
+1689(things\213but)X
+2047(that)X
+2173(thou)X
+2319(should)X
+2529(know)X
+2706(the)X
+2812(cause)X
+2990(of)X
+3068(its)X
+3154(unhappiness)X
+3528(and)X
+3650(understand)X
+3984(what)X
+4141(worri-)X
+776 2580(some)N
+946(sign)X
+1084(it)X
+1142(tries)X
+1284(to)X
+1358(speak)X
+1540(of.)X
+10 s
+432 2704(2)N
+632(Thou)X
+821(shalt)X
+991(not)X
+1113(follow)X
+1341(the)X
+1458(NULL)X
+1690(pointer,)X
+1956(for)X
+2070(chaos)X
+2271(and)X
+2406(madness)X
+2700(await)X
+2891(thee)X
+3043(at)X
+3120(its)X
+3215(end.)X
+9 s
+776 2824(Clearly)N
+1010(the)X
+1120(holy)X
+1270(scriptures)X
+1572(were)X
+1733(mis-transcribed)X
+2203(here,)X
+2367(as)X
+2449(the)X
+2559(words)X
+2756(should)X
+2970(have)X
+3128(been)X
+3286(``null)X
+3468(pointer'',)X
+3760(to)X
+3838(minimize)X
+4132(confu-)X
+776 2904(sion)N
+915(between)X
+1173(the)X
+1280(concept)X
+1523(of)X
+1602(null)X
+1733(pointers)X
+1984(and)X
+2107(the)X
+2214(macro)X
+2413(NULL)X
+2622(\(of)X
+2725(which)X
+2919(more)X
+3085(anon\).)X
+3303(Otherwise,)X
+3633(the)X
+3739(meaning)X
+4005(is)X
+4071(plain.)X
+4269(A)X
+776 2984(null)N
+910(pointer)X
+1136(points)X
+1334(to)X
+1412(regions)X
+1646(\201lled)X
+1816(with)X
+1965(dragons,)X
+2233(demons,)X
+2498(core)X
+2645(dumps,)X
+2878(and)X
+3005(numberless)X
+3356(other)X
+3527(foul)X
+3666(creatures,)X
+3967(all)X
+4062(of)X
+4145(which)X
+776 3064(delight)N
+995(in)X
+1070(frolicing)X
+1337(in)X
+1412(thy)X
+1523(program)X
+1786(if)X
+1849(thou)X
+1995(disturb)X
+2213(their)X
+2363(sleep.)X
+2565(A)X
+2634(null)X
+2764(pointer)X
+2986(doth)X
+2 f
+3132(not)X
+1 f
+3242(point)X
+3408(to)X
+3482(a)X
+3532(0)X
+3586(of)X
+3664(any)X
+3786(type,)X
+3946(despite)X
+4168(some)X
+776 3144(blasphemous)N
+1170(old)X
+1280(code)X
+1434(which)X
+1627(impiously)X
+1933(assumes)X
+2191(this.)X
+10 s
+432 3268(3)N
+632(Thou)X
+822(shalt)X
+994(cast)X
+1139(all)X
+1240(function)X
+1528(arguments)X
+1882(to)X
+1966(the)X
+2085(expected)X
+2389(type)X
+2548(if)X
+2619(they)X
+2778(are)X
+2897(not)X
+3021(of)X
+3110(that)X
+3251(type)X
+3410(already,)X
+3686(even)X
+3858(when)X
+4052(thou)X
+4216(art)X
+4322(con-)X
+632 3364(vinced)N
+864(that)X
+1003(this)X
+1138(is)X
+1211(unnecessary,)X
+1640(lest)X
+1770(they)X
+1927(take)X
+2079(cruel)X
+2258(vengeance)X
+2613(upon)X
+2793(thee)X
+2945(when)X
+3137(thou)X
+3299(least)X
+3464(expect)X
+3691(it.)X
+9 s
+776 3484(A)N
+845(programmer)X
+1219(should)X
+1429(understand)X
+1763(the)X
+1869(type)X
+2011(structure)X
+2281(of)X
+2359(his)X
+2461(language,)X
+2757(lest)X
+2875(great)X
+3037(misfortune)X
+3367(befall)X
+3549(him.)X
+776 3604(Contrary)N
+1055(to)X
+1134(the)X
+1245(heresies)X
+1500(espoused)X
+1787(by)X
+1882(some)X
+2057(of)X
+2140(the)X
+2251(dwellers)X
+2517(on)X
+2612(the)X
+2723(Western)X
+2985(Shore,)X
+3194(`int')X
+3341(and)X
+3468(`long')X
+3667(are)X
+3778(not)X
+3894(the)X
+4006(same)X
+4178(type.)X
+776 3684(The)N
+915(moment)X
+1178(of)X
+1265(their)X
+1424(equivalence)X
+1795(in)X
+1878(size)X
+2017(and)X
+2148(representation)X
+2583(is)X
+2658(short,)X
+2847(and)X
+2978(the)X
+3093(agony)X
+3295(that)X
+3429(awaits)X
+3638(believers)X
+3924(in)X
+4006(their)X
+4164(inter-)X
+776 3764(changeability)N
+1182(shall)X
+1336(last)X
+1454(forever)X
+1680(and)X
+1802(ever)X
+1944(once)X
+2098(64-bit)X
+2288(machines)X
+2578(become)X
+2820(common.)X
+776 3884(Also,)N
+956(contrary)X
+1223(to)X
+1306(the)X
+1421(beliefs)X
+1640(common)X
+1919(among)X
+2142(the)X
+2257(more)X
+2432(backward)X
+2738(inhabitants)X
+3081(of)X
+3168(the)X
+3283(Polluted)X
+3550(Eastern)X
+3793(Marshes,)X
+4082(`NULL')X
+776 3964(does)N
+926(not)X
+1036(have)X
+1190(a)X
+1240(pointer)X
+1462(type,)X
+1622(and)X
+1744(must)X
+1902(be)X
+1988(cast)X
+2118(to)X
+2192(the)X
+2298(correct)X
+2516(type)X
+2658(whenever)X
+2955(it)X
+3013(is)X
+3079(used)X
+3229(as)X
+3307(a)X
+3357(function)X
+3615(argument.)X
+776 4084(\(The)N
+931(words)X
+1125(of)X
+1204(the)X
+1311(prophet)X
+1550(Ansi,)X
+1722(which)X
+1916(permit)X
+2123(NULL)X
+2332(to)X
+2407(be)X
+2494(de\201ned)X
+2725(as)X
+2804(having)X
+3019(the)X
+3126(type)X
+3269(`void)X
+3439(*',)X
+3536(are)X
+3643(oft)X
+3742(taken)X
+3917(out)X
+4028(of)X
+4108(context)X
+776 4164(and)N
+909(misunderstood.)X
+1398(The)X
+1539(prophet)X
+1788(was)X
+1928(granting)X
+2197(a)X
+2258(special)X
+2487(dispensation)X
+2875(for)X
+2987(use)X
+3111(in)X
+3195(cases)X
+3375(of)X
+3463(great)X
+3635(hardship)X
+3911(in)X
+3995(wild)X
+4150(lands.)X
+776 4244(Verily,)N
+1001(a)X
+1057(righteous)X
+1349(program)X
+1617(must)X
+1781(make)X
+1961(its)X
+2053(own)X
+2200(way)X
+2343(through)X
+2591(the)X
+2703(Thicket)X
+2947(Of)X
+3046(Types)X
+3246(without)X
+3489(lazily)X
+3673(relying)X
+3902(on)X
+3999(this)X
+4128(rarely-)X
+776 4324(available)N
+1058(dispensation)X
+1440(to)X
+1518(solve)X
+1692(all)X
+1786(its)X
+1876(problems.)X
+2202(In)X
+2284(any)X
+2410(event,)X
+2606(the)X
+2716(great)X
+2882(deity)X
+3048(Dmr)X
+3201(who)X
+3346(created)X
+3576(C)X
+3646(hath)X
+3792(wisely)X
+4000(endowed)X
+4280(it)X
+776 4404(with)N
+921(many)X
+1099(types)X
+1269(of)X
+1347(pointers,)X
+1615(not)X
+1725(just)X
+1847(one,)X
+1987(and)X
+2109(thus)X
+2247(it)X
+2305(would)X
+2502(still)X
+2628(be)X
+2714(necessary)X
+3013(to)X
+3088(convert)X
+3323(the)X
+3430(prophet's)X
+3721(NULL)X
+3930(to)X
+4005(the)X
+4112(desired)X
+776 4484(type.\))N
+776 4604(It)N
+847(may)X
+998(be)X
+1093(thought)X
+1340(that)X
+1475(the)X
+1590(radical)X
+1813(new)X
+1959(blessing)X
+2222(of)X
+2309(``prototypes'')X
+2736(might)X
+2932(eliminate)X
+3228(the)X
+3344(need)X
+3508(for)X
+3620(caution)X
+3860(about)X
+4048(argument)X
+776 4684(types.)N
+993(Not)X
+1129(so,)X
+1240(brethren.)X
+1545(Firstly,)X
+1780(when)X
+1964(confronted)X
+2305(with)X
+2461(the)X
+2578(twisted)X
+2814(strangeness)X
+3174(of)X
+3262(variable)X
+3522(numbers)X
+3798(of)X
+3886(arguments,)X
+4232(the)X
+776 4764(problem)N
+1047(returns...)X
+1332(and)X
+1467(he)X
+1566(who)X
+1720(has)X
+1847(not)X
+1970(kept)X
+2126(his)X
+2242(faith)X
+2406(strong)X
+2618(by)X
+2722(repeated)X
+2998(practice)X
+3258(shall)X
+3426(surely)X
+3634(fall)X
+3762(to)X
+3850(this)X
+3986(subtle)X
+4190(trap.)X
+776 4844(Secondly,)N
+1091(the)X
+1208(wise)X
+1368(men)X
+1521(have)X
+1686(observed)X
+1975(that)X
+2112(reliance)X
+2369(on)X
+2470(prototypes)X
+2802(doth)X
+2958(open)X
+3126(many)X
+3314(doors)X
+3502(to)X
+3586(strange)X
+3822(errors,)X
+4036(and)X
+4168(some)X
+776 4924(indeed)N
+991(had)X
+1118(hoped)X
+1317(that)X
+1448(prototypes)X
+1775(would)X
+1977(be)X
+2068(decreed)X
+2315(for)X
+2422(purposes)X
+2701(of)X
+2785(error)X
+2949(checking)X
+3233(but)X
+3349(would)X
+3552(not)X
+3668(cause)X
+3852(implicit)X
+4100(conver-)X
+776 5004(sions.)N
+984(Lastly,)X
+1206(reliance)X
+1458(on)X
+1554(prototypes)X
+1882(causeth)X
+2122(great)X
+2290(dif\201culty)X
+2578(in)X
+2658(the)X
+2770(Real)X
+2926(World)X
+3133(today,)X
+3335(when)X
+3514(many)X
+3698(cling)X
+3866(to)X
+3946(the)X
+4058(old)X
+4173(ways)X
+776 5084(and)N
+906(the)X
+1020(old)X
+1138(compilers)X
+1448(out)X
+1566(of)X
+1652(desire)X
+1850(or)X
+1936(necessity,)X
+2244(and)X
+2374(no)X
+2472(man)X
+2622(knoweth)X
+2895(what)X
+3060(machine)X
+3331(his)X
+3442(code)X
+3605(may)X
+3756(be)X
+3851(asked)X
+4042(to)X
+4125(run)X
+4248(on)X
+776 5164(tomorrow.)N
+10 s
+432 5288(4)N
+632(If)X
+709(thy)X
+834(header)X
+1069(\201les)X
+1224(fail)X
+1353(to)X
+1438(declare)X
+1690(the)X
+1810(return)X
+2024(types)X
+2215(of)X
+2305(thy)X
+2430(library)X
+2666(functions,)X
+3006(thou)X
+3172(shalt)X
+3346(declare)X
+3599(them)X
+3782(thyself)X
+4023(with)X
+4188(the)X
+4309(most)X
+632 5384(meticulous)N
+1001(care,)X
+1173(lest)X
+1303(grievous)X
+1598(harm)X
+1782(befall)X
+1983(thy)X
+2105(program.)X
+9 s
+776 5504(The)N
+906(prophet)X
+1144(Ansi,)X
+1315(in)X
+1389(her)X
+1499(wisdom,)X
+1762(hath)X
+1904(added)X
+2094(that)X
+2220(thou)X
+2366(shouldst)X
+2624(also)X
+2758(scourge)X
+3001(thy)X
+3112(Suppliers,)X
+3421(and)X
+3544(demand)X
+3791(on)X
+3882(pain)X
+4025(of)X
+4104(excom-)X
+776 5584(munication)N
+1119(that)X
+1245(they)X
+1387(produce)X
+1637(header)X
+1847(\201les)X
+1985(that)X
+2111(declare)X
+2337(their)X
+2487(library)X
+2697(functions.)X
+3019(For)X
+3137(truly,)X
+3309(only)X
+3455(they)X
+3597(know)X
+3774(the)X
+3880(precise)X
+4102(form)X
+4260(of)X
+776 5664(the)N
+882(incantation)X
+1220(appropriate)X
+1566(to)X
+1640(invoking)X
+1914(their)X
+2064(magic)X
+2258(in)X
+2332(the)X
+2438(optimal)X
+2676(way.)X
+776 5784(The)N
+907(prophet)X
+1146(hath)X
+1289(also)X
+1425(commented)X
+1781(that)X
+1909(it)X
+1969(is)X
+2037(unwise,)X
+2278(and)X
+2402(leads)X
+2570(one)X
+2694(into)X
+2826(the)X
+2934(pits)X
+3058(of)X
+3138(damnation)X
+3462(and)X
+3586(subtle)X
+3778(bugs,)X
+3952(to)X
+4028(attempt)X
+4264(to)X
+776 5864(declare)N
+1002(such)X
+1152(functions)X
+1438(thyself)X
+1652(when)X
+1825(thy)X
+1935(header)X
+2145(\201les)X
+2283(do)X
+2373(the)X
+2479(job)X
+2589(right.)X
+
+2 p
+%%Page: 2 2
+9 s 0 xH 0 xS 1 f
+10 s
+2381 312(-)N
+2428(2)X
+2488(-)X
+432 528(5)N
+632(Thou)X
+821(shalt)X
+991(check)X
+1196(the)X
+1313(array)X
+1497(bounds)X
+1748(of)X
+1835(all)X
+1934(strings)X
+2167(\(indeed,)X
+2446(all)X
+2546(arrays\),)X
+2809(for)X
+2924(surely)X
+3140(where)X
+3355(thou)X
+3518(typest)X
+3729(``foo'')X
+3965(someone)X
+4269(some-)X
+632 624(day)N
+767(shall)X
+937(type)X
+1094 -0.1184(``supercalifragilisticexpialidocious''.)AX
+9 s
+776 744(As)N
+874(demonstrated)X
+1281(by)X
+1373(the)X
+1481(deeds)X
+1665(of)X
+1745(the)X
+1853(Great)X
+2032(Worm,)X
+2253(a)X
+2305(consequence)X
+2693(of)X
+2773(this)X
+2897(commandment)X
+3345(is)X
+3413(that)X
+3541(robust)X
+3741(production)X
+4073(software)X
+776 824(should)N
+988(never)X
+1168(make)X
+1344(use)X
+1460(of)X
+2 f
+1540(gets\(\))X
+1 f
+1704(,)X
+1742(for)X
+1846(it)X
+1905(is)X
+1972(truly)X
+2127(a)X
+2178(tool)X
+2309(of)X
+2388(the)X
+2495(Devil.)X
+2709(Thy)X
+2844(interfaces)X
+3143(should)X
+3354(always)X
+3572(inform)X
+3787(thy)X
+3898(servants)X
+4153(of)X
+4232(the)X
+776 904(bounds)N
+1004(of)X
+1084(thy)X
+1196(arrays,)X
+1410(and)X
+1534(servants)X
+1790(who)X
+1933(spurn)X
+2113(such)X
+2265(advice)X
+2473(or)X
+2553(quietly)X
+2773(fail)X
+2890(to)X
+2967(follow)X
+3175(it)X
+3236(should)X
+3449(be)X
+3538(dispatched)X
+3867(forthwith)X
+4155(to)X
+4232(the)X
+776 984(Land)N
+942(Of)X
+1035(Rm,)X
+1175(where)X
+1368(they)X
+1510(can)X
+1628(do)X
+1718(no)X
+1808(further)X
+2022(harm)X
+2188(to)X
+2262(thee.)X
+10 s
+432 1108(6)N
+632(If)X
+710(a)X
+769(function)X
+1059(be)X
+1158(advertised)X
+1509(to)X
+1595(return)X
+1810(an)X
+1910(error)X
+2091(code)X
+2266(in)X
+2353(the)X
+2475(event)X
+2672(of)X
+2764(dif\201culties,)X
+3149(thou)X
+3316(shalt)X
+3491(check)X
+3701(for)X
+3820(that)X
+3964(code,)X
+4159(yea,)X
+4314(even)X
+632 1204(though)N
+875(the)X
+993(checks)X
+1230(triple)X
+1419(the)X
+1537(size)X
+1681(of)X
+1769(thy)X
+1892(code)X
+2062(and)X
+2197(produce)X
+2474(aches)X
+2670(in)X
+2752(thy)X
+2874(typing)X
+3098(\201ngers,)X
+3355(for)X
+3469(if)X
+3538(thou)X
+3700(thinkest)X
+3972(``it)X
+4090(cannot)X
+4322(hap-)X
+632 1300(pen)N
+767(to)X
+849(me'',)X
+1040(the)X
+1157(gods)X
+1328(shall)X
+1498(surely)X
+1713(punish)X
+1946(thee)X
+2098(for)X
+2212(thy)X
+2334(arrogance.)X
+9 s
+776 1420(All)N
+888(true)X
+1021(believers)X
+1302(doth)X
+1451(wish)X
+1607(for)X
+1712(a)X
+1765(better)X
+1950(error-handling)X
+2387(mechanism,)X
+2754(for)X
+2859(explicit)X
+3096(checks)X
+3313(of)X
+3394(return)X
+3588(codes)X
+3774(are)X
+3884(tiresome)X
+4154(in)X
+4232(the)X
+776 1500(extreme)N
+1028(and)X
+1152(the)X
+1260(temptation)X
+1588(to)X
+1664(omit)X
+1816(them)X
+1980(is)X
+2048(great.)X
+2248(But)X
+2372(until)X
+2524(the)X
+2632(far-off)X
+2840(day)X
+2964(of)X
+3044(deliverance)X
+3396(cometh,)X
+3645(one)X
+3768(must)X
+3927(walk)X
+4085(the)X
+4192(long)X
+776 1580(and)N
+905(winding)X
+1165(road)X
+1318(with)X
+1470(patience)X
+1735(and)X
+1864(care,)X
+2027(for)X
+2136(thy)X
+2253(Vendor,)X
+2511(thy)X
+2628(Machine,)X
+2922(and)X
+3051(thy)X
+3168(Software)X
+3452(delight)X
+3678(in)X
+3760(surprises)X
+4042(and)X
+4172(think)X
+776 1660(nothing)N
+1014(of)X
+1092(producing)X
+1402(subtly)X
+1596(meaningless)X
+1970(results)X
+2176(on)X
+2266(the)X
+2372(day)X
+2494(before)X
+2696(thy)X
+2806(Thesis)X
+3012(Oral)X
+3157(or)X
+3235(thy)X
+3345(Big)X
+3467(Pitch)X
+3633(To)X
+3731(The)X
+3861(Client.)X
+776 1780(Occasionally,)N
+1192(as)X
+1276(with)X
+1427(the)X
+2 f
+1539(ferror\(\))X
+1 f
+1783(feature)X
+2007(of)X
+2 f
+2091(stdio)X
+1 f
+(,)S
+2273(it)X
+2337(is)X
+2409(possible)X
+2669(to)X
+2749(defer)X
+2921(error)X
+3085(checking)X
+3369(until)X
+3525(the)X
+3637(end)X
+3765(when)X
+3944(a)X
+4000(cumulative)X
+776 1860(result)N
+964(can)X
+1092(be)X
+1188(tested,)X
+1402(and)X
+1534(this)X
+1666(often)X
+1842(produceth)X
+2158(code)X
+2322(which)X
+2525(is)X
+2601(shorter)X
+2829(and)X
+2961(clearer.)X
+3220(Also,)X
+3400(even)X
+3563(the)X
+3678(most)X
+3845(zealous)X
+4088(believer)X
+776 1940(should)N
+991(exercise)X
+1250(some)X
+1425(judgement)X
+1752(when)X
+1930(dealing)X
+2165(with)X
+2315(functions)X
+2606(whose)X
+2813(failure)X
+3025(is)X
+3097(totally)X
+3305(uninteresting...)X
+3759(but)X
+3875(beware,)X
+4124(for)X
+4232(the)X
+776 2020(cast)N
+906(to)X
+980(void)X
+1126(is)X
+1192(a)X
+1242(two-edged)X
+1563(sword)X
+1756(that)X
+1882(sheddeth)X
+2156(thine)X
+2318(own)X
+2459(blood)X
+2641(without)X
+2878(remorse.)X
+10 s
+432 2144(7)N
+632(Thou)X
+826(shalt)X
+1001(study)X
+1199(thy)X
+1326(libraries)X
+1612(and)X
+1752(strive)X
+1954(not)X
+2081(to)X
+2168(re-invent)X
+2481(them)X
+2665(without)X
+2933(cause,)X
+3155(that)X
+3300(thy)X
+3428(code)X
+3604(may)X
+3767(be)X
+3868(short)X
+4054(and)X
+4195(readable)X
+632 2240(and)N
+767(thy)X
+889(days)X
+1055(pleasant)X
+1335(and)X
+1470(productive.)X
+9 s
+776 2360(Numberless)N
+1140(are)X
+1249(the)X
+1358(unwashed)X
+1666(heathen)X
+1911(who)X
+2055(scorn)X
+2232(their)X
+2385(libraries)X
+2642(on)X
+2735(various)X
+2969(silly)X
+3115(and)X
+3241(spurious)X
+3507(grounds,)X
+3779(such)X
+3933(as)X
+4015(blind)X
+4185(wor-)X
+776 2440(ship)N
+921(of)X
+1006(the)X
+1119(Little)X
+1300(Tin)X
+1424(God)X
+1571(\(also)X
+1735(known)X
+1954(as)X
+2038(``Ef\201ciency''\).)X
+2514(While)X
+2713(it)X
+2777(is)X
+2849(true)X
+2985(that)X
+3117(some)X
+3293(features)X
+3545(of)X
+3629(the)X
+3741(C)X
+3813(libraries)X
+4073(were)X
+4236(ill-)X
+776 2520(advised,)N
+1037(by)X
+1132(and)X
+1259(large)X
+1426(it)X
+1489(is)X
+1560(better)X
+1747(and)X
+1874(cheaper)X
+2121(to)X
+2200(use)X
+2319(the)X
+2430(works)X
+2628(of)X
+2711(others)X
+2911(than)X
+3059(to)X
+3139(persist)X
+3351(in)X
+3431(re-inventing)X
+3807(the)X
+3919(square)X
+4131(wheel.)X
+776 2600(But)N
+901(thou)X
+1050(should)X
+1263(take)X
+1404(the)X
+1513(greatest)X
+1758(of)X
+1839(care)X
+1980(to)X
+2057(understand)X
+2394(what)X
+2554(thy)X
+2667(libraries)X
+2924(promise,)X
+3195(and)X
+3320(what)X
+3480(they)X
+3625(do)X
+3718(not,)X
+3848(lest)X
+3968(thou)X
+4116(rely)X
+4248(on)X
+776 2680(facilities)N
+1042(that)X
+1168(may)X
+1310(vanish)X
+1516(from)X
+1674(under)X
+1856(thy)X
+1966(feet)X
+2092(in)X
+2166(future.)X
+10 s
+432 2804(8)N
+632(Thou)X
+823(shalt)X
+995(make)X
+1189(thy)X
+1313(program's)X
+1664(purpose)X
+1939(and)X
+2077(structure)X
+2379(clear)X
+2556(to)X
+2641(thy)X
+2766(fellow)X
+2992(man)X
+3152(by)X
+3255(using)X
+3451(the)X
+3571(One)X
+3726(True)X
+3900(Brace)X
+4108(Style,)X
+4314(even)X
+632 2900(if)N
+706(thou)X
+873(likest)X
+1070(it)X
+1139(not,)X
+1286(for)X
+1405(thy)X
+1532(creativity)X
+1857(is)X
+1935(better)X
+2141(used)X
+2311(in)X
+2397(solving)X
+2656(problems)X
+2977(than)X
+3138(in)X
+3224(creating)X
+3504(beautiful)X
+3811(new)X
+3967(impediments)X
+4402(to)X
+632 2996(understanding.)N
+9 s
+776 3116(These)N
+970(words,)X
+1185(alas,)X
+1337(have)X
+1495(caused)X
+1713(some)X
+1887(uncertainty)X
+2233(among)X
+2451(the)X
+2561(novices)X
+2803(and)X
+2929(the)X
+3039(converts,)X
+3324(who)X
+3470(knoweth)X
+3740(not)X
+3855(the)X
+3966(ancient)X
+4197(wis-)X
+776 3196(doms.)N
+995(The)X
+1134(One)X
+1280(True)X
+1443(Brace)X
+1638(Style)X
+1813(referred)X
+2068(to)X
+2151(is)X
+2226(that)X
+2361(demonstrated)X
+2776(in)X
+2858(the)X
+2972(writings)X
+3233(of)X
+3319(the)X
+3433(First)X
+3591(Prophets,)X
+3887(Kernighan)X
+4216(and)X
+776 3276(Ritchie.)N
+1045(Often)X
+1233(and)X
+1362(again)X
+1543(it)X
+1608(is)X
+1681(criticized)X
+1974(by)X
+2071(the)X
+2184(ignorant)X
+2449(as)X
+2534(hard)X
+2687(to)X
+2768(use,)X
+2907(when)X
+3087(in)X
+3168(truth)X
+3329(it)X
+3394(is)X
+3467(merely)X
+3693(somewhat)X
+4010(dif\201cult)X
+4264(to)X
+776 3356(learn,)N
+956(and)X
+1078(thereafter)X
+1372(is)X
+1438(wonderfully)X
+1807(clear)X
+1965(and)X
+2087(obvious,)X
+2351(if)X
+2413(perhaps)X
+2655(a)X
+2705(bit)X
+2799(sensitive)X
+3069(to)X
+3143(mistakes.)X
+776 3476(While)N
+971(thou)X
+1119(might)X
+1307(think)X
+1475(that)X
+1603(thine)X
+1767(own)X
+1910(ideas)X
+2078(of)X
+2158(brace)X
+2334(style)X
+2490(lead)X
+2630(to)X
+2706(clearer)X
+2922(programs,)X
+3232(thy)X
+3344(successors)X
+3669(will)X
+3801(not)X
+3914(thank)X
+4095(thee)X
+4236(for)X
+776 3556(it,)N
+853(but)X
+964(rather)X
+1151(shall)X
+1306(revile)X
+1489(thy)X
+1600(works)X
+1794(and)X
+1917(curse)X
+2088(thy)X
+2199(name,)X
+2392(and)X
+2515(word)X
+2681(of)X
+2759(this)X
+2881(might)X
+3067(get)X
+3173(to)X
+3247(thy)X
+3357(next)X
+3499(employer.)X
+3825(Many)X
+4010(customs)X
+4264(in)X
+776 3636(this)N
+903(life)X
+1022(persist)X
+1233(because)X
+1484(they)X
+1631(ease)X
+1778(friction)X
+2013(and)X
+2140(promote)X
+2403(productivity)X
+2778(as)X
+2861(a)X
+2916(result)X
+3099(of)X
+3183(universal)X
+3471(agreement,)X
+3813(and)X
+3941(whether)X
+4196(they)X
+776 3716(are)N
+882(precisely)X
+1160(the)X
+1266(optimal)X
+1504(choices)X
+1738(is)X
+1804(much)X
+1982(less)X
+2108(important.)X
+2442(So)X
+2536(it)X
+2594(is)X
+2660(with)X
+2805(brace)X
+2979(style.)X
+776 3836(As)N
+875(a)X
+927(lamentable)X
+1263(side)X
+1399(issue,)X
+1581(there)X
+1745(has)X
+1861(been)X
+2017(some)X
+2189(unrest)X
+2385(from)X
+2545(the)X
+2653(fanatics)X
+2897(of)X
+2978(the)X
+3087(Pronoun)X
+3352(Gestapo)X
+3608(over)X
+3757(the)X
+3866(use)X
+3983(of)X
+4064(the)X
+4173(word)X
+776 3916(``man'')N
+1016(in)X
+1091(this)X
+1214(Commandment,)X
+1695(for)X
+1798(they)X
+1941(believe)X
+2168(that)X
+2295(great)X
+2458(efforts)X
+2665(and)X
+2788(loud)X
+2935(shouting)X
+3202(devoted)X
+3449(to)X
+3524(the)X
+3631(ritual)X
+3802(puri\201cation)X
+4153(of)X
+4232(the)X
+776 3996(language)N
+1064(will)X
+1204(somehow)X
+1508(redound)X
+1773(to)X
+1858(the)X
+1975(bene\201t)X
+2200(of)X
+2289(the)X
+2406(downtrodden)X
+2814(\(whose)X
+3050(real)X
+3187(and)X
+3320(grievous)X
+3597(woes)X
+3773(tendeth)X
+4014(to)X
+4099(get)X
+4216(lost)X
+776 4076(amidst)N
+1000(all)X
+1103(that)X
+1242(thunder)X
+1493(and)X
+1628(fury\).)X
+1839(When)X
+2041(preaching)X
+2356(the)X
+2475(gospel)X
+2694(to)X
+2781(the)X
+2900(narrow)X
+3134(of)X
+3225(mind)X
+3404(and)X
+3539(short)X
+3714(of)X
+3805(temper,)X
+4054(the)X
+4173(word)X
+776 4156(``creature'')N
+1122(may)X
+1264(be)X
+1350(substituted)X
+1680(as)X
+1758(a)X
+1808(suitable)X
+2050(pseudoBiblical)X
+2500(term)X
+2650(free)X
+2780(of)X
+2858(the)X
+2964(taint)X
+3110(of)X
+3188(Political)X
+3446(Incorrectness.)X
+10 s
+432 4280(9)N
+632(Thy)X
+784(external)X
+1063(identi\201ers)X
+1404(shall)X
+1577(be)X
+1675(unique)X
+1915(in)X
+2000(the)X
+2120(\201rst)X
+2267(six)X
+2383(characters,)X
+2748(though)X
+2993(this)X
+3131(harsh)X
+3327(discipline)X
+3659(be)X
+3757(irksome)X
+4037(and)X
+4175(the)X
+4296(years)X
+632 4376(of)N
+728(its)X
+832(necessity)X
+1152(stretch)X
+1393(before)X
+1626(thee)X
+1786(seemingly)X
+2141(without)X
+2412(end,)X
+2575(lest)X
+2713(thou)X
+2883(tear)X
+3030(thy)X
+3160(hair)X
+3312(out)X
+3442(and)X
+3585(go)X
+3693(mad)X
+3858(on)X
+3966(that)X
+4113(fateful)X
+4349(day)X
+632 4472(when)N
+824(thou)X
+986(desirest)X
+1249(to)X
+1331(make)X
+1523(thy)X
+1645(program)X
+1936(run)X
+2063(on)X
+2163(an)X
+2258(old)X
+2380(system.)X
+9 s
+776 4592(Though)N
+1024(some)X
+1200(hasty)X
+1376(zealots)X
+1600(cry)X
+1716(``not)X
+1880(so;)X
+1988(the)X
+2100(Millenium)X
+2427(is)X
+2499(come,)X
+2698(and)X
+2827(this)X
+2956(saying)X
+3169(is)X
+3242(obsolete)X
+3507(and)X
+3636(no)X
+3733(longer)X
+3942(need)X
+4103(be)X
+4196(sup-)X
+776 4672(ported'',)N
+1046(verily)X
+1234(there)X
+1398(be)X
+1486(many,)X
+1684(many)X
+1864(ancient)X
+2092(systems)X
+2340(in)X
+2416(the)X
+2524(world,)X
+2728(and)X
+2851(it)X
+2910(is)X
+2977(the)X
+3084(decree)X
+3291(of)X
+3370(the)X
+3477(dreaded)X
+3724(god)X
+3851(Murphy)X
+4101(that)X
+4228(thy)X
+776 4752(next)N
+918(employment)X
+1296(just)X
+1418(might)X
+1604(be)X
+1690(on)X
+1780(one.)X
+1938(While)X
+2131(thou)X
+2277(sleepest,)X
+2541(he)X
+2627(plotteth)X
+2865(against)X
+3087(thee.)X
+3261(Awake)X
+3481(and)X
+3603(take)X
+3741(care.)X
+776 4872(It)N
+838(is,)X
+922(note)X
+1064(carefully,)X
+1356(not)X
+1466(necessary)X
+1764(that)X
+1890(thy)X
+2000(identi\201ers)X
+2306(be)X
+2392(limited)X
+2614(to)X
+2688(a)X
+2 f
+2738(length)X
+1 f
+2936(of)X
+3014(six)X
+3116(characters.)X
+3462(The)X
+3592(only)X
+3738(requirement)X
+4105(that)X
+4232(the)X
+776 4952(holy)N
+922(words)X
+1115(place)X
+1285(upon)X
+1447(thee)X
+1585(is)X
+1651(uniqueness)X
+1989(within)X
+2190(the)X
+2 f
+2296(\201rst)X
+1 f
+2426(six.)X
+2564(This)X
+2710(often)X
+2876(is)X
+2942(not)X
+3052(so)X
+3134(hard)X
+3280(as)X
+3358(the)X
+3464(belittlers)X
+3734(claimeth.)X
+10 s
+432 5076(10)N
+632(Thou)X
+823(shalt)X
+995(foreswear,)X
+1351(renounce,)X
+1685(and)X
+1822(abjure)X
+2043(the)X
+2162(vile)X
+2303(heresy)X
+2533(which)X
+2749(claimeth)X
+3044(that)X
+3185(``All)X
+3362(the)X
+3481(world's)X
+3747(a)X
+3805(VAX'',)X
+4073(and)X
+4211(have)X
+4384(no)X
+632 5172(commerce)N
+991(with)X
+1160(the)X
+1285(benighted)X
+1627(heathens)X
+1933(who)X
+2098(cling)X
+2285(to)X
+2375(this)X
+2518(barbarous)X
+2861(belief,)X
+3090(that)X
+3237(the)X
+3362(days)X
+3535(of)X
+3629(thy)X
+3758(program)X
+4056(may)X
+4220(be)X
+4322(long)X
+632 5268(even)N
+802(though)X
+1044(the)X
+1161(days)X
+1327(of)X
+1414(thy)X
+1536(current)X
+1782(machine)X
+2071(be)X
+2166(short.)X
+9 s
+776 5388(This)N
+925(particular)X
+1222(heresy)X
+1431(bids)X
+1572(fair)X
+1693(to)X
+1770(be)X
+1859(replaced)X
+2124(by)X
+2217(``All)X
+2377(the)X
+2486(world's)X
+2726(a)X
+2779(Sun'')X
+2960(or)X
+3042(``All)X
+3203(the)X
+3313(world's)X
+3554(a)X
+3608(386'')X
+3786(\(this)X
+3936(latter)X
+4106(being)X
+4288(a)X
+776 5468(particularly)N
+1129(revolting)X
+1410(invention)X
+1703(of)X
+1784(Satan\),)X
+2007(but)X
+2120(the)X
+2229(words)X
+2425(apply)X
+2606(to)X
+2683(all)X
+2776(such)X
+2929(without)X
+3169(limitation.)X
+3505(Beware,)X
+3762(in)X
+3838(particular,)X
+4152(of)X
+4232(the)X
+776 5548(subtle)N
+974(and)X
+1104(terrible)X
+1339(``All)X
+1505(the)X
+1620(world's)X
+1866(a)X
+1925(32-bit)X
+2124(machine'',)X
+2461(which)X
+2663(is)X
+2738(almost)X
+2957(true)X
+3096(today)X
+3283(but)X
+3402(shall)X
+3565(cease)X
+3748(to)X
+3831(be)X
+3926(so)X
+4017(before)X
+4228(thy)X
+776 5628(resume)N
+1002(grows)X
+1195(too)X
+1305(much)X
+1483(longer.)X
+
+2 p
+%%Trailer
+xt
+
+xs

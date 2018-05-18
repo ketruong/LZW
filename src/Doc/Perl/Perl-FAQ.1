@@ -1,0 +1,969 @@
+Newsgroups: comp.lang.perl.announce,comp.lang.perl.misc,comp.answers,news.answers
+Path: yale!news3.near.net!paperboy.wellfleet.com!news-feed-1.peachnet.edu!umn.edu!spool.mu.edu!howland.reston.ans.net!newsjunkie.ans.net!news.ptd.net!spp
+From: spp@peach.epix.net
+Subject: comp.lang.perl.* FAQ 1/5 - Availability
+X-Nntp-Posting-Host: cs1-12.pcn.ptd.net
+Message-ID: <SPP.95Sep5191032@icarus.sunfire.com>
+Followup-To: poster
+Sender: news@postoffice.ptd.net (News Master)
+Organization: ProLog - PenTeleData, Inc.
+Date: Tue, 5 Sep 1995 23:10:32 GMT
+Approved: news-answers-request@MIT.EDU
+Lines: 955
+Xref: yale comp.lang.perl.announce:115 comp.lang.perl.misc:5179 comp.answers:13178 news.answers:49622
+
+
+
+Archive-name: perl-faq/part1
+Version: $Id: part1,v 2.9 1995/05/15 15:44:17 spp Exp spp $
+Posting-Frequency: bi-weekly
+Last Edited: Wed Aug 16 21:22:01 1995 by spp (Stephen P Potter) on temples.syrinx.com
+
+This posting contains answers to general information and availability
+questions.  The following questions are answered in this posting: 
+
+
+1.1) What is Perl?
+    
+    Perl is a compiled scripting language written by Larry Wall*.
+
+    Here's the beginning of the description from the perl(1) man page:
+
+	Perl is an interpreted language optimized for scanning arbi-
+	trary  text  files,  extracting  information from those text
+	files, and printing reports based on that information.  It's
+	also  a good language for many system management tasks.  The
+	language is intended to be practical  (easy  to  use,  effi-
+	cient,  complete)  rather  than  beautiful  (tiny,  elegant,
+	minimal).  It combines (in  the  author's  opinion,  anyway)
+	some  of the best features of C, sed, awk, and sh, so people
+	familiar with those languages should have little  difficulty
+	with  it.  (Language historians will also note some vestiges
+	of csh, Pascal,  and  even  BASIC-PLUS.)  Expression  syntax
+	corresponds  quite  closely  to C expression syntax.  Unlike
+        most Unix utilities, perl does  not  arbitrarily  limit  the
+	size  of your data--if you've got the memory, perl can slurp
+        in your whole file as a  single  string.   Recursion  is  of
+	unlimited  depth.   And  the hash tables used by associative
+        arrays grow as necessary to  prevent  degraded  performance.
+	Perl  uses sophisticated pattern matching techniques to scan
+        large amounts of data very quickly.  Although optimized  for
+	scanning  text, perl can also deal with binary data, and can
+        make dbm files look like associative arrays  (where  dbm  is
+	available).   Setuid  perl scripts are safer than C programs
+        through a dataflow tracing  mechanism  which  prevents  many
+	stupid  security  holes.   If  you have a problem that would
+        ordinarily use sed or awk or sh, but it exceeds their  capa-
+	bilities  or must run a little faster, and you don't want to
+        write the silly thing in C, then perl may be for you.  There
+	are  also  translators to turn your sed and awk scripts into
+        perl scripts.  OK, enough hype.
+
+
+1.2) What are perl4 and perl5, are there any differences?
+
+    Perl4 and perl5 are different versions of the language.  Perl4 was the
+    previous release, and perl5 is "Perl: The Next Generation."
+    Perl5 is, essentially, a complete rewrite of the perl source code
+    from the ground up.  It has been modularized, object oriented, 
+    tweaked, trimmed, and optimized until it almost doesn't look like
+    the old code.  However, the interface is mostly the same, and
+    compatibility with previous releases is very high.
+
+
+1.3) What features does perl5 provide over perl4?
+
+    If you get the newest source (from any of the main FTP sites), you will
+    find a directory full of man pages (possibly to be installed as section
+    1p and 3pm) that discuss the differences, new features, old
+    incompatibilies and much more.  Here, however, are some highlights as
+    to the new features and old incompatibilities.
+
+    * Enhanced Usability:  Perl code can now be written in a much more
+	legible style.  Regular expressions have been enhanced to allow
+	minimal matches, conditionals, and much more.  Cryptic variable
+	names (although still supported) have been aliased to new
+    	nmemonics, using the "English" module, allowing old scripts to run
+    	and new scripts to be readable.  Error messages and optional
+    	warnings are more informative and will catch many common mistakes.
+    	See the perldiag(1) man page, which contains pithy prose from Larry
+    	Wall* on each and every possible muttering perl might spout at you.
+    * Simplified Grammar:  The new yacc grammar is one half the size of
+	the old one.  Many of the arbitrary grammar rules have been
+	regularized.  The number of reserved words has been cut by 2/3.
+    * Lexical Scoping:  Perl variables may now be declared within a
+	lexical scope, similar to C's "auto" variables.  This is a
+	great improvement on efficiency and contributes to better
+	privacy.  See the my() entry in perlfunc(1).
+    * Arbitrarily nested data structures:  Full fledged multidimensional
+	arrays.  Any scalar value, including an array element, may now
+	contain a reference to any other variable or subroutine.
+	Easily created anonymous variables and subroutines.  See
+    	perlref(1).
+    * Modularity and Reusability:  The Perl library is now defined in
+	terms of modules which can be easily shared among various
+	packages.  Packages can import any or all of a module's
+	published interface.  See perlmod(1), perlsub(1), and
+    	Exporter(3pm). 
+    * Object-oriented programming:  A package can function as a class.
+	Dynamic multiple inheritance and virtual methods are supported
+	in a straight-forward manner with little new syntax.  Filehandles
+	are now treated as objects.  See perlobj(1), perlmod(1), and
+    	FileHandle(3pm). 
+    * Embeddable and Extensible:  Perl can be easily embedded in C/C++
+	applications, and can either call or be called by your routines
+    	through a documented interface.  The XS preprocessor is provided to
+    	make it easy to glue your C/C++ routines into Perl.  Dynamic
+    	loading of modules is supported.  See perlapi(1), perlcall(1), and
+    	DynaLoader(3pm). 
+    * POSIX compliant:  A major new module is the POSIX module, which
+	provides access to all available POSIX routines and definitions.
+    	Seee POSIX(3pm).
+    * Package constructors and destructors:  The new BEGIN and END blocks
+    	provide means to capture control as a package is being compiled and
+    	after the program exits.  As a degenerate case, they work just like
+    	awk's BEGIN and END when you use the -p or -n switches.  See
+    	perlmod(1). 
+    * Multiple simultaneous DBM implementations:  A perl program now has
+    	access to DBM, NDBM, SDBM, GDBM and Berkeley DB files in the same
+    	script.  The dbmopen interface has been generalized to allow any
+    	variable to be tied to an object class which defines its access
+    	methods.  tie/untie now preferable to dbmopen/dbmclose.  See the
+    	tie() entry in perlfunc(1) and the DB_File(3pm) man pages.
+    * Subroutine definitions may now be autoloaded:  The AUTOLOAD mechanism
+    	allows any arbitrary semantics to undefined subroutine calls.  See
+    	the section on Autoloading in the perlsub(1) manpage.
+    * Regular Expression Enhancements:  Qualifiers may be followed by a "?"
+	to signify that they should be non-greedy.  A "?" directly after
+	an opening paren indicates non backreference grouping and the next
+	character determines the purpose of the match (?:a|b|c) will match
+	any of a b or c without producing a backreference, (?=stuff) does
+	a non-eating look ahead to assure that the next thing is stuff, 
+	(?!nonsense) looks ahead to assure that the next thing must not
+	be "nonsense".  Embedded whitespace and comments for readability.  
+	A consistent extensibility mechanism has been added that is 
+	upwardly compatible with all old regexps.  Variables may now be 
+	interpolated literally into a pattern with \Q or the quotemeta 
+	function, which works like \U but backwhacks non-alphanumerics.  
+	New m and s "flags" for pattern matching force multi- or 
+	single-line matching.  The "s" makes "." match "\n".  \A and
+	\Z anchor matches to the beginning and end of a string and ignore
+	multiline semantics.  \G matches where the previous m//g or s///g
+	left off.
+    * The -w (warnings) switch is much more informative.
+    * References and Objects (see t/op/ref.t) for examples.
+    * => is a synonym for comma and helps group paired arguments, such
+	as initializers for associative arrays and named arguments to
+	subroutines.
+    * All functions, even predeclared subroutines, are treated as list
+    	operators or unary operators.  Parens are optional. 
+    * Flattened interpreter:  Compare perl4's eval.c with perl5's pp.c.
+	Compare perl4's 900 line interpreter look with perl5's one line.
+    * eval is now treated like a subroutine call, meaning (among other
+	things) you can return from it.
+    * format value lists may be spread over multiple lines with a do {}
+	block.
+    * flags on the #! line are interpreted even if the script wasn't
+	invoked directly.
+    * ?: is now an lvalue.
+    * list context now propogates to the right side of && and ||, and
+	as the 2nd and 3rd arguments of ?:
+    * preferred package delimiter now :: rather than '.
+    * new "and" and "or" operators, like && and || but with a lower
+	precedence than comma, so they work better with list operators.
+    * New functions abs(), chr(), uc(), ucfirst(), lc(), and lcfirst()
+    * require(number) checks to see that the version is at least that
+	version
+    * qw//, which is equivalent to split(' ', q//)
+    * assignment of a reference to a glob replaces the single element
+	of the glob corresponding to the reference type:
+	    *foo = \$bar, * foo = \&bletch;
+    * filehandle methods are supported:
+	output_autoflush STDOUT 1;
+    * Autoload stubs can now call the replacement subroutine with
+	goto &realsub.
+    * Subroutines can be defined lazily in any package by declaring
+	an AUTOLOAD routine, which will be called if a non-existent
+	subroutine is called in that package.
+    * "use" and "no" subsume many features.  "use Module LIST" is
+	short for "BEGIN { require Module; import Module LIST }"
+	"no" is identical, except that it calls "unimport" instead.
+	"use integer" and variations of "use strict [vars,refs,subs]"
+	were implemented through new modules.
+
+(Thanks to Tom Christiansen* for this section)
+
+
+1.4) Where can I get docs on perl5?
+  
+    The complete perl documentation is available with the Perl
+    distribution, or can be accessed from the following sites.
+    Note that the PerlDoc ps file is 240 pages long!! 
+  
+    Marked Up (HTML) format:
+    	http://www.metronet.com/0/perlinfo/perl5/manual/perl.html
+    	http://web.nexor.co.uk/perl/perl.html	    	    	(Europe)
+
+    PostScript:
+	ftp://ftp.cis.ufl.edu/pub/perl/doc/PerlDoc.ps.gz
+        ftp://ftp.uu.net/languages/perl/PerlDoc.ps.gz
+        ftp://www.metronet.com/pub/perl/perl5/manual/PerlDoc.ps.gz
+        ftp://ftp.zrz.tu-berlin.de/pub/unix/perl/PerlDoc.ps.gz  (Europe)
+        ftp://ftp.cs.ruu.nl/pub/PERL/perl5.0/doc/PerlDoc.ps.gz  (Europe)
+        ftp://sungear.mame.mu.oz.au/pub/perl/doc/PerlDoc.ps.gz  (Oz)
+		unable to access as of 7/15/95
+
+    TeXinfo (Emacs) Format:
+    	ftp://www.metronet.com/pub/perl/perl5/manual/perl5-info.tar.gz
+
+
+1.5) Will perl5 break my perl4 scripts?
+  
+    In general, no.  However, certain bad old practices have become highly
+    frowned upon.  The following are the most important of the known
+    incompatibilities between perl4 and perl5.  See perltrap(1) for more 
+    details.
+  
+    * "@" ***ALWAYS*** interpolates in double quoted strings.  Non-array
+    "@"s must be escaped: 
+    	Mail("foo@bar.com") needs to be
+    	Mail("foo\@bar.com"); 
+    The compiler catches this.
+    * "open FILE || die" needs to be "open(FILE) || die".  The compiler
+      forgives you for this, but won't stop complaining until you fix it.
+    * Barewords are no longer (necessarily) strings: they will actually
+      call the function (if it existed when that code was compiled)
+      instead of returning a string of that value.  Check your 
+      signal handlers.  The 'use strict subs' pragma (see strict(3pm))
+      will help you with this.
+    * "shift @x + 20" needs to be "shift(@x) + 20" because of precedence,
+      and likewise "$y = scalar keys %foo + 30" needs to be instead 
+      "$y = scalar keys(%foo) + 30".
+    * The internal symbol table is called %{PACKAGE::} for any given 
+      package.  It used to be %{_PACKAGE}.
+    * You may no longer (attempt to) write to read-only variables, like $1,
+      or assign to a substr() past the end of a string.
+    * Various deprecated practices elicit warning messages.
+    * The package delimiter has been changed from ' to ::.  Use of ' is
+      deprecated, but still works.  Use of :: may break scripts if you
+      aren't careful (especially if you are working with colon delimited
+      data files, like /etc/passwd)
+
+
+1.6) When will Perl stabilize?
+  
+When asked at what point the Perl code would be frozen, Larry answered:
+  
+    Part of the redesign of Perl is to *allow* us to more or less freeze
+    the language itself.  It won't totally freeze, of course, but I think
+    the rate of change of the core of the language is asymptotically
+    approaching 0.  In fact, as time goes on, now that we have an official
+    extension mechanism, some of the things that are currently in the core
+    of the language may move out (transparently) as extensions.  This has
+    already happened to dbmopen().
+  
+    I've also been continuously reminding myself of what Henry Spencer
+    calls "second system syndrome", in which everything under the sun gets
+    added, resulting in a colossal kludge, like OS 360.  You'll find that
+    the new features in Perl 5 are all pretty minimalistic.  The
+    object-oriented features in particular added only one new piece of
+    syntax, a C++-style method call.
+  
+    : The whole idea behind
+    : Perl is to be a fast text-processing, system-maintenance, zero-startup
+    : time language. If it gets to be so large and complicated that it isn't
+    : fast-running and easy to use, it won't be to anyone's benefit.
+  
+    My motto from the start has been, "If it ain't broke, don't fix it."
+    I've been trying very hard not to remove those features from Perl that
+    make it what it is.  At the same time, a lot of streamlining has gone
+    into the syntax.  The new yacc file is about half the size of the old
+    one, and the number of official reserved words has been cut by 2/3.
+    All built-in functions have been unified (dualified?) as either list
+    operators or unary operators.
+  
+    : I really like a lot of the features in Perl, but in order for Perl to
+    : be useful on a long term basis, those features have to stay put. I
+    : bought the Camel book less than a year ago and it sounds like within
+    : another year it will be obsolete.
+  
+    The parts of Perl that the Camel book covers have not changed all that
+    much.  Most old scripts still run.  Many scripts from Perl version 1.0
+    still run.  We'll certainly be revising the Camel, but the new man
+    pages are split up such that it's pretty easy to ferret out the new
+    info when you want it.
+  
+    We did break a few misfeatures in going to Perl 5.  It seemed like the
+    first and last chance to do so.  There's a list of the
+    incompatibilities in the documentation. 
+  
+    : Not only is it a lot of work to recompile Perl
+    : on 20+ machines periodically, but it's hard to write scripts that are 
+    : useful in the long term if the guts of the language keep changing.
+    : (And if I keep having to buy new books. I keep hearing about new
+    : features of Perl 5 that aren't documented in any of the perl 5
+    : documentation that *I* can find.)
+  
+    I think you'll find a lot of folks who think that 4.036 has been a
+    pretty stable platform.
+  
+    Perl 5 is a special case.  I've been working on it for years.  (This is
+    part of the reason 4.036 has been so stable!)  There are many changes,
+    most of them for the better, I hope.  I don't expect the transition to
+    be without pain.  But that's why I stuck numbered versions out in your
+    bin directory, so that you can upgrade piecemeal if you like.  And
+    that's why I made the -w switch warn about many of the incompatibilities.
+  
+    And overriding all that, I've tried to keep it so that you don't have
+    to know much about the new stuff to use the old stuff.  You can upgrade
+    your *knowledge* piecemeal too.
+  
+    The extension mechanism is designed to take over most of the
+    evolutionary role from now on.  And it's set up so that, if you don't
+    have a particular extension, you know it right up at the front. 
+  
+    : Are there any plans to write a Perl compiler? While interpreted Perl
+    : is great for many applications, it would also be cool to be able to
+    : precompile many scripts. (Yes, I know you can undump things, but
+    : undump isn't provided with Perl and I haven't found a copy.) The
+    : creation of a perl library and dynamically-loadable modules seems
+    : like a step in that direction.  
+  
+    Yes, part of the design of Perl 5 was to make it *possible* to write a 
+    compiler for it.  It could even be done as an extension module, I
+    suppose.  Anyone looking for a master's thesis topic?
+  
+    In summary, almost every concern that you might think of has already
+    been (at least) thought about.  In a perfect world, every concern
+    could be addressed perfectly.  But in this world we just have to slog
+    through.
+  
+
+1.7) What's the difference between "perl" and "Perl"?
+
+    32!  [ ord('p') - ord('P') ]  (Shouldn't that be 42, the Answer to the
+		Great Question of Life, the Universe, and Everything?  ;) 
+
+    Larry now uses "Perl" to signify the language proper and "perl" the
+    implementation of it, i.e. the current interpreter.  Hence Tom's
+    quip that "Nothing but perl can parse Perl."
+
+    On the other hand, the aesthetic value of casewise parallelism in
+    "awk", "sed", and "perl" as much require the lower-case version as "C",
+    "Pascal", and "Perl" require the upper-case version.  It's also easier
+    to type "Perl" in typeset print than to be constantly switching in
+    Courier. :-) 
+    
+    In other words, it doesn't matter much, especially if all you're doing
+    is hearing someone talk about the language; case is hard to distinguish
+    aurally. 
+
+
+1.8) Is it a perl program or a perl script?
+
+    It depends on whether you are talking about the perl binary or
+    something that you wrote using perl.  And, actually, even this isn't
+    necessarily true.
+
+    "Standard" UNIX terminology is (roughly) this:  programs are compiled
+    into machine code once and run multiple times, scripts are translated
+    (by a program) each time they are used.  However, some say that a
+    program is anything written which is executed on a computer system.
+    Larry considers it a program if it is set in stone and you can't change
+    it, whereas if you can go in and hack at it, it's a script.  Of course,
+    if you have the source code, that makes just about anything a
+    script.  ;)
+
+    In general, it probably doesn't really matter.  The terms are used
+    interchangeably.  If you particularly like one or the other, use it.  If
+    you want to call yourself a perl programmer, call them programs.  If
+    you want to call yourself a perl scripter, call them scripts.  Randal*
+    and I (at least) will call them hacks.  (See question 2.10 ;)
+
+    Larry says that a script is what you give an actor, but a program is
+    what you give an audience.
+
+
+1.9) Is perl difficult to learn?
+    
+    Not at all.  Many people find Perl extremely easy to learn.  There are
+    at least three main reasons for this.
+
+    The first reason is that most of Perl has been derived from standard
+    utilities, tools, and languages that you are (probably) already
+    familiar with.  If you have any knowledge of the C programming language
+    and standard C library, the Unix Shell, sed and awk, Perl should be
+    simple and fun for you to learn.
+
+    The second reason that Perl is easy to learn is that you only have to
+    know a very small subset of Perl to be able to get useful results.  In
+    fact, once you can master
+
+    	#!/usr/local/bin/perl
+	 print "Hello, world\n";
+
+    you can start writing Perl scripts.  In fact, you will probably never
+    have to (or be able to) know everything about Perl.  As you feel the
+    need or desire to use more sophisticated features (such as C structures
+    or networking), you can learn these as you go.  The learning curve for
+    Perl is not a steep one, especially if you have the headstart of having 
+    a background in UNIX.  Rather, its learning curve is gentle and
+    gradual, but it *is* admittedly rather long. 
+
+    The third reason is that you can get immediate results from your
+    scripts.  Unlike a normal compiled language (like C or Pascal, for
+    example), you don't have to continually recompile your program every
+    time you change one little thing.  Perl allows you to experiment and
+    test/debug quickly and easily.  This ease of experimentation flattens
+    the learning curve even more.
+
+    If you don't know C or UNIX at all, it'll be a steeper learning curve,
+    but what you then learn from Perl will carry over into other areas,
+    like using the C library, UNIX system calls, regular expressions, and 
+    associative arrays, just to name a few.  To know Perl is to know UNIX,
+    and vice versa. 
+
+
+1.10) Should I program everything in Perl?
+
+    Most definitely.  In fact, you should delete the binaries for sed, awk,
+    cc, gcc, grep, rm, ls, cat... well, just delete your /bin directory.
+
+    But seriously, of course you shouldn't.  As with any job, you should
+    use the appropriate tool for the task at hand.  Just because a hammer 
+    will put screws into a piece of board, you probably don't want to do
+    that.
+
+    While it's true that the answer to the question "Can I do (some
+    arbitrary task) in Perl?" is almost always "yes", that doesn't mean
+    this is necessarily a good thing to do.  For many people, Perl serves
+    as a great replacement for shell programming.  For a few people, it
+    also serves as a replacement for most of what they'd do in C.  But for
+    some things, Perl just isn't the optimal choice.
+
+
+1.11) How does Perl compare with other scripting languages, like Tcl, Python
+     or REXX?
+
+    REXX is an interpreted programming language first seen on IBM systems.
+    Python is an interpreted programming language by Guido van Rossum*.
+    TCL is John Ousterhout*'s embeddable command language, designed just
+    for embedded command extensions, but lately used for larger
+    applications.  TCL's most intriguing feature for many people is the
+    tcl/tk toolset that allows for interpreted X-based tools.  Others use
+    it for its "expect" extension.
+
+    To avoid any flamage, if you really want to know the answer to this
+    question, probably the best thing to do is try to write equivalent
+    code to do a set of tasks.  All three have their own newsgroups in
+    which you can learn about (but hopefully not argue about) these
+    languages.
+
+    To find out more about these or other languages, you might also check
+    out David Muir Sharnoff*'s posting "Catalog of Compilers, Interpreters,
+    and Other Language Tools" which he posts to comp.lang.misc,
+    comp.sources.d, comp.archives.admin, and news.answers newsgroups.  It's
+    a comprehensive treatment of many different languages.  (Caveat lector:
+    he considers Perl's syntax "unappealing".)
+
+
+1.12) How can I get Perl over the Internet?
+
+    Perl is available from any comp.sources.misc archive.  You can use an
+    archie server (see the alt.sources FAQ in news.answers) to find these
+    if you want.
+
+      Version 4:
+	Volume	Issues	Patchlevel and Notes
+	------	------	------------------------------------------------
+	  18    19-54	Patchlevel 3, Initial posting.
+	  20	56-62	Patches 4-10	
+
+      Version 5:
+    	Volume	Issues	Patchlevel and Notes
+    	------	------	-----------------------------------------------
+    	  45	64-128	Initial Posting, patchlevel 0.
+
+    Since 1993, a number of archives have sprung up specifically for Perl
+    and Perl related items.  Larry maintains the official distribution
+    site (for both perl4.036 and perl5) at netlabs.  Probably the largest
+    archive is at the University of Florida.  In order of probability these
+    sites will have the sources.
+
+	Site	Directory and notes	            	    IP	    	    
+	--------------------------------------------- 	    -------	    
+    North America:
+	ftp://ftp.netlabs.com/pub/outgoing/perl5.0/ 	    192.94.48.152
+	ftp://ftp.cis.ufl.edu/pub/perl/src/5.0/	    	    128.227.100.198
+    	ftp://prep.ai.mit.edu/pub/gnu/	    	    	    18.71.0.38
+		not current as of 7/15/95
+    	ftp://ftp.uu.net/languages/perl/    	    	    192.48.96.9
+		not current as of 7/15/95
+    	ftp://ftp.khoros.unm.edu/pub/perl/  	    	    198.59.155.28
+		not current as of 7/15/95
+    	ftp://ftp.cbi.tamucc.edu/pub/duff/Perl/	    	    165.95.1.3
+	ftp://ftp.metronet.com/pub/perl/sources/    	    192.245.137.1
+    	ftp://genetics.upenn.edu/perl5/	    	    	    128.91.200.37
+
+    Europe:
+    	ftp://ftp.cs.ruu.nl/pub/PERL/perl5.0/src/	    131.211.80.17
+    	ftp://ftp.funet.fi/pub/languages/perl/ports/perl5/  128.214.248.6
+    	ftp://ftp.zrz.tu-berlin.de/pub/unix/perl/   	    130.149.4.40
+        ftp://src.doc.ic.ac.uk/packages/perl5/	    	    146.169.17.5
+  
+    Australia:
+    	ftp://sungear.mame.mu.oz.au/pub/perl/src/5.0/	    128.250.209.2
+
+    South America (mirror of ftp://prep.ai.mit.edu/pub/gnu):
+    	ftp://ftp.inf.utfsm.cl/pub/gnu/	    	    	    146.83.198.3
+
+    If there is a site in Asia or Japan, please tell us about it.  Thanks! 
+
+    You can also retrieve perl via non-ftp methods:
+  
+        http://src.doc.ic.ac.uk/packages/perl5/	    	    146.169.17.5
+        gopher://src.doc.ic.ac.uk/0/packages/perl5/ 	    146.169.17.5
+
+
+1.13) How can I get Perl via Email?
+
+    The following is a list of known ftpmail sites.  Please attempt to use
+    the site closest to you with the ftp archive closest to it.  Many of
+    these sites already have perl on them.  For information on how to use
+    one of these sites, send email containing the word "help" to the
+    address.
+
+	United States:
+	    Massachusetts:	ftpmail@decwrl.dec.com
+	    New Jersey:		bitftp@pucc.princeton.edu
+	    North Carolina:	ftpmail@sunsite.unc.edu
+
+	Europe/UK:
+	    Germany:		ftpmail@ftp.uni-stuttgart.de
+				bitftp@vx.gmd.de
+	    UK:			ftpmail@doc.ic.ac.uk
+
+	Australia:		ftpmail@cs.uow.edu.au
+
+    Henk P Penning* suggests that if you are in Europe you should try the
+    following (if you are in Germany or the UK, you should probably use one
+    of the servers listed above): 
+
+        Email: Send a message to 'mail-server@cs.ruu.nl' containing:
+	 begin
+	 path your_email_address
+	 send help
+	 send PERL/perl5.0/INDEX
+	 end
+	The path-line may be omitted if your message contains a normal
+	From:-line.  You will receive a help-file and an index of the
+	directory that contains the Perl stuff.
+
+    If all else fails, mail to Larry usually suffices.
+
+
+1.14) How can I get Perl via UUCP?
+
+    There currently is no way of getting Perl via UUCP.  If anyone knows of
+    a way, please contact me.  The OSU site has discontinued the service.
+
+
+1.15) Are there other ways of getting perl?
+
+    Another possibility is to use UUNET, although they charge you for it.
+    You have been duly warned.  Here's the advertisement: 
+
+	       Anonymous Access to UUNET's Source Archives
+
+			     1-900-GOT-SRCS
+
+	UUNET now provides access to its extensive collection of UNIX
+    related sources to non- subscribers.  By  calling  1-900-468-7727
+    and  using the login "uucp" with no password, anyone may uucp any
+    of UUNET's on line source collection.  Callers will be charged 40
+    cents  per  minute.   The charges will appear on their next tele-
+    phone bill.
+
+	 The file uunet!/info/help contains instructions.   The  file
+    uunet!/index//ls-lR.Z  contains  a  complete  list  of  the files 
+    available  and is  updated daily.   Files ending  in Z need to be 
+    uncompressed before being used.  The file uunet!~/compress.tar is
+    a tar archive containing the C sources for the uncompress program. 
+
+	 This service provides a  cost  effective  way  of  obtaining
+    current  releases  of sources without having to maintain accounts
+    with UUNET or some other service.  All modems  connected  to  the
+    900  number  are  Telebit T2500 modems.  These modems support all
+    standard modem speeds including PEP, V.32 (9600), V.22bis (2400),
+    Bell  212a  (1200), and Bell 103 (300).  Using PEP or V.32, a 1.5
+    megabyte file such as the GNU C compiler would cost $10  in  con-
+    nect  charges.   The  entire  55  megabyte X Window system V11 R4
+    would cost only $370 in connect time.  These costs are less  than
+    the  official  tape  distribution fees and they are available now
+    via modem.
+
+		      UUNET Communications Services
+		   3110 Fairview Park Drive, Suite 570
+			 Falls Church, VA 22042
+			 +1 703 876 5050 (voice)
+			  +1 703 876 5059 (fax)
+			    info@uunet.uu.net
+
+
+1.16) Has perl been ported to machine FOO?
+
+    Perl runs on virtually all Unix machines simply by following the hints
+    file and instructions in the Configure script.  This auto-configuration
+    script allows Perl to compile on a wide variety of platforms by
+    modifying the machine specific parts of the code.  For most Unix
+    systems, or VMS systems for v5 perl, no porting is required.  Try to
+    compile Perl on your machine.  If you have problems, examine the README
+    file carefully.  If all else fails, send a message to comp.lang.perl
+    and crosspost to comp.sys.[whatever], there's probably someone out
+    there that has already solved your problem and will be able to help you
+    out. 
+
+    Perl4.036 has been ported to many non-Unix systems, although currently
+    there are only a few (beta) v5 ports.  All of the following are
+    mirrored at ftp://ftp.cis.ufl.edu:/pub/perl/src/.  The following are
+    the (known) official distribution points.  Please contact the porters 
+    directly (when possible) in case of questions on these ports.
+
+	* MS-DOS binaries and source are available at  [130.179.8.47]
+    	  ftp://ftp.ee.umanitoba.ca/pub/msdos/perl/perl4
+	  There are currently half a dozen different ports for MS-DOS.
+	  BigPerl4 (v4) is perl4.036 compiled with the Watcom C/C++^32
+	  compiler (32-bit, flat-memory model C compiler) with the
+	  following features:
+	    * Up to 32MB of memory can be used.
+	    * Supports virtual memory.
+	    * Works under Windows 3.1 
+	    * The perl debugger can be used.
+	    * Contains Berkeley DB support.  GDBM is no longer supported.
+
+	  Note that the latest version of BigPerl4 can also be found at
+	  any SimTel mirror site (ftp.ee.umanitoba.ca does not
+	  necessarily have the latest version), such as:
+
+		ftp://oak.oakland.edu/SimTel/msdos/perl/
+
+    	  A beta-test version of bigperl based on Perl 5.000 can be
+    	  obtained from the following sites:
+
+    	    ftp://ftp.einet.net/pub/perl5
+    	    ftp://ftp.khoros.unm.edu/pub/perl/msdos
+    	    ftp://ftp.ee.umanitoba.ca/pub/msdos/perl/perl5
+
+    	  This beta bigperl also contains ported versions of a2p and s2p.
+
+	* Windows/NT binaries are available from
+    	  ftp://ftp.intergraph.com/pub/win32/perl, or at any of the major
+    	  NT archives.  They are compiled for NT 3.5, but appears to work
+    	  under Win95 also.  It is visible to the NT Registry.  Dean
+    	  Troyer* is working on extending the visibility to SAM and the
+    	  Event Log.  His current work-in-progress is available from
+    	  ftp://pmip.dist.maricopa.edu/pub/nt.
+
+	* Macintosh binaries and source are available from [130.59.1.40]
+    	  ftp://nic.switch.ch/software/mac/perl.
+	  Version 4.1.3 is perl4.036 compiled with the MPW C compiler
+	    * Mac_Perl_413_src.sit.bin	    Sources
+	    * Mac_Perl_413_tool.sit.bin	    MPW Tool
+	    * Mac_Perl_413_appl.sit.bin	    Standalone Application
+	  There is a mailing list for discussing Macintosh Perl.  Contact
+	  "mpw-perl-request@iis.ee.ethz.ch".
+
+	  Timothy Murphy* also ported a version of perl to the Macintosh
+	  using Think C.  It has probably been abandoned in favour of the
+	  MPW port, but is still available at [134.266.81.10]
+    	  ftp://ftp.maths.tcd.ie/pub/Mac/perl-4.035/.
+
+    	  Matthias Ulrich Neeracher* is working on a perl5 port to the
+    	  Macintosh.  A PowerPC version is available at 
+    	  ftp://err.ethz.ch/pub/neeri/MacPerlBeta.
+
+	* OS/2 sources are also available at
+    	  ftp://ftp.cis.ufl.edu/pub/perl/src/4.0/os2.  This appears to have
+    	  been abandoned and added to the official distribution.  See the
+    	  directory os2 in the perl5 sources.
+
+	* VMS systems should be able to build directly from the standard
+	  distribution.
+
+    	* Amiga sources are not available from ftp.cis.ufl.edu, but can
+    	  be found at any Aminet archive, notably:
+    	    * ftp://ftp.wustl.edu/pub/aminet/dev/lang/
+    	    * ftp://ftp.uni-erlangen.de/pub/aminet/dev/lang/
+    	    * ftp://ftp.doc.ic.ac.uk/pub/aminet/dev/lang/
+    	    * ftp://ftp.funet.fi/pub/languages/perl/ports/perl4/amiga
+
+1.17) How do I get Perl to compile on Solaris?
+
+    The following directions are for perl, version 4.  Perl, version 5,
+    should compile more easily.  If not, send mail to The Perl Porters
+    Mailing List (perl5-porters@nicoh.com)
+
+    John Lees* reports:
+
+        I have built perl on Solaris 2.1, 2.2 beta, and 2.2 FCS. Take
+	/usr/ucb out of your path and do not use any BSD/UCB libraries.
+	Only -lsocket, -lnsl, and -lm are needed. You can use the hint for
+	Solaris 2.0, but the one for 2.1 is wrong. Do not use vfork. Do not
+	use -I/usr/ucbinclude.  The result works fine for me, but of couse
+	does not support a couple of BSDism's.
+
+    Casper H.S. Dik* reports
+
+        You must remove all the references to /usr/ucblib AND
+        /usr/ucbinclude.  And ignore the Solaris_2.1 hints. They are wrong.
+        The undefining of vfork() probably has to do with the confusion it 
+        gives to the compilers.  If you use cc, you mustn't compile
+	util.c/tutil.c  with -O.  I only used the following libs: -lsocket 
+	-lnsl -lm (there is a problem with -lmalloc)
+
+    Michael D'Errico* reports:
+
+        If you are using Solaris 2.x, the signal handling is broken.  If
+	you set up a signal handler such as 'ripper' it will be forgotten
+	after the first time the signal is caught.  To fix this, you need
+	to recompile Perl.  Just add '#define signal(x,y) sigset((x),(y))'
+	after the '#include <signal.h>' directive in each file that it
+	occurs, then make it again. 
+
+
+1.18) How do I get Perl to compile on a Next?
+
+    According to Andreas Koenig*, under NeXTstep 3.2, both perl4.036 and
+    perl5.000 compile with the supplied hints file. 
+
+    However, Bill Eldridge* provides this message to help get perl4.036 on
+    NeXTstep 3.0 to work: 
+
+        To get perl to compile on NeXTs, you need to combine the ANSI
+        and BSD headers:
+
+        cd /usr/include
+        mkdir ansibsd
+        cd ansibsd
+        ln -s ../ansi
+        ln -s ../bsd
+
+        Then, follow the configuration instructions for NeXTs, *replacing*
+        all mention of -I/usr/include/ansi or -I/usr/include/bsd with
+        -I/usr/include/ansibsd.
+
+
+1.19) What extensions are available from Perl and where can I get them?
+  
+    Some of the more popular extensions include those for windowing,
+    graphics, or data base work.  Most of the major sites contain an
+    archive of the extensions, usually in the ext directory.  Since the
+    list of available extensions changes so often, I have opted to list
+    only the sites and directories, not the individual extensions, please
+    check the closest archive for more information
+  
+      ftp://ftp.cis.ufl.edu/pub/perl/ext
+    	(also linked at ftp://ftp.cis.ufl.edu/pub/perl/src/5.0/ext)
+      ftp://ftp.khoros.unm.edu/pub/perl/extensions/
+      ftp://ftp.metronet.com/pub/perlinfo/perl5/
+      ftp://ftp.cs.ruu.nl/pub/PERL/perl5.0/ext
+      ftp://black.ox.ac.uk/src/ALPHA/
+ 
+
+1.20) What is dbperl and where can I get it?
+
+    Many database-oriented extensions to Perl have been written.
+    Basically, these use the usub mechanism (see the usub/ subdirectory) in
+    the source distribution) to link in a database library, allowing
+    embedded calls to Informix, Ingres, Interbase, Oracle and Sybase.
+
+    Here are the authors of the various extensions:
+
+    What            Target DB       Who
+    --------        -----------     ----------------------------------------
+    ?Infoperl       Informix        Kurt Andersen (kurt@hpsdid.sdd.hp.com)
+    Ingperl	    Ingres	    Tim Bunce (timbo@ig.co.uk) and Ted Lemon
+    Interperl       Interbase       Buzz Moschetti (buzz@bear.com)
+    Isqlperl	    Informix	    William Hails, bill@tardis.co.uk
+    Oraperl         Oracle          Kevin Stock (kstock@Auspex.com)
+    Pgperl	    Postgres	    Igor Metz (metz@iam.unibe.ch)
+    *Sqlperl        Ingres          Ted Lemon (mellon@ncd.com)
+    Sybperl         Sybase          Michael Peppler (mpeppler@itf.ch)
+    Uniperl	    Unify 5.0	    Rick Wargo (rickers@coe.drexel.edu)
+
+    ? Does this one still exist?
+    * Sqlperl appears to have been subsumed by Ingperl
+
+    Buzz Moschetti* has organized a project to create a higher level
+    interface to allow you to write your queries in a database-independent
+    fashion.  If this type of project interests you, send mail to
+    <perldb-interest-request@vix.com> and asked to be placed on the 
+    "perldb-interest" mailing lists.
+
+    Here's a bit of advertising from Buzz:
+
+	Perl is an interpreted language with powerful string, scalar, and
+	array processing features developed by Larry Wall that "nicely
+	bridges the functionality gap between sh(1) and C."  Since
+	relational DB operations are typically textually oriented, perl is
+	particularly well-suited to manage the data flows.  The C source
+	code, which is available free of charge and runs on many platforms,
+	contains a user-defined function entry point that permits a
+	developer to extend the basic function set of the language.  The
+	DBperl Group seeks to exploit this capability by creating a
+	standardized set of perl function extensions (e.g. db_fetch(),
+	db_attach()) based on the SQL model for manipulating a relational
+    	DB, thus providing a portable perl interface to a variety of
+    	popular RDMS engines including Sybase, Oracle, Ingres, Informix,
+    	and Interbase.  In theory, any DB engine that implements a dynamic
+    	SQL interpreter in its HLI can be bolted onto the perl front end
+    	with predicatable results, although at this time backends exist
+    	only for the aforementioned five DB engines. 
+
+    The official archive for DBperl extensions is ftp.demon.co.uk:
+    /pub/perl/db.  It's the home of the evolving DBperl API Specification.
+    Here's an extract from the updated README there:
+
+    DBI/    	The home of the DBI archive. To join the DBI mailing list
+                send your request to perldb-interest-REQUEST@vix.com
+
+    DBD/        Database Drivers for the DBI ...
+     
+    Oracle/      By Tim Bunce (not yet ready!) 
+    Ingres/      By Tim Bunce (not yet started!) 
+ 
+    mod/           Other Perl 5 Modules and Extensions ...
+
+    Sybperl/    By Michael Peppler, mpeppler@itf.ch
+
+ 
+    perl4/         Perl 4 extensions (using the usub C interface)
+ 
+       oraperl/   ORACLE 6 & 7  By Kevin Stock, kstock@auspex.com 
+       sybperl/   SYBASE 4      By Michael Peppler, mpeppler@itf.ch
+       ingperl/   INGRES        By Tim Bunce timbo@ig.co.uk and Ted Lemon
+       isqlperl/  INFORMIX      By William Hails, bill@tardis.co.uk
+       interperl/ INTERBASE     By Buzz Moschetti, buzz@bear.com
+       oraperl/   ORACLE 6 & 7  By Kevin Stock (sadly no longer on the net)
+       sybperl/   SYBASE 4      By Michael Peppler, mpeppler@itf.ch
+       ingperl/   INGRES        By Tim Bunce timbo@ig.co.uk and Ted Lemon
+       isqlperl/  INFORMIX      By William Hails, bill@tardis.co.uk
+       interperl/ INTERBASE     By Buzz Moschetti, buzz@bear.com
+       uniperl/   UNIFY 5.0     By Rick Wargo, rickers@coe.drexel.edu
+       pgperl/    POSTGRES      By Igor Metz, metz@iam.unibe.ch
+ 
+       btreeperl/ NDBM perl extensions.   By John Conover, john@johncon.com
+       ctreeperl/ C-Tree perl extensions. By John Conover, john@johncon.com
+       duaperl/   X.500 Directory User Agent. By Eric Douglas.
+  
+    scripts/       Perl and shell scripts
+  
+       rdb/       RDB is a perl RDBMS for ASCII files. By Walt Hobbs,
+    	    	    hobbs@rand.org 
+       shql/      SHQL is an interactive SQL database engine.  Written as a
+    	    	    shell script, SHQL interprets SQL commands and
+    	    	    manipulates flat files based on those commands. By
+    	    	    Bruce Momjian, root@candle.uucp 
+       xbase/     Perl scripts for accessing xBase style files (dBase III) 
+ 
+ 
+   refinfo/       Reference information
+      
+       sqlsyntax/ Yacc and lex syntax and C source code for SQL1 and SQL2
+    	    from ftp.uu.net:/pub/uunet/published/oreilly/nutshell/yacclex, 
+            and a draft SQL3 syntax from Jeff Fried <jfried@informix.com>+      
+       formats/   Details of file formats such as Lotus 1-2-3 .WK1
+ 
+    There are also a number of non SQL database interfaces for perl
+    available from ftp.demon.co.uk.  These include:
+
+    Directory	Target System	Authors and notes
+    ---------	-------------	-------------------------------------------
+    btreeperl	NDBM extension	John Conover (john@johncon.com)
+    ctreeperl	CTree extension John Conover (john@johncon.com)
+    duaperl	X.500 DUA	Eric Douglas
+    rdb		RDBMS		Walt Hobbs (hobbs@rand.org)
+    shql	SQL Engine	Bruce Momjian (root@candle.uucp)
+
+
+1.21) Which DBM should I use?
+ 
+    As shipped, Perl (version 5) comes with interfaces for several DBM
+    packages (SDBM, old DBM, NDBM, GDBM, Berkeley DBM) that are not supplied  
+    but either come with your system are readily accessible via FTP.  SDBM
+    is guaranteed to be there.  For a comparison, see AnyDBM_File(3pm)
+    and DB_File(3pm).
+ 
+    
+1.22) Is there an SNMP aware Perl?
+
+    snmperl was written by Guy Streeter (streeter@ingr.com), and was
+    posted in late February 1993 to comp.protocols.snmp.  It can be found
+    archived at one of two (known) places:
+
+    Host liasun3.epfl.ch
+
+	Location: /pub/net/snmp
+	       FILE -rw-rw-r--       3407  Aug 11 1992  snmperl.README
+	       FILE -rw-r--r--      17678  Aug 11 1992  snmperl.tar.Z
+
+    Host ftp.cis.ufl.edu
+	Location: /pub/perl/scripts/snmp
+
+    Here is the gist of the README:
+
+    This directory contains the source code to add callable C subroutines
+    to perl.  The subroutines implement the SNMP functions "get",
+    "getnext", and "set".  They use the freely-distributable SNMP package
+    (version 1.1b) from CMU.
+
+    USE:
+      There are four subroutines defined in the callable interface:
+    snmp_get, snmp_next, snmp_set, and snmp_error.
+
+      snmp_get and snmp_next implement the GET and GETNEXT operations,
+    respectively.  The first two calling arguments are the hostname and
+    Community string.  The IP address of the host, as a dotted-quad ASCII
+    string, may be used as the hostname.  The rest of the calling
+    arguments are a list of variables.  See the CMU package documentation
+    for how variables may be specified.
+      snmp_set also takes hostname and Community string as arguments.  The
+    remaining arguments are a list of triples consisting of variable name,
+    variable type, and value.  The variable type is a string, such as
+    "INTEGER" or "IpAddress".
+      snmp_get, snmp_next, and snmp_set return a list containing
+    alternating variables and values.  snmp_get and snmp_next will simply
+    omit non-existent variables on return.  snmp_set will fail completely
+    if one of the specified variables does not exist (or is read-only).
+      snmp_error will return a text string containing some error
+    information about the most recent snmp_get|next|set call, if it had an
+    error.
+
+    OTHER NOTES:
+      I didn't find all the places where the CMU library writes to stderr
+    or calls exit() directly.
+      The changes I made to mib.c involve the formatting of variable values
+    for return to the caller.  I took out the descriptive prefix so the
+    string contains only the value.
+      Enumerated types are returned as a string containing the symbolic
+    representation followed in parentheses by the numeric.
+
+    DISTRIBUTION and OWNERSHIP
+      perl and the CMU SNMP package have their own statements.  Read them.
+    The work I've done is free and clear.  Just don't say you wrote it if
+    you didn't, and don't say I wrote it if you change it.
+
+    Guy Streeter
+    streeter@ingr.com
+    April 1, 1992 (not a joke!)
+
+
+1.23) Is there an ISO or ANSI certified version of Perl?
+
+    No.  Larry thinks it likely that he'll be certified before perl is.
+
+--
+Stephen P Potter        Pencom Systems Administration         AMP Incorporated
+spp@peach.epix.net	spp@psa.pencom.com	          steve.potter@amp.com
+Home: 717-540-0131	Pager: 1-800-759-8888, 547-9561     Work: 717-986-5401
+                Systems Administation: It's a Kind of Magic

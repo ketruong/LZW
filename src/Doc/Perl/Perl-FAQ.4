@@ -1,0 +1,1476 @@
+Newsgroups: comp.lang.perl.announce,comp.lang.perl.misc,comp.answers,news.answers
+Path: yale!news3.near.net!paperboy.wellfleet.com!news-feed-1.peachnet.edu!gatech!usenet.eel.ufl.edu!spool.mu.edu!howland.reston.ans.net!newsjunkie.ans.net!news.ptd.net!spp
+From: spp@peach.epix.net
+Subject: comp.lang.perl.* FAQ 4/5 - General Programming
+X-Nntp-Posting-Host: cs1-12.pcn.ptd.net
+Message-ID: <SPP.95Sep5192352@icarus.sunfire.com>
+Followup-To: poster
+Sender: news@postoffice.ptd.net (News Master)
+Organization: ProLog - PenTeleData, Inc.
+Date: Tue, 5 Sep 1995 23:23:52 GMT
+Approved: news-answers-request@MIT.EDU
+Lines: 1462
+Xref: yale comp.lang.perl.announce:112 comp.lang.perl.misc:5110 comp.answers:13144 news.answers:49521
+
+
+
+Archive-name: perl-faq/part4
+Version: $Id: part4,v 2.9 1995/05/15 15:46:10 spp Exp spp $
+Posting-Frequency: bi-weekly
+Last Edited: Wed Aug 16 21:22:18 1995 by spp (Stephen P Potter) on temples.syrinx.com
+
+This posting contains answers to the following questions about General
+Programming, Regular Expressions (Regexp) and Input/Output:
+
+
+4.1) What are all these $@%*<> signs and how do I know when to use them?
+
+    Those are type specifiers: 
+	$ for scalar values
+	@ for indexed arrays
+	% for hashed arrays (associative arrays)
+	* for all types of that symbol name.  These are sometimes used like
+	    pointers in perl4, but perl5 uses references.
+	<> are used for inputting a record from a filehandle.  
+    	\ takes a reference to something.
+
+    See the question on arrays of arrays for more about Perl pointers.
+
+    While there are a few places where you don't actually need these type
+    specifiers, except for files, you should always use them.  Note that
+    <FILE> is NOT the type specifier for files; it's the equivalent of awk's
+    getline function, that is, it reads a line from the handle FILE.  When
+    doing open, close, and other operations besides the getline function on
+    files, do NOT use the brackets.
+
+    Beware of saying:
+	$foo = BAR;
+    Which wil be interpreted as 
+	$foo = 'BAR';
+    and not as 
+	$foo = <BAR>;
+    If you always quote your strings, you'll avoid this trap.
+
+    Normally, files are manipulated something like this (with appropriate
+    error checking added if it were production code):
+
+	open (FILE, ">/tmp/foo.$$");
+	print FILE "string\n";
+	close FILE;
+
+    If instead of a filehandle, you use a normal scalar variable with file
+    manipulation functions, this is considered an indirect reference to a
+    filehandle.  For example,
+
+	$foo = "TEST01";
+	open($foo, "file");
+
+    After the open, these two while loops are equivalent:
+
+	while (<$foo>) {}
+	while (<TEST01>) {}
+
+    as are these two statements:
+	
+	close $foo;
+	close TEST01;
+
+    but NOT to this:
+
+	while (<$TEST01>) {} # error
+		^
+		^ note spurious dollar sign
+
+    This is another common novice mistake; often it's assumed that
+
+	open($foo, "output.$$");
+
+    will fill in the value of $foo, which was previously undefined.  This
+    just isn't so -- you must set $foo to be the name of a filehandle
+    before you attempt to open it.   
+
+    Often people request:
+
+    : How about changing perl syntax to be more like awk or C?  I $$mean @less
+    : $-signs = <and> &other *special \%characters?
+
+    Larry's answer is:
+
+	Then it would be less like the shell.  :-)
+
+	You'll be pleased to know that I've been trying real hard to get
+	rid of unnecessary punctuation in Perl 5.  You'll be displeased to
+	know that I don't think noun markers like $ and @ unnecessary.
+	Not only do they function like case markers do in human language,
+	but they are automatically distinguished within interpolative
+	contexts, and the user doesn't have to worry about different
+	syntactic treatments for variable references within or without
+	such a context.
+
+	But the & prefix on verbs is now optional, just as "do" is in
+	English.  I do hope you do understand what I mean.
+
+	For example, you used to have to write this:
+
+	    &california || &bust;
+
+	It can now be written more cleanly like this:
+
+	    california or bust;
+
+	Strictly speaking, of course, $ and @ aren't case markers, but
+	number markers.  English has mandatory number markers, and people
+	get upset when they doesn't agree.
+
+	It were just convenient in Perl (for the shellish interplative
+	reasons mentioned above) to pull the markers out to the front of
+	each noun phrase.  Most people seems to like it that way.  It
+	certainly seem to make more sense than putting them on the end,
+	like most varieties of BASIC does.
+
+
+4.2) How come Perl operators have different precedence than C operators?
+
+    Actually, they don't; all C operators have the same precedence in Perl as
+    they do in C.  The problem is with a class of functions called list
+    operators, e.g. print, chdir, exec, system, and so on.  These are somewhat
+    bizarre in that they have different precedence depending on whether you
+    look on the left or right of them.  Basically, they gobble up all things
+    on their right.  For example,
+
+	unlink $foo, "bar", @names, "others";
+
+    will unlink all those file names.  A common mistake is to write:
+
+	unlink "a_file" || die "snafu";
+
+    The problem is that this gets interpreted as
+
+	unlink("a_file" || die "snafu");
+
+    To avoid this problem, you can always make them look like function calls
+    or use an extra level of parentheses:
+
+	unlink("a_file")  || die "snafu";
+	(unlink "a_file") || die "snafu";
+
+    In perl5, there are low precedence "and", "or", and "not" operators,
+    which bind less tightly than comma.  This allows you to write:
+
+	unlink $foo, "bar", @names, "others" 	or die "snafu";
+
+    Sometimes you actually do care about the return value:
+
+	unless ($io_ok = print("some", "list")) { } 
+
+    Yes, print() returns I/O success.  That means
+
+	$io_ok = print(2+4) * 5;
+
+    returns 5 times whether printing (2+4) succeeded, and 
+	print(2+4) * 5;
+    returns the same 5*io_success value and tosses it.
+
+    See the perlop(1) man page's section on Precedence for more gory details,
+    and be sure to use the -w flag to catch things like this.
+
+    One very important thing to be aware of is that if you start thinking
+    of Perl's $, @, %, and & as just flavored versions of C's * operator,
+    you're going to be sorry.  They aren't really operators, per se, and
+    even if you do think of them that way.  In C, if you write
+
+	*x[i]
+
+    then the brackets will bind more tightly than the star, yielding
+
+	*(x[i])
+
+    But in perl, they DO NOT!  That's because the ${}, @{}, %{}, and &{}
+    notations (and I suppose the *{} one as well for completeness) aren't
+    actually operators.  If they were, you'd be able to write them as *()
+    and that's not feasible.  Instead of operators whose precedence is
+    easily understandable, they are instead figments of yacc's grammar.
+    This means that:
+
+	$$x[$i]
+
+    is really
+
+	{$$x}[$i]
+
+    (by which I actually mean)
+
+	${$x}[$i]
+
+    and not
+
+	${$x[$i]}
+
+    See the difference?  If not, check out perlref(1) for gory details.
+
+
+4.3) What's the difference between dynamic and static (lexical) scoping?
+     What are my() and local()?
+ 
+    [NOTE: This question refers to perl5 only.  There is no my() in perl4]
+    Scoping refers to visibility of variables.  A dynamic variable is
+    created via local() and is just a local value for a global variable,
+    whereas a lexical variable created via my() is more what you're
+    expecting from a C auto.  (See also "What's the difference between
+    deep and shallow binding.")  In general, we suggest you use lexical
+    variables wherever possible, as they're faster to access and easier to
+    understand.   The "use strict vars" pragma will enforce that all
+    variables are either lexical, or full classified by package name.  We
+    strongly suggest that you develop your code with "use strict;" and the
+    -w flag.  (When using formats, however, you will still have to use
+    dynamic variables.)  Here's an example of the difference:
+
+    	#!/usr/local/bin/perl
+    	$myvar = 10;
+    	$localvar = 10;
+
+    	print "Before the sub call - my: $myvar, local: $localvar\n";
+    	&sub1();
+
+    	print "After the sub call - my: $myvar, local: $localvar\n";
+
+    	exit(0);
+
+    	sub sub1 {
+    	    my $myvar;
+    	    local $localvar;
+
+    	    $myvar = 5;     # Only in this block
+    	    $localvar = 20; # Accessible to children
+
+    	    print "Inside first sub call - my: $myvar, local: $localvar\n";
+
+    	    &sub2();
+    	}
+
+    	sub sub2 {
+    	    print "Inside second sub - my: $myvar, local: $localvar\n";
+    	}
+
+    Notice that the variables declared with my() are visible only within
+    the scope of the block which names them.  They are not visible outside
+    of this block, not even in routines or blocks that it calls.  local() 
+    variables, on the other hand, are visible to routines that are called
+    from the block where they are declared.  Neither is visible after the
+    end (the final closing curly brace) of the block at all.
+
+    Oh, lexical variables are only available in perl5.  Have we mentioned
+    yet that you might consider upgrading? :-) 
+
+
+4.4) What's the difference between deep and shallow binding?
+
+    5.000 answer:
+
+    This only matters when you're making subroutines yourself, at least
+    so far.   This will give you shallow binding:
+
+	{
+          my $x = time;
+          $coderef = sub { $x };
+        }
+
+    When you call &$coderef(), it will get whatever dynamic $x happens
+    to be around when invoked.  However, you can get the other behaviour
+    this way:
+
+	{
+          my $x = time;
+          $coderef = eval "sub { \$x }";
+        }
+
+    Now you'll access the lexical variable $x which is set to the
+    time the subroutine was created.  Note that the difference in these
+    two behaviours can be considered a bug, not a feature, so you should
+    in particular not rely upon shallow binding, as it will likely go
+    away in the future.  See perlref(1).
+
+    5.001 Answer:
+
+    Perl will always give deep binding to functions, so you don't need the
+    eval hack anymore.   Furthermore,  functions and even formats
+    lexically declared nested within another lexical scope have access to
+    that scope.
+
+	require 5.001;
+
+	sub mkcounter {
+	    my $start = shift;
+	    return sub {
+		return ++$start;
+	    } 
+	} 
+	$f1 = mkcounter(10);
+	$f2 = mkcounter(20);
+	print &$f1(), &$f2(); 
+    11 21
+	print &$f1(), &$f2(), &$f1();
+    12 22 13
+
+    See the question on "What's a closure?"
+
+
+4.5) How can I manipulate fixed-record-length files?
+
+    The most efficient way is using pack and unpack.  This is faster than
+    using substr.  Here is a sample chunk of code to break up and put back
+    together again some fixed-format input lines, in this case, from ps.
+
+	# sample input line:
+	#   15158 p5  T      0:00 perl /mnt/tchrist/scripts/now-what
+	$ps_t = 'A6 A4 A7 A5 A*';
+	open(PS, "ps|");
+	$_ = <PS>; print;
+	while (<PS>) {
+	    ($pid, $tt, $stat, $time, $command) = unpack($ps_t, $_);
+	    for $var ('pid', 'tt', 'stat', 'time', 'command' ) {
+		print "$var: <", eval "\$$var", ">\n";
+	    }
+	    print 'line=', pack($ps_t, $pid, $tt, $stat, $time, $command),  "\n";
+	}
+
+
+4.6) How can I make a file handle local to a subroutine?
+
+    You must use the type-globbing *VAR notation.  Here is some code to
+    cat an include file, calling itself recursively on nested local
+    include files (i.e. those with #include "file", not #include <file>):
+
+	sub cat_include {
+	    local($name) = @_;
+	    local(*FILE);
+	    local($_);
+
+	    warn "<INCLUDING $name>\n";
+	    if (!open (FILE, $name)) {
+		warn "can't open $name: $!\n";
+		return;
+	    }
+	    while (<FILE>) {
+		if (/^#\s*include "([^"]*)"/) {
+		    &cat_include($1);
+		} else {
+		    print;
+		}
+	    }
+	    close FILE;
+	}
+
+
+4.7) How can I call alarm() or usleep() from Perl?
+
+    If you want finer granularity than 1 second (as usleep() provides) and
+    have itimers and syscall() on your system, you can use the following.
+    You could also use select().
+
+    It takes a floating-point number representing how long to delay until
+    you get the SIGALRM, and returns a floating- point number representing
+    how much time was left in the old timer, if any.  Note that the C
+    function uses integers, but this one doesn't mind fractional numbers.
+
+    # alarm; send me a SIGALRM in this many seconds (fractions ok)
+    # tom christiansen <tchrist@convex.com>
+    sub alarm {
+	require 'syscall.ph';
+	require 'sys/time.ph';
+
+	local($ticks) = @_;
+	local($in_timer,$out_timer);
+	local($isecs, $iusecs, $secs, $usecs);
+
+	local($itimer_t) = 'L4'; # should be &itimer'typedef()
+
+	$secs = int($ticks);
+	$usecs = ($ticks - $secs) * 1e6;
+
+	$out_timer = pack($itimer_t,0,0,0,0);  
+	$in_timer  = pack($itimer_t,0,0,$secs,$usecs);
+
+	syscall(&SYS_setitimer, &ITIMER_REAL, $in_timer, $out_timer)
+	    && die "alarm: setitimer syscall failed: $!";
+
+	($isecs, $iusecs, $secs, $usecs) = unpack($itimer_t,$out_timer);
+	return $secs + ($usecs/1e6);
+    }
+
+
+4.8) How can I do an atexit() or setjmp()/longjmp() in Perl?  (Exception handling)
+
+    Perl's exception-handling mechanism is its eval operator.  You 
+    can use eval as setjmp and die as longjmp.  Here's an example
+    of Larry's for timed-out input, which in C is often implemented
+    using setjmp and longjmp:
+
+	  $SIG{ALRM} = TIMEOUT;
+	  sub TIMEOUT { die "restart input\n" }
+
+	  do { eval { &realcode } } while $@ =~ /^restart input/;
+
+	  sub realcode {
+	      alarm 15;
+	      $ans = <STDIN>;
+	      alarm 0;
+	  }
+
+   Here's an example of Tom's for doing atexit() handling:
+
+	sub atexit { push(@_exit_subs, @_) }
+
+	sub _cleanup { unlink $tmp }
+
+	&atexit('_cleanup');
+
+	eval <<'End_Of_Eval';  $here = __LINE__;
+	# as much code here as you want
+	End_Of_Eval
+
+	$oops = $@;  # save error message
+
+	# now call his stuff
+	for (@_exit_subs) { &$_() }
+
+	$oops && ($oops =~ s/\(eval\) line (\d+)/$0 .
+	    " line " . ($1+$here)/e, die $oops);
+
+    You can register your own routines via the &atexit function now.  You
+    might also want to use the &realcode method of Larry's rather than
+    embedding all your code in the here-is document.  Make sure to leave
+    via die rather than exit, or write your own &exit routine and call
+    that instead.   In general, it's better for nested routines to exit
+    via die rather than exit for just this reason.
+
+    In Perl5, it is easy to set this up because of the automatic processing
+    of per-package END functions.  These work much like they would in awk.
+    See perlfunc(1), perlmod(1) and perlrun(1).
+
+    Eval is also quite useful for testing for system dependent features,
+    like symlinks, or using a user-input regexp that might otherwise
+    blowup on you.
+
+
+4.9) How do I catch signals in perl?
+
+    Perl allows you to trap signals using the %SIG associative array.
+    Using the signals you want to trap as the key, you can assign a
+    subroutine to that signal.  The %SIG array will only contain those
+    values which the programmer defines.  Therefore, you do not have to
+    assign all signals.  For example, to exit cleanly from a ^C:
+
+	$SIG{'INT'} = 'CLEANUP';
+	sub CLEANUP {
+	    print "\n\nCaught Interrupt (^C), Aborting\n";
+	    exit(1);
+	}
+
+    There are two special "routines" for signals called DEFAULT and IGNORE.
+    DEFAULT erases the current assignment, restoring the default value of
+    the signal.  IGNORE causes the signal to be ignored.  In general, you
+    don't need to remember these as you can emulate their functionality
+    with standard programming features.  DEFAULT can be emulated by
+    deleting the signal from the array and IGNORE can be emulated by any
+    undeclared subroutine.
+
+    In 5.001, the $SIG{__WARN__} and $SIG{__DIE__} handlers may be used to
+    intercept die() and warn().  For example, here's how you could promote
+    unitialized variables to trigger a fatal rather merely complaining:
+
+	#!/usr/bin/perl -w 
+	require 5.001;
+	$SIG{__WARN__} = sub {
+	    if ($_[0] =~ /uninit/) {
+		die $@;
+	    } else {
+		warn $@;
+	    } 
+	};
+
+
+4.10) Why doesn't Perl interpret my octal data octally?
+
+    Perl only understands octal and hex numbers as such when they occur
+    as literals in your program.  If they are read in from somewhere and
+    assigned, then no automatic conversion takes place.  You must
+    explicitly use oct() or hex() if you want this kind of thing to happen. 
+    Actually, oct() knows to interpret both hex and octal numbers, while
+    hex only converts hexadecimal ones.  For example:
+
+	{
+	    print "What mode would you like? ";
+	    $mode = <STDIN>;
+	    $mode = oct($mode);
+	    unless ($mode) {
+		print "You can't really want mode 0!\n";
+		redo;
+	    } 
+	    chmod $mode, $file;
+	} 
+
+    Without the octal conversion, a requested mode of 755 would turn 
+    into 01363, yielding bizarre file permissions of --wxrw--wt.
+
+    If you want something that handles decimal, octal and hex input, 
+    you could follow the suggestion in the man page and use:
+
+	$val = oct($val) if $val =~ /^0/;
+
+
+4.11) How can I compare two date strings?
+
+    If the dates are in an easily parsed, predetermined format, then you
+    can break them up into their component parts and call &timelocal from
+    the distributed perl library.  If the date strings are in arbitrary
+    formats, however, it's probably easier to use the getdate program from
+    the Cnews distribution, since it accepts a wide variety of dates.  Note
+    that in either case the return values you will really be comparing will
+    be the total time in seconds as returned by time(). 
+   
+    Here's a getdate function for perl that's not very efficient; you can
+    do better than this by sending it many dates at once or modifying
+    getdate to behave better on a pipe.  Beware the hardcoded pathname. 
+
+	sub getdate {
+	    local($_) = shift;
+
+	    s/-(\d{4})$/+$1/ || s/\+(\d{4})$/-$1/; 
+		# getdate has broken timezone sign reversal!
+
+	    $_ = `/usr/local/lib/news/newsbin/getdate '$_'`;
+	    chop;
+	    $_;
+	} 
+
+    You can also get the  GetDate extension module that's actually the C
+    code linked into perl from wherever fine Perl extensions are given
+    away.  It's about 50x faster.  If you can't find it elsewhere, I
+    usually keep a copy on perl.com for ftp, since I (Tom) ported it.
+
+    Richard Ohnemus <Rick_Ohnemus@Sterling.COM> actually has a getdate.y for
+    use with the Perl yacc (see question 3.3 "Is there a yacc for Perl?").  
+
+    You might also consider using these: 
+
+    date.pl        - print dates how you want with the sysv +FORMAT method 
+    date.shar      - routines to manipulate and calculate dates
+    ftp-chat2.shar - updated version of ftpget. includes library and demo 
+		     programs 
+    getdate.shar   - returns number of seconds since epoch for any given
+		     date 
+    ptime.shar     - print dates how you want with the sysv +FORMAT method 
+
+    You probably want 'getdate.shar'... these and other files can be ftp'd
+    from the /pub/perl/scripts directory on ftp.cis.ufl.edu. See the README
+    file in the /pub/perl directory for time and the European mirror site
+    details. 
+
+
+4.12) How can I find the Julian Day?
+
+    Here's an example of a Julian Date function provided by Thomas R.
+    Kimpton*.
+
+    #!/usr/local/bin/perl
+
+    @theJulianDate = ( 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 );
+
+    #************************************************************************
+    #****   Return 1 if we are after the leap day in a leap year.       *****
+    #************************************************************************
+			       
+    sub leapDay			 
+    {				 
+    	my($year,$month,$day) = @_;
+    
+    	if (year % 4) {
+	    return(0);
+        }
+
+    	if (!(year % 100)) {             # years that are multiples of 100
+	                                 # are not leap years
+	    if (year % 400) {            # unless they are multiples of 400
+	    	return(0);
+	    }
+    	}
+    	if (month < 2) {
+    	    return(0);
+        } elsif ((month == 2) && (day < 29)) {
+	    return(0);
+        } else {
+	    return(1);
+        }
+    }
+	
+    #************************************************************************
+    #****   Pass in the date, in seconds, of the day you want the       *****
+    #****   julian date for.  If your localtime() returns the year day  *****
+    #****   return that, otherwise figure out the julian date.          *****
+    #************************************************************************
+		
+    sub julianDate	
+    {		
+    	my($dateInSeconds) = @_;
+        my($sec, $min, $hour, $mday, $mon, $year, $wday, $yday);
+    
+    	($sec, $min, $hour, $mday, $mon, $year, $wday, $yday) =
+	    localtime($dateInSeconds);
+        if (defined($yday)) {
+	    return($yday+1);
+        } else {
+	    return($theJulianDate[$mon] + $mday + &leapDay($year,$mon,$mday));
+        }
+    
+    }
+
+    print "Today's julian date is: ",&julianDate(time),"\n";
+
+
+4.13) Does perl have a round function?  What about ceil() and floor()?
+
+    Perl does not have an explicit round function.  However, it is very
+    simple to create a rounding function.  Since the int() function simply
+    removes the decimal value and returns the integer portion of a number,
+    you can use 
+
+    	sub round {
+    	    my($number) = shift;
+
+    	    return int($number + .5);
+    	}
+
+    If you examine what this function is doing, you will see that any
+    number greater than .5 will be increased to the next highest integer,
+    and any number less than .5 will remain the current integer, which has
+    the same effect as rounding.
+
+    A slightly better solution, one which handles negative numbers as well,
+    might be to change the return (above) to:
+
+    	return int($number + .5 * ($number <=> 0));
+
+    which will modify the .5 to be either positive or negative, based on
+    the number passed into it.
+
+    If you wish to round to a specific significant digit, you can use the
+    printf function (or sprintf, depending upon the situation), which does
+    proper rounding automatically.  See the perlfunc man page for more
+    information on the (s)printf function.
+
+    Version 5 includes a POSIX module which defines the standard C math
+    library functions, including floor() and ceil().  floor($num) returns
+    the largest integer not greater than $num, while ceil($num) returns the
+    smallest integer not less than $num.  For example:
+
+    	#!/usr/local/bin/perl
+    	use POSIX qw(ceil floor);
+
+    	$num = 42.4;  # The Answer to the Great Question (on a Pentium)!
+
+    	print "Floor returns: ", floor($num), "\n";
+    	print "Ceil returns:  ", ceil($num), "\n";
+
+    Which prints:
+
+    	Floor returns: 42
+    	Ceil returns:  43
+
+
+4.14) What's the fastest way to code up a given task in perl?
+
+    Post it to comp.lang.perl.misc and ask Tom or Randal a question about
+    it.  ;) 
+
+    Because Perl so lends itself to a variety of different approaches for
+    any given task, a common question is which is the fastest way to code a
+    given task.  Since some approaches can be dramatically more efficient
+    that others, it's sometimes worth knowing which is best.
+    Unfortunately, the implementation that first comes to mind, perhaps as
+    a direct translation from C or the shell, often yields suboptimal
+    performance.  Not all approaches have the same results across different
+    hardware and software platforms.  Furthermore, legibility must
+    sometimes be sacrificed for speed. 
+
+    While an experienced perl programmer can sometimes eye-ball the code
+    and make an educated guess regarding which way would be fastest,
+    surprises can still occur.  So, in the spirit of perl programming
+    being an empirical science, the best way to find out which of several
+    different methods runs the fastest is simply to code them all up and
+    time them. For example:
+
+	$COUNT = 10_000; $| = 1;
+
+	print "method 1: ";
+
+	    ($u, $s) = times;
+	    for ($i = 0; $i < $COUNT; $i++) {
+		# code for method 1
+	    }
+	    ($nu, $ns) = times;
+	    printf "%8.4fu %8.4fs\n", ($nu - $u), ($ns - $s);
+
+	print "method 2: ";
+
+	    ($u, $s) = times;
+	    for ($i = 0; $i < $COUNT; $i++) {
+		# code for method 2
+	    }
+	    ($nu, $ns) = times;
+	    printf "%8.4fu %8.4fs\n", ($nu - $u), ($ns - $s);
+
+    Perl5 includes a new module called Benchmark.pm.  You can now simplify
+    the code to use the Benchmarking, like so:
+
+        use Benchmark;
+
+            timethese($count, {
+                Name1 => '...code for method 1...',
+                Name2 => '...code for method 2...',
+                ... });
+
+    It will output something that looks similar to this:
+
+        Benchmark: timing 100 iterations of Name1, Name2...
+                Name1:  2 secs (0.50 usr 0.00 sys = 0.50 cpu)
+                Name2:  1 secs (0.48 usr 0.00 sys = 0.48 cpu)
+
+
+    For example, the following code will show the time difference between
+    three different ways of assigning the first character of a string to
+    a variable:
+
+	use Benchmark;
+	timethese(100000, {
+	    'regex1' => '$str="ABCD"; $str =~ s/^(.)//; $ch = $1',
+	    'regex2' => '$str="ABCD"; $str =~ s/^.//; $ch = $&',
+	    'substr' => '$str="ABCD"; $ch=substr($str,0,1); substr($str,0,1)="",
+	});
+
+    The results will be returned like this:
+
+	Benchmark: timing 100000 iterations of regex1, regex2, substr...
+	   regex1: 11 secs (10.80 usr   0.00 sys =  10.80 cpu)
+	   regex2: 10 secs (10.23 usr   0.00 sys =  10.23 cpu)
+	   substr:  7 secs ( 5.62 usr	0.00 sys =   5.62 cpu)
+
+    For more specific tips, see the section on Efficiency in the
+    ``Other Oddments'' chapter at the end of the Camel Book.
+
+
+4.15) Do I always/never have to quote my strings or use semicolons?
+
+    You don't have to quote strings that can't mean anything else in the
+    language, like identifiers with any upper-case letters in them.
+    Therefore, it's fine to do this: 
+
+	$SIG{INT} = Timeout_Routine;
+    or 
+
+    @Days = (Sun, Mon, Tue, Wed, Thu, Fri, Sat, Sun);
+
+    but you can't get away with this:
+
+	$foo{while} = until;
+
+    in place of 
+
+	$foo{'while'} = 'until';
+
+    The requirements on semicolons have been increasingly relaxed.  You no 
+    longer need one at the end of a block, but stylistically, you're better
+    to use them if you don't put the curly brace on the same line: 
+
+	for (1..10) { print }
+
+    is ok, as is
+
+	@nlist = sort { $a <=> $b } @olist;
+
+    but you probably shouldn't do this:
+	
+	for ($i = 0; $i < @a; $i++) {
+	    print "i is $i\n"  # <-- oops!
+	} 
+
+    because you might want to add lines later, and anyway, it looks
+    funny. :-) 
+
+    Actually, I lied.  As of 5.001, there are two autoquoting contexts:
+
+	This			is like this
+	------------            ---------------
+	$foo{line}		$foo{"line"}
+	bar => stuff		"bar" => stuff
+
+
+4.16) What is variable suicide and how can I prevent it?
+
+    Variable suicide is a nasty side effect of dynamic scoping and the way
+    variables are passed by reference.  If you say 
+
+	$x = 17;
+	&munge($x);
+	sub munge {
+	    local($x);
+	    local($myvar) = $_[0];
+	    ...
+	} 
+
+    Then you have just clobbered $_[0]!  Why this is occurring is pretty
+    heavy wizardry: the reference to $x stored in $_[0] was temporarily
+    occluded by the previous local($x) statement (which, you're recall,
+    occurs at run-time, not compile-time).  The work around is simple,
+    however: declare your formal parameters first:
+
+	sub munge {
+	    local($myvar) = $_[0];
+	    local($x);
+	    ...
+	}
+
+    That doesn't help you if you're going to be trying to access @_
+    directly after the local()s.  In this case, careful use of the package
+    facility is your only recourse. 
+
+    Another manifestation of this problem occurs due to the magical nature
+    of the index variable in a foreach() loop. 
+
+	@num = 0 .. 4;
+	print "num begin  @num\n";
+	foreach $m (@num) { &ug }
+	print "num finish @num\n";
+	sub ug {
+	    local($m) = 42;
+	    print "m=$m  $num[0],$num[1],$num[2],$num[3]\n";
+	}
+    
+    Which prints out the mysterious:
+
+	num begin  0 1 2 3 4
+	m=42  42,1,2,3
+	m=42  0,42,2,3
+	m=42  0,1,42,3
+	m=42  0,1,2,42
+	m=42  0,1,2,3
+	num finish 0 1 2 3 4
+
+    What's happening here is that $m is an alias for each element of @num.
+    Inside &ug, you temporarily change $m.  Well, that means that you've
+    also temporarily changed whatever $m is an alias to!!  The only
+    workaround is to be careful with global variables, using packages,
+    and/or just be aware of this potential in foreach() loops. 
+
+    The perl5 static autos via "my" do not exhibit this problem.
+
+
+4.17) What does "Malformed command links" mean?
+
+    This is a bug in 4.035.  While in general it's merely a cosmetic
+    problem, it often comanifests with a highly undesirable coredumping 
+    problem.  Programs known to be affected by the fatal coredump include
+    plum and pcops.  This bug has been fixed since 4.036.  It did not
+    resurface in 5.001.
+
+
+4.18) How can I set up a footer format to be used with write()?
+
+    While the $^ variable contains the name of the current header format,
+    there is no corresponding mechanism to automatically do the same thing
+    for a footer.  Not knowing how big a format is going to be until you
+    evaluate it is one of the major problems.
+
+    If you have a fixed-size footer, you can get footers by checking for
+    line left on page ($-) before each write, and printing the footer
+    yourself if necessary.
+
+    Another strategy is to open a pipe to yourself, using open(KID, "|-")
+    and always write()ing to the KID, who then postprocesses its STDIN to
+    rearrange headers and footers however you like.  Not very convenient,
+    but doable.
+
+    See the perlform(1) man page for other tricks.
+
+
+4.19) Why does my Perl program keep growing in size?
+
+    This is caused by a strange occurrence that Larry has dubbed "feeping
+    creaturism".  Larry is always adding one more feature, always getting
+    Perl to handle one more problem.  Hence, it keeps growing.  Once you've
+    worked with perl long enough, you will probably start to do the same
+    thing.  You will then notice this problem as you see your scripts
+    becoming larger and larger.
+
+    Oh, wait... you meant a currently running program and its stack size.
+    Mea culpa, I misunderstood you.  ;)  While there may be a real memory
+    leak in the Perl source code or even whichever malloc() you're using,
+    common causes are incomplete eval()s or local()s in loops.
+
+    An eval() which terminates in error due to a failed parsing will leave
+    a bit of memory unusable. 
+
+    A local() inside a loop:
+
+	for (1..100) {
+	    local(@array);
+	} 
+
+    will build up 100 versions of @array before the loop is done.  The
+    work-around is:   
+
+	local(@array);
+	for (1..100) {
+	    undef @array;
+	} 
+
+    This local array behaviour has been fixed for perl5, but a failed
+    eval() still leaks.
+
+    One other possibility, due to the way reference counting works, is
+    when you've introduced a circularity in a data structure that would
+    normally go out of scope and be unreachable.  For example:
+
+	sub oops {
+	    my $x;
+	    $x = \$x;
+	} 
+
+    When $x goes out of scope, the memory can't be reclaimed, because
+    there's still something point to $x (itself, in this case).  A 
+    full garbage collection system could solve this, but at the cost
+    of a great deal of complexity in perl itself and some inevitable
+    performance problems as well.  If you're making a circular data
+    structure that you want freed eventually, you'll have to break the
+    self-reference links yourself.
+
+
+4.20) Can I do RPC in Perl?
+
+    Yes, you can, since Perl has access to sockets.  An example of the rup
+    program written in Perl can be found in the script ruptime.pl at the
+    scripts archive on ftp.cis.ufl.edu.  I warn you, however, that it's not
+    a pretty sight, as it's used nothing from h2ph or c2ph, so everything is
+    utterly hard-wired. 
+
+
+4.21) Why doesn't my sockets program work under System V (Solaris)?  What
+    does the error message "Protocol not supported" mean?
+
+    Some System V based systems, notably Solaris 2.X, redefined some of the
+    standard socket constants.  Since these were constant across all
+    architectures, they were often hardwired into the perl code.  The
+    "proper" way to deal with this is to make sure that you run h2ph
+    against sys/socket.h, require that file and use the symbolic names
+    (SOCK_STREAM, SOCK_DGRAM, SOCK_RAW, SOCK_RDM, and SOCK_SEQPACKET).
+
+    Note that even though SunOS 4 and SunOS 5 are binary compatible, these
+    values are different, and require a different socket.ph for each OS.
+
+    Under version 5, you can also "use Socket" to get the proper values.
+
+
+4.22) How can I quote a variable to use in a regexp?
+
+    From the manual:
+
+	$pattern =~ s/(\W)/\\$1/g;
+
+    Now you can freely use /$pattern/ without fear of any unexpected meta-
+    characters in it throwing off the search.  If you don't know whether a
+    pattern is valid or not, enclose it in an eval to avoid a fatal run-
+    time error.  
+
+    Perl5 provides a vastly improved way of doing this.  Simply use the
+    new quotemeta character (\Q) within your variable.
+
+4.23) How can I change the first N letters of a string?
+
+    Remember that the substr() function produces an lvalue, that is, it may
+    be assigned to.  Therefore, to change the first character to an S, you
+    could do this:
+    
+	substr($var,0,1) = 'S';
+
+    This assumes that $[ is 0;  for a library routine where you can't know
+    $[, you should use this instead:
+
+	substr($var,$[,1) = 'S';
+
+    While it would be slower, you could in this case use a substitute:
+
+	$var =~ s/^./S/;
+    
+    But this won't work if the string is empty or its first character is a
+    newline, which "." will never match.  So you could use this instead:
+
+	$var =~ s/^[^\0]?/S/;
+
+    To do things like translation of the first part of a string, use
+    substr, as in:
+
+	substr($var, $[, 10) =~ tr/a-z/A-Z/;
+
+    If you don't know the length of what to translate, something like this
+    works: 
+
+	/^(\S+)/ && substr($_,$[,length($1)) =~ tr/a-z/A-Z/;
+    
+    For some things it's convenient to use the /e switch of the substitute
+    operator: 
+
+	s/^(\S+)/($tmp = $1) =~ tr#a-z#A-Z#, $tmp/e
+
+    although in this case, it runs more slowly than does the previous
+    example. 
+
+
+4.24) How can I count the number of occurrences of a substring within a
+    string? 
+
+    If you want a count of a certain character (X) within a string, you can
+    use the tr/// function like so:
+
+    $string="ThisXlineXhasXsomeXx'sXinXit":
+    $count = ($string =~ tr/X//);
+    print "There are $count Xs in the string";
+
+    This is fine if you are just looking for a single character.  However,
+    if you are trying to count multiple character substrings within a
+    larger string, tr/// won't work.  What you can do is wrap a while loop
+    around a pattern match.
+
+    $string="-9 55 48 -2 23 -76 4 14 -44";
+    $count++ while $string =~ /-\d+/g;
+    print "There are $count negative numbers in the string";
+
+
+4.25) Can I use Perl regular expressions to match balanced text?
+
+    No, or at least, not by themselves.
+
+    Regexps just aren't powerful enough.  Although Perl's patterns aren't
+    strictly regular because they do backreferencing (the \1 notation), you
+    still can't do it.  You need to employ auxiliary logic.  A simple
+    approach would involve keeping a bit of state around, something 
+    vaguely like this (although we don't handle patterns on the same line):
+
+	while(<>) {
+	    if (/pat1/) {
+		if ($inpat++ > 0) { warn "already saw pat1" } 
+		redo;
+	    } 
+	    if (/pat2/) {
+		if (--$inpat < 0) { warn "never saw pat1" } 
+		redo;
+	    } 
+	}
+
+    A rather more elaborate subroutine to pull out balanced and possibly
+    nested single chars, like ` and ', { and }, or ( and ) can be found
+    on convex.com in /pub/perl/scripts/pull_quotes.
+
+
+4.26) What does it mean that regexps are greedy?  How can I get around it?
+
+    The basic idea behind regexps being greedy is that they will match the
+    maximum amount of data that they can, sometimes resulting in incorrect
+    or strange answers.
+
+    For example, I recently came across something like this:
+
+	$_="this (is) an (example) of multiple parens";
+	while ( m#\((.*)\)#g ) {
+	    print "$1\n";
+	}
+
+    This code was supposed to match everything between a set of
+    parentheses.  The expected output was:
+
+	is
+	example
+
+    However, the backreference ($1) ended up containing "is) an (example",
+    clearly not what was intended.
+
+    In perl4, the way to stop this from happening is to use a negated
+    group.  If the above example is rewritten as follows, the results are
+    correct: 
+
+	while ( m#\(([^)]*)\)#g ) {
+
+    In perl5 there is a new minimal matching metacharacter, '?'.  This
+    character is added to the normal metacharacters to modify their
+    behaviour, such as "*?", "+?", or even "??".  The example would now be
+    written in the following style:
+
+	while (m#\((.*?)\)#g )
+
+    Hint: This new operator leads to a very elegant method of stripping
+    comments from C code:
+
+	s:/\*.*?\*/::gs
+
+
+4.27) How do I use a regular expression to strip C style comments from a
+      file?
+
+    Since we're talking about how to strip comments under perl5, now is a
+    good time to talk about doing it in perl4.  Since comments can be
+    embedded in strings, or look like function prototypes, care must be
+    taken to ignore these cases.  Jeffrey Friedl* proposes the following
+    two programs to strip C comments and C++ comments respectively:
+ 
+    C comments:
+    	#!/usr/bin/perl
+        $/ = undef;
+        $_ = <>; 
+
+        s#/\*[^*]*\*+([^/*][^*]*\*+)*/|([^/"']*("[^"\\]*(\\[\d\D][^"\\]*)*"[^/"']*|'[^'\\]*(\\[\d\D][^'\\]*)*'[^/"']*|/+[^*/][^/"']*)*)#$2#g;
+        print; 
+
+    C++ comments:
+    	#!/usr/local/bin/perl
+    	$/ = undef;
+    	$_ = <>;
+    	s#//(.*)|/\*[^*]*\*+([^/*][^*]*\*+)*/|"(\\.|[^"\\])*"|'(\\.|[^'\\])*'|[^/"']+#  $1 ? "/*$1 */" : $& #ge;
+    	print;
+
+    (Yes, Jeffrey says, those are complete programs to strip comments
+    correctly.) 
+
+
+4.28) How can I split a [character] delimited string except when inside
+    [character]?
+
+    I'm trying to split a string that is comma delimited into its different
+    fields.  I could easily use split(/,/), except that I need to not split
+    if the comma is inside quotes.  For example, my data file has a line
+    like this:
+
+    SAR001,"","Cimetrix, Inc","Bob Smith","CAM",N,8,1,0,7,"Error, Core Dumped"
+
+    Due to the restriction of the quotes, this is a fairly complex
+    solution.  However, we thankfully have Jeff Friedl* to handle these for
+    us.  He suggests (assuming that your data is contained in the special
+    variable $_):
+
+    undef @field;
+    push(@fields, defined($1) ? $1:$3) while 
+    	m/"([^"\\]*(\\.[^"\\]*)*)"|([^,]+)/g;
+
+
+4.29) Why doesn't "local($foo) = <FILE>;" work right?
+
+    Well, it does.  The thing to remember is that local() provides an array
+    context, and that the <FILE> syntax in an array context will read all the
+    lines in a file.  To work around this, use:
+
+	local($foo);
+	$foo = <FILE>;
+
+    You can use the scalar() operator to cast the expression into a scalar
+    context:
+
+	local($foo) = scalar(<FILE>);
+
+
+4.30) How can I detect keyboard input without reading it? 
+
+    You should check out the Frequently Asked Questions list in
+    comp.unix.* for things like this: the answer is essentially the same.
+    It's very system dependent.  Here's one solution that works on BSD
+    systems:
+
+	sub key_ready {
+	    local($rin, $nfd);
+	    vec($rin, fileno(STDIN), 1) = 1;
+	    return $nfd = select($rin,undef,undef,0);
+	}
+
+    Under perl5, you should look into getting the ReadKey extension from
+    your regular perl archive.
+
+
+4.31) How can I read a single character from the keyboard under UNIX and DOS?
+
+    A closely related question to the no-echo question below is how to
+    input a single character from the keyboard.  Again, this is a system
+    dependent operation.  As with the previous question, you probably want
+    to get the ReadKey extension.  The following code may or may not help
+    you.  It should work on both SysV and BSD flavors of UNIX:
+
+	$BSD = -f '/vmunix';
+	if ($BSD) {
+	    system "stty cbreak </dev/tty >/dev/tty 2>&1";
+	}
+	else {
+	    system "stty", '-icanon',
+	    system "stty", 'eol', "\001"; 
+	}
+
+	$key = getc(STDIN);
+
+	if ($BSD) {
+	    system "stty -cbreak </dev/tty >/dev/tty 2>&1";
+	}
+	else {
+	    system "stty", 'icanon';
+	    system "stty", 'eol', '^@'; # ascii null
+	}
+	print "\n";
+
+    You could also handle the stty operations yourself for speed if you're
+    going to be doing a lot of them.  This code works to toggle cbreak
+    and echo modes on a BSD system:
+
+    sub set_cbreak { # &set_cbreak(1) or &set_cbreak(0)
+	local($on) = $_[0];
+	local($sgttyb,@ary);
+	require 'sys/ioctl.ph';
+	$sgttyb_t   = 'C4 S' unless $sgttyb_t;  # c2ph: &sgttyb'typedef()
+
+	ioctl(STDIN,&TIOCGETP,$sgttyb) || die "Can't ioctl TIOCGETP: $!";
+
+	@ary = unpack($sgttyb_t,$sgttyb);
+	if ($on) {
+	    $ary[4] |= &CBREAK;
+	    $ary[4] &= ~&ECHO;
+	} else {
+	    $ary[4] &= ~&CBREAK;
+	    $ary[4] |= &ECHO;
+	}
+	$sgttyb = pack($sgttyb_t,@ary);
+
+	ioctl(STDIN,&TIOCSETP,$sgttyb) || die "Can't ioctl TIOCSETP: $!";
+    }
+
+    Note that this is one of the few times you actually want to use the
+    getc() function; it's in general way too expensive to call for normal
+    I/O.  Normally, you just use the <FILE> syntax, or perhaps the read()
+    or sysread() functions.
+
+    For perspectives on more portable solutions, use anon ftp to retrieve
+    the file /pub/perl/info/keypress from convex.com.
+
+    Under Perl5, with William Setzer's Curses module, you can call
+    &Curses::cbreak() and &Curses::nocbreak() to turn cbreak mode on and
+    off.  You can then use getc() to read each character.  This should work
+    under both BSD and SVR systems.  If anyone can confirm or deny
+    (especially William), please contact the maintainers.
+
+    For DOS systems, Dan Carson <dbc@tc.fluke.COM> reports:
+
+    To put the PC in "raw" mode, use ioctl with some magic numbers gleaned
+    from msdos.c (Perl source file) and Ralf Brown's interrupt list (comes
+    across the net every so often):
+
+	$old_ioctl = ioctl(STDIN,0,0);     # Gets device info
+	$old_ioctl &= 0xff;
+	ioctl(STDIN,1,$old_ioctl | 32);    # Writes it back, setting bit 5
+
+    Then to read a single character:
+
+	sysread(STDIN,$c,1);               # Read a single character
+
+    And to put the PC back to "cooked" mode:
+
+	ioctl(STDIN,1,$old_ioctl);         # Sets it back to cooked mode.
+
+
+    So now you have $c.  If ord($c) == 0, you have a two byte code, which
+    means you hit a special key.  Read another byte (sysread(STDIN,$c,1)),
+    and that value tells you what combination it was according to this
+    table:
+
+	# PC 2-byte keycodes = ^@ + the following:
+
+	# HEX     KEYS
+	# ---     ----
+	# 0F      SHF TAB
+	# 10-19   ALT QWERTYUIOP
+	# 1E-26   ALT ASDFGHJKL
+	# 2C-32   ALT ZXCVBNM
+	# 3B-44   F1-F10
+	# 47-49   HOME,UP,PgUp
+	# 4B      LEFT
+	# 4D      RIGHT
+	# 4F-53   END,DOWN,PgDn,Ins,Del
+	# 54-5D   SHF F1-F10
+	# 5E-67   CTR F1-F10
+	# 68-71   ALT F1-F10
+	# 73-77   CTR LEFT,RIGHT,END,PgDn,HOME
+	# 78-83   ALT 1234567890-=
+	# 84      CTR PgUp
+
+    This is all trial and error I did a long time ago, I hope I'm reading the
+    file that worked.
+
+
+4.32) How can I get input from the keyboard without it echoing to the
+      screen?
+
+    Terminal echoing is generally handled directly by the shell.
+    Therefore, there is no direct way in perl to turn echoing on and off.
+    However, you can call the command "stty [-]echo".  The following will
+    allow you to accept input without it being echoed to the screen, for
+    example as a way to accept passwords (error checking deleted for
+    brevity):
+
+	print "Please enter your password: ";
+        system("stty -echo");
+	chop($password=<STDIN>);
+	print "\n";
+	system("stty echo");
+
+    Again, under perl 5, you can use Curses and call &Curses::noecho() and
+    &Curses::echo() to turn echoing off and on.  Or, there's always the
+    ReadKey extension.
+
+
+4.33) Is there any easy way to strip blank space from the beginning/end of
+    a string?
+
+    Yes, there is.  Using the substitution command, you can match the
+    blanks and replace it with nothing.  For example, if you have the
+    string "     String     " you can use this:
+
+    	s/^\s*(.*?)\s*$/$1/; 	# perl5 only!
+
+    	s/^\s+|\s+$//g;	    	# perl4 or perl5
+
+    or even
+
+    	s/^\s+//; s/\s+$//;
+
+    Note however that Jeffrey Friedl* says these are only good for shortish
+    strings.  For longer strings, and worse-case scenarios, they tend to
+    break-down and become inefficient.
+
+    For the longer strings, he suggests using either
+
+    	$_ = $1 if m/^\s*((.*\S)?)/;
+
+    or
+    
+    	s/^\s*((.*\S)?)\s*$/$1/;
+
+    It should also be noted that for generally nice strings, these tend to
+    be noticably slower than the simple ones above.  It is suggested that
+    you use whichever one will fit your situation best, understanding that
+    the first examples will work in roughly ever situation known even if
+    slow at times.
+
+4.34) How can I print out a number with commas into it?
+
+    This one will do it for you:
+
+	sub commify {
+	    local($_) = shift;
+	    1 while s/^(-?\d+)(\d{3})/$1,$2/;
+	    return $_;
+	} 
+
+	$n = 23659019423.2331;
+	print "GOT: ", &commify($n), "\n";
+
+	GOT: 23,659,019,423.2331
+
+    The reason you can't just do
+
+	s/^(-?\d+)(\d{3})/$1,$2/g;
+
+    Is that you have to put the comma in and then recalculate anything.  
+    Some substitutions need to work this way.  See the question on 
+    expanding tabs for another such.
+
+4.35) How do I expand tabs in a string?
+
+	1 while s/\t+/' ' x (length($&) * 8 - length($`) % 8)/e;
+
+    You could have written that
+
+	while (s/\t+/' ' x (length($&) * 8 - length($`) % 8)/e) {
+	    # spin, spin, spin, ....
+	} 
+
+    Placed in a function:
+
+	sub tab_expand {
+	    local($_) = shift;
+	    1 while s/\t+/' ' x (length($&) * 8 - length($`) % 8)/e;
+	    return $_;
+	} 
+
+    This is especially important when you're working going to unpack 
+    an ascii string that might have tabs in it.  Otherwise you'll be
+    off on the byte count.  For example:
+
+	$NG = "/usr/local/lib/news/newsgroups";
+	open(NG, "< $NG") || die "can't open $NG: $!";
+	while (<NG>) {
+	    chop;  # chomp would be better, but it's only perl5
+	    # now for the darned tabs in the newsgroups file
+	    1 while s/\t+/' ' x (length($&) * 8 - length($`) % 8)/e;
+	    ($ng, $desc) = unpack("A24 A*", $_);
+	    if (length($ng) == 24) {
+		$desc =~ s/^(\S+)\s*//;
+		$ng .= $1;
+	    } 
+
+4.36) What's wrong with grep() or map() in a void context?
+
+    Well, nothing precisely, but it's not a good way to write 
+    maintainable code.  It's just fine to use grep when you want
+    an answer, like
+
+	@bignums = grep ($_ > 100, @allnums);
+	@triplist = map {$_ * 3} @allnums;
+
+    But using it in a void context like this:
+
+	grep{ $_ *= 3, @nums);
+
+    Is using it for its side-effects, and side-effects can be mystifying.
+    There's no void grep that's not better written as a for() loop:
+
+	for (@nums) { $_ *= 3 } 
+
+    In the same way, a ?: in a void context is considered poor form:
+
+	fork ? wait : exec $prog;
+
+    When you can write it this way:
+
+	if (fork) {
+	    wait;
+	} else {
+	    exec $prog;
+	    die "can't exec $prog: $!";
+	} 
+
+    Of course, using ?: in expressions is just what it's made for, 
+    and just fine (but try not to nest them.).
+
+    Remember that the most important things in almost any program are,
+    and in this order:
+
+	1. correctness
+	2. maintainability
+	3. efficiency
+
+    Notice at no point did cleverness enter the picture.
+
+    On the other hand, if you're just trying write JAPHs (aka Obfuscated
+    Perl entries), or write ugly code, you would probably invert these :-)
+
+	1. cleverness
+	2. efficiency
+	3. maintainability
+	4. correctness
+
+--
+Stephen P Potter        Pencom Systems Administration         AMP Incorporated
+spp@peach.epix.net	spp@psa.pencom.com	          steve.potter@amp.com
+Home: 717-540-0131	Pager: 1-800-759-8888, 547-9561     Work: 717-986-5401
+                Systems Administation: It's a Kind of Magic

@@ -1,0 +1,301 @@
+Unix Review Column 5 (November 1995)
+
+Like most algorithmic languages, Perl provides a mechanism to place portions of
+the code into a "subroutine".  Subroutines can be used to provide easy re-use of
+algorithms, especially when someone else has written the code.  Subroutines can
+also make it easier to follow the logic of a program, because the details of a
+subroutine are hidden away from its use.  In this column, I'm going to talk
+about the basics of subroutine invocation and linkage, from parameters to
+recursion.
+
+Let's take a simple problem.  You have a bunch of numbers in @data, and you want
+to know the sum total of those numbers.  You could write code that looks like
+this:
+
+	... code ...
+	$sum = 0;
+	foreach (@data) {
+		$sum += $_;
+	}
+	# now use $sum
+
+This initializes the value $sum to zero, and then adds each element of @data
+into the current value of $sum.  We can wrap this up into a subroutine like so:
+
+	sub sum_data {
+		$sum = 0;
+		foreach (@data) {
+			$sum += $_;
+		}
+	}
+
+and when we want to set $sum equal to the current value of @data, simply invoke
+the subroutine:
+
+	&sum_data();
+
+This works.  I can type the code to add @data into $sum once, somewhere in the
+program (often towards the end), and then re-use the code repeatedly by invoking
+the subroutine from different places in the main part of the code.
+
+The result is left in the variable $sum.  However, every subroutine invocation
+also returns a value, because technically the invocation is always within some
+expression.  (In this case, the expression's value is thrown away.) This "return
+value" of a subroutine is whatever expression is evaluated last within the
+subroutine.  As it turns out, the last thing evaluated in this subroutine is
+always the $sum += $_ line, which will result in the return value being the same
+as $sum!
+
+So, we can write the subroutine invocation like this:
+
+	$total = &sum_data();
+
+and $total will also be the same value as $sum.  Or even:
+
+	$two_total = &sum_data() + &sum_data();
+
+which evaluates the sum twice, ending up in $two_total.  This is wasteful, of
+course, and would probably be reduced to:
+
+	$two_total = 2 * &sum_data();
+
+in a real program.
+
+If you can't tell that $sum is the return value of &amp;sum_data(), you can also
+put $sum explictly as the last expression evaluated, like so:
+
+	sub sum_data {
+		$sum = 0;
+		foreach (@data) {
+			$sum += $_;
+		}
+		$sum; # return value
+	}
+
+Note that $sum as an expression on its own is enough to make it the last
+expression evaluated within the subroutine, and therefore the return value of
+the subroutine.
+
+This subroutine is interesting, but it is limited to computing the sum of values
+in the @data array.  What if we had @data_one and @data_two?  We'd have to write
+a different version of &amp;sum_data() for each array.  Well, no, that's not
+necessary.  Just as a subroutine can return back a value, it can also take a
+list of values as arguments or parameters:
+
+	$total = &sum_this(@data);
+
+In this case, the values of @data are collected up into a new array called @_
+within the subroutine, like so:
+
+	sub sum_this {
+		$sum = 0;
+		foreach (@_) {
+			$sum += $_;
+		}
+		$sum;
+	}
+
+Note that all I've done is change @data to @_, which holds the values of the
+passed-in parameters.  The values passed to the subroutine are constructed from
+any list.  For example, I can also say:
+
+	$more_total = &sum_this(5,@data);
+
+which will prepend 5 to @data, yielding an array in @_ that is one element
+larger than @data.
+
+The routine &amp;sum_this is pretty useful now.  However, what if I'm using the
+$sum variable in some other part of my program?  By default, all variables
+within a subroutine refer to the global use of those variables, so the
+&amp;sum_this routine will clobber whatever value was previously in $sum.  To
+fix this, I can (and should) make the $sum variable local to the subroutine:
+
+	sub sum_this {
+		my $sum = 0;
+		foreach (@_) {
+			$sum += $_;
+		}
+		$sum;
+	}
+
+Now, for the duration of this routine, the variable $sum refers not to a global
+$sum, but to a new local variable that is thrown away as soon as the subroutine
+returns.
+
+If you are not yet up to Perl version 5 (released roughly a year ago, but
+surprisingly, some have not gotten with the program yet), you can use Perl
+version 4's construct called "local", which performs a similar function:
+
+	sub sum_this {
+		local($sum) = 0;
+		foreach (@_) {
+			$sum += $_;
+		}
+		$sum;
+	}
+
+However, had this subroutine (with "local" instead of "my") called another
+subroutine, any reference in that subroutine to $sum would have accessed this
+subroutine's $sum, rather than the global $sum, and that can get quite confusing
+to say the least.
+
+If you had a program with &amp;sum_data, and also added &amp;sum_this, you could
+rewrite &amp;sum_data in terms of &amp;sum_this like so:
+
+	sub sum_data { &sum_this(@data); }
+
+I have done this from time to time as I rewrite specific subroutines into
+general ones.
+
+A subroutine can return a list of values rather than just a single value (a
+scalar).  Let's hack on this subroutine a bit to get it to return all the
+intermediate sums instead of just the final sum:
+
+	sub sum_this {
+		my $sum = 0;
+		my @sums;
+		for (@_) {
+			$sum += $_;
+			push(@sums,$sum);
+		}
+		@sums;
+	}
+
+Now, what's going on here?  I'm creating a new array called @sums that will hold
+the incremental results of adding each new element to the sum.  As each sum is
+calculated, it is pushed onto the end of the list.  When the loop is complete,
+the value of @sums is returned.  This means I can call this subroutine like so:
+
+	@result = &sum_this(1,2,3);
+	print "@result\n"; # prints "1 3 6\n"
+
+What happens when I call this subroutine in a scalar context (such as assigning
+the result to a scalar)?  Well, the scalar context gets passed down into the
+last expression evaluated -- in this case, the name of @sums.  The name of an
+array in a scalar context is the number of elements in the array, so we'll get:
+
+	$what = &sum_this(1,2,3);
+	print $what;
+
+which will print "3", the number of elements in the return value.  With a little
+bit of trickery, we can combine the two kinds of subroutines into one:
+
+	sub sum_this {
+		my $sum = 0;
+		my @sums;
+		for (@_) {
+			$sum += $_;
+			push(@sums,$sum);
+		}
+		if (wantarray) {
+			@sums;
+		} else {
+			$sum;
+		}
+	}
+
+In this case, if the subroutine is being invoked in an array context (assigned
+to an array, for example), the builtin value "wantarray" is true, and the @sums
+array is returned.  If not, the builtin value "wantarray" is false, so $sum gets
+returned instead.
+
+Now, we get results like this:
+
+	$total = &sum_this(1,2,3); # gets 6
+	@totals = &sum_this(1,2,3); # gets 1,3,6
+
+Obviously, a subroutine designer has a lot of flexibility.  If you implement a
+general-purpose subroutine for others, be sure to consider what it does in a
+scalar and array context, and if sense, use the wantarray construct to make sure
+that it returns an appropriate value.
+
+Like most algorithmic languages, Perl supports recursive subroutines.  This
+means that a subroutine can call itself to perform a part of the task.  A
+classic example of this is a subroutine to calculate a Fibonacci number F(n),
+defined as follows:
+
+	F(0) = 0;
+	F(1) = 1;
+	F(n) = F(n-1)+F(n-2) for n > 1;
+
+Now, this definition can be translated directly into a Perl subroutine as
+follows:
+
+	sub F {
+		my ($n) = @_;
+		if ($n == 0) {
+			0;
+		} elsif ($n == 1) {
+			1;
+		} else {
+			&F($n - 1) + &F($n - 2);
+		}
+	}
+
+This will indeed generate the correct result.  However, for a large value of $n,
+the subroutine will be called repeatedly with the exact same values of numbers
+smaller than $n.  For example, the call to compute F(10) will compute F(9) and
+F(8).  However, the call to compute F(9) will also call F(8) again, and so on.
+
+A quick solution to this is to maintain a cache of the previous return values.
+Let's call the cache @F_cache, and use it as follows:
+
+	sub F {
+		my ($n) = @_;
+		if ($n == 0) {
+			0;
+		} elsif ($n == 1) {
+			1;
+		} elsif ($F_cache[$n]) {
+			$F_cache[$n];
+		} else {
+			$F_cache[$n] =
+				&F($n - 1) + &F($n - 2);
+		}
+	}
+
+Now, if a number greater than 1 is passed into this function, one of two things
+can happen:  (1) if the number has been computed already, we simply return the
+computed value, or (2) if the number hasn't been computed, we compute the value,
+and remember it for a possible future invocation.  Note that the assignment to
+@F_cache is also the return value.
+
+I've used this technique on many subroutines that have an expensive value to
+calculate.  For example, mapping the IP number to a name via DNS can take a
+little while, so I wrote a routine that remembers the previous return values
+that it has seen, thereby saving the second and subsequent lookups (at least in
+this particular invocation of the program).  The subroutine looked like this:
+
+	sub ip_to_name {
+		if ($ip_to_name{$_[0]}) {
+			$ip_to_name{$_[0]};
+		} else {
+			$ip_to_name{$_[0]} =
+				... calculations ...
+		}
+	}
+ 
+Here, the first parameter $_[0] is looked up as the key of an associative array.
+If the entry is found, that value is returned immediately, otherwise a new value
+is calculated and remembered for future invocations.  This kind of cache is a
+speed-up only when the subroutine is likely to be called with multiple instances
+of the same argument -- otherwise, you're just wasting time.
+
+I hope you've enjoyed this little excursion into subroutines.  Next time, I'll
+probably talk about something different.
+
+
+Randal L. Schwartz has been a computer science professional for over 17 years.
+He has authored two books on Perl, and provides Unix consulting and Perl
+training throughout the United States.  He can be reached at
+merlyn@stonehenge.com or +1 503 777 0095, and welcomes questions or comments
+about Perl, downhill snow skiing, small planes, Unix, or Karaoke, but not
+necessarily in that order.  His World Wide Web homepage is located at
+http://www.teleport.com/~merlyn/.
+
+This text is copyright by Miller-Freeman, Inc, and is used with their
+permission.  Further distribution or use is not permitted.
+
+This text has appeared in an edited form in Unix Review magazine.  However, the
+version you are reading here is as the author originally submitted the article
+for publication, not after their editors applied their (ahem) creativity.

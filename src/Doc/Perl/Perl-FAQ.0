@@ -1,0 +1,234 @@
+Newsgroups: comp.lang.perl.announce,comp.lang.perl.misc,comp.answers,news.answers
+Path: yale!news3.near.net!paperboy.wellfleet.com!news-feed-1.peachnet.edu!umn.edu!spool.mu.edu!howland.reston.ans.net!newsjunkie.ans.net!news.ptd.net!spp
+From: spp@peach.epix.net
+Subject: comp.lang.perl.* FAQ 0/5 - Introduction
+X-Nntp-Posting-Host: cs1-12.pcn.ptd.net
+Message-ID: <SPP.95Sep5190909@icarus.sunfire.com>
+Apparently-To: spp@peach.epix.net
+Followup-To: poster
+Sender: news@postoffice.ptd.net (News Master)
+Organization: ProLog - PenTeleData, Inc.
+Date: Tue, 5 Sep 1995 23:09:09 GMT
+Approved: news-answers-request@MIT.EDU
+Lines: 219
+Xref: yale comp.lang.perl.announce:114 comp.lang.perl.misc:5178 comp.answers:13177 news.answers:49621
+
+
+
+Archive-name: perl-faq/part0
+Posting-Frequency: bi-weekly
+Last Edited: Wed Aug 16 21:10:06 1995 by spp (Stephen P Potter) on temples.syrinx.com
+
+Hear ye, hear ye.  This most honourable session on Perl Frequently Asked
+Questions is hereby called to order.  Please stand and show your respect
+for those that have gone before us.  Let us honour Larry Wall*, the father
+of Perl who unselfishly spends vast amounts of time reviewing this document
+for veracity and accuracy.  Let us also honour Tom Christiansen* without
+whom this document would not exist.  Finally, let us collectively honour
+the members of comp.lang.perl.misc who have offered much advice and
+corrections to this list.
+
+This article details the contents of the most Frequently Asked Questions in
+comp.lang.perl.misc, a Usenet newsgroup devoted to the Perl programming
+language.  There are five pieces following this, the general information
+questions in part1, part2 and part3 and the programming ones in part4 and
+part5. 
+
+If this is your first exposure to Perl, please read this document and the 
+perl(1) man page before asking questions in comp.lang.perl.misc.  If you're
+using v4 perl, that page contains all you need to know (or at least enough
+to get started).  If you're using v5 perl, that page will show you where to
+look for specific information.  When we refer to perlmod(1), it means the 
+"perlmod" man page in section "1" of the manual, just as Foo(3pm), that
+means it's the "Foo" man page in section "3pm" (perl modules) of the
+library.  The perl install does NOT automatically install the module man
+pages for you, however.
+
+Hopefully the questions herein are asked enough that considerable net
+bandwidth can be saved by looking here before asking.  Also, hopefully
+there is enough information contained here that someone who has never
+heard of Perl can read this and at least have some sort of idea as to what
+Perl is.
+
+Some questions in this group aren't really about Perl, but rather about
+system-specific issues.  You might also consult the Most Frequently Asked
+Questions list in comp.unix.questions for answers to this type of question.
+
+The current version of perl is 5.001, perl 5.000 emerged into the world on
+16 October, 1994.  The previous non-beta version was 4.036 (version 4,
+patchlevel 36).  Many of these questions were written for perl4, however a
+lot of perl5 information has also been added.  Perl5 only features will be
+clearly marked as such, so as not to cause confusion for those still using
+perl4.  You should upgrade to perl5 as soon as possible though (see below).
+
+This list was initially written, and still hacked upon, by Tom
+Christiansen*.  However, due to his erratic schedule, it is currently
+maintained by Stephen P Potter*.  First person singular pronouns, when not
+in quoted postings, generally are Tom talking.  
+
+This document, and all its parts, are Copyright (c) 1994/1995, Stephen P
+Potter and Tom Christiansen, perlfaq@perl.com.  All rights reservered.
+Permisson to distribute this collection, in part or full, via electronic
+means (emailed, posted or archived) or printed copy are granted providing
+that no charges are involved, reasonable attempt is made to use the most
+current version, and all credits and copyright notices are retained.
+Requests for other distribution rights, including incorporation in
+commercial products, such as books, magazine articles, or CD-ROMs should be
+made to perlfaq@perl.com.
+
+This FAQ is archived on ftp.cis.ufl.edu [128.227.100.198] in the file
+pub/perl/doc/FAQ, as well as on rtfm.mit.edu [18.181.0.24] in
+/pub/usenet/comp.lang.perl.*.  If you have any suggested additions or
+corrections to this article, please send them to <perlfaq@perl.com>. 
+
+
+Part 1 - General Information and Availability
+1.1) What is Perl?
+1.2) What are perl4 and perl5, are there any differences?
+1.3) What features does perl5 provide over perl4?
+1.4) Where can I get docs on perl5?
+1.5) Will perl5 break my perl4 scripts?
+1.6) When will Perl stabilize?
+1.7) What's the difference between "perl" and "Perl"?
+1.8) Is it a perl program or a perl script?
+1.9) Is perl difficult to learn?
+1.10) Should I program everything in perl?
+1.11) How does perl compare with other scripting languages, like Tcl,
+    	Python or REXX? 
+1.12) Where can I get Perl over the Internet (FTP)?
+1.13) How can I get Perl via email?
+1.14) How can I get Perl via UUCP?
+1.15) Are there other ways of getting perl?
+1.16) Has perl been ported to machine FOO?
+1.17) How do I get perl to compile on Solaris?
+1.18) How do I get perl to compile on a NeXT?
+1.19) What extensions are available for Perl and where can I get them?
+1.20) What is dbperl and where can I get it?
+1.21) Which DBM should I use?
+1.22) Is there an SNMP aware perl?
+1.23) Is there an ISO or ANSI certified version of Perl?
+
+
+Part 2 - Informational Sources
+2.1) Is there a USENET group for perl?
+2.2) Have any books or magazine articles been published about perl?
+2.3) When will the Camel and Llama books be updated?
+2.4) What FTP resources are available?
+2.5) What WWW/gopher resources are available?
+2.6) Can people who don't have access to USENET get comp.lang.perl.misc?
+2.7) Are archives of comp.lang.perl.* available?
+2.8) Is there a WAIS server for comp.lang.perl.*?
+2.9) What other sources of information about Perl or training are available?
+2.10) Where can I get training classes on Perl?
+2.11) What companies ship or use perl?
+2.12) Is there commercial, third-party support for perl?
+2.13) What is a JAPH?  What does "Will hack perl for ..." mean?
+2.14) Where can I get a collection of Larry Wall witticisms?
+2.15) What are the known bugs?
+2.16) Where should I post bugs?
+2.17) Where should I post source code?
+2.18) Where can I learn about object-orienting Perl programming?
+2.19) Where can I learn about linking C with Perl? [h2xs, xsubpp]
+2.20) What is perl.com?
+2.21) What do the asterisks (*) throughout the FAQ stand for?
+
+
+Part 3 - Programming Aids
+3.1) How do I use perl interactively?
+3.2) Is there a perl profiler?
+3.3) Is there a yacc for perl?
+3.4) Is there a pretty printer (similar to indent(1)) for perl?
+3.5) How can I convert my perl scripts directly to C or compile them into
+     binary form?
+3.6) Where can I get a perl mode for emacs?
+3.7) Is there a perl shell?
+3.8) How can I use curses with perl?
+3.9) How can I use X or Tk with perl?
+3.10) Can I dynamically load C user routines?
+3.11) What is undump and where can I get it?
+3.12) How can I get '#!perl' to work under MS-DOS?
+3.13) Can I write useful perl programs on the command line?
+3.14) What's a "closure"?
+
+
+Part 4 - General Programming, Regular Expressions (Regexp) and I/O
+4.1) What are all these $@%*<> signs and how do I know when to use them?
+4.2) Why do Perl operators have different precedence than C operators?
+4.3) What's the difference between dynamic and static (lexical) scoping?
+4.4) What's the difference between deep and shallow binding?
+4.5) How can I manipulate fixed-record-length files?
+4.6) How can I make a file handle local to a subroutine?
+4.7) How can I sleep or alarm for under a second?
+4.8) How can I do an atexit() or setjmp()/longjmp()? (Exception handling) 
+4.9) How can I catch signals?
+4.10) Why isn't my octal data interpretted correctly?
+4.11) How can I compare two date strings?
+4.12) How can I find the Julian Day?
+4.13) Does perl have a round function?  What about ceil() and floor()?
+4.14) What's the fastest way to code up a given task in perl?
+4.15) Do I always/never have to quote my strings or use semicolons?
+4.16) What is variable suicide and how can I prevent it?
+4.17) What does "Malformed command links" mean?
+4.18) How can I set up a footer format to be used with write()?
+4.19) Why does my program keep growing in size?
+4.20) Can I do RPC?
+4.21) Why doesn't my sockets program work under System V (Solaris)?  What
+    	does the error message "Protocol not supported" mean?
+4.22) How can I quote a variable to use in a regexp?
+4.23) How can I change the first N letters of a string?
+4.24) How can I count the number of occurrences of a substring within a
+    	string?
+4.25) Can I use Perl regular expressions to match balanced text?
+4.26) What does it mean that regexps are greedy?  How can I get around it?
+4.27) How do I use a regular expression to strip C style comments from a
+    	file?
+4.28) How can I split a [character] delimited string except when inside
+    	[character]?
+4.29) Why doesn't "local($foo) = <FILE>;" work right?
+4.30) How can I detect keyboard input without reading it? 
+4.31) How can I read a single character from the keyboard under UNIX and DOS?
+4.32) How can I get input from the keyboard without it echoing to the
+    	screen?
+4.33) Is there any easy way to strip blank space from the beginning/end of
+    	a string?
+4.34) How can I output my numbers with commas added?
+4.35) How do I expand tags in a string?
+4.36) What's wrong with grep in a void context?
+
+
+Part 5 - Arrays and Shell and External Program Interactions
+5.1) What is the difference between $array[1] and @array[1]?
+5.2) How can I make an array of arrays or other recursive data types?
+5.3) How can I make an array of structures containing various data types?
+5.4) How can I extract just the unique elements of an array?
+5.5) How can I tell whether an array contains a certain element?
+5.6) How can I sort an associative array by value instead of by key?
+5.7) How can I know how many entries are in an associative array?
+5.8) What's the difference between "delete" and "undef" with %arrays?
+5.9) Why don't backticks work as they do in shells?
+5.10) Why does my converted awk/sed/sh script run more slowly in perl?
+5.11) How can I call my system's unique C functions from perl?
+5.12) Where do I get the include files to do ioctl() or syscall()?  [h2ph]
+5.13) Why do setuid perl scripts complain about kernel problems?
+5.14) How can I open a pipe both to and from a command?
+5.15) How can I capture STDERR from an external command?
+5.16) Why doesn't open() return an error when a pipe open fails?
+5.17) Why can't my script read from STDIN after I gave it ^D (EOF)?
+5.18) How can I translate tildes (~) in a filename?
+5.19) How can I convert my shell script to perl?
+5.20) Can I use perl to run a telnet or ftp session?
+5.21) Why do I sometimes get an "Argument list to long" when I use <*>?
+5.22) How do I do a "tail -f" in perl?
+5.23) Is there a way to hide perl's command line from programs such as "ps"?
+5.24) I {changed directory, modified my environment} in a perl script.  How
+      come the change disappeared when I exited the script?  How do I get
+      my changes to be visible?
+5.25) How can I pass a filehandle to a function, or make a list of
+      filehandles? 
+5.26) How can I open a file with a leading ">" or trailing blanks?
+5.27) How can I tell if a variable is tainted?
+--
+Stephen P Potter        Pencom Systems Administration         AMP Incorporated
+spp@peach.epix.net	spp@psa.pencom.com	          steve.potter@amp.com
+Home: 717-540-0131	Pager: 1-800-759-8888, 547-9561     Work: 717-986-5401
+                Systems Administation: It's a Kind of Magic

@@ -1,0 +1,91 @@
+
+Public test script for lzw (10/19/17)
+
+***** Checking for warning messages *****
+Making ./encode ./decode
+make: 'encode' is up to date.
+make: 'decode' is up to date.
+
+Each test is either passed or failed; there is no partial credit.
+
+To execute the test labelled IJ, type the command:
+     /c/cs323/Hwk4/Tests/tIJ
+The answer expected is in /c/cs323/Hwk4/Tests/tIJ.L.
+
+
+               Correctness? (no -m)
+  1 point   01. Text (small):   $TESTS/t01x
+run './encode': cputime limit exceeded
+/c/cs323/Hwk4/Tests/t02: line 14: 12373 Broken pipe             cat $FILE
+     12374 CPU time limit exceeded (core dumped) | $RUN ./encode $EFLAG > $EOUT
+0a1
+> - /c/cs323/Doc/sylvie.1 differ: byte 301750, line 6813
+Error: STDERR should be empty
+  0 point   02. Text (large):   Doc/sylvie.1
+0a1
+> - /c/cs323/Hwk4/Tests/t03x differ: byte 255, line 2
+Error: STDOUT differs from expected
+  0 point   03. Binary (small): $TESTS/t03x
+
+               Compresses? (no -m)
+  1 point   04. Text (small):    size(no flags) <=    600?: $TESTS/t04x
+  1 point   05. Text (large):    size(no flags) <= 130000?: Doc/words
+decode: corrupted file
+0a1
+> - /bin/ln differ: byte 742, line 1
+Error: STDERR should be empty
+  0 point   06. Binary (medium): size(no flags) <=  54000?: /bin/ln
+
+               -m MAXBITS Correctness?
+  1 point   07. size(-m 13) < size(no flags)?: Doc/logic.1
+
+               -m MAXBITS Compresses?
+  1 point   08. size(-m 13) in [34000,40000]?: Doc/malloc.ps
+
+               nBits grows: Correctness?
+  1 point   09. size(-m 16) = size(-m 14) << size(-m 9)?:  Style/C-Pike
+  1 point   10. size(-m 17) = size(-m 15) << size(-m 13)?: Doc/gdbref.ps
+
+               nBits grows: Compresses?
+  1 point   11. size(no flags) <= 4000?: Style/C-Stanford
+  1 point   12. size(no flags) <= 3850?: Style/C-Cottam
+
+               Correctness? -p
+run './encode -p': cputime limit exceeded
+/c/cs323/Hwk4/Tests/t13: line 17: 14604 CPU time limit exceeded (core dumped) $RUN ./encode $EFLAG < $FILE > $EOUT
+run './decode': segmentation fault
+/c/cs323/Hwk4/Tests/t13: line 18: 14999 Segmentation fault      (core dumped) $RUN ./decode < $EOUT > $DOUT
+run './encode': cputime limit exceeded
+/c/cs323/Hwk4/Tests/t13: line 21: 15012 CPU time limit exceeded (core dumped) $RUN ./encode $XFLAG < $FILE > $XOUT
+0a1,3
+> - /c/cs323/Doc/linux.words differ: byte 40961, line 4450
+> - /c/cs323/Doc/linux.words differ: byte 278975, line 30865
+> size(-p) = 352298 > 134380 = .80 * 167975 = .80 * size()
+Error: STDERR should be empty
+  0 point   13. size(-p) << size(no flags)? Doc/linux.words
+
+               Compresses?  -p
+0a1
+> size(-p) = 18328 > 11800
+Error: STDOUT differs from expected
+  0 point   14. size(-p) <= 11700?:         Style/C-Delaware
+
+               Small Footprint?
+1a2,5
+> TOTAL(encode) = 214980 > 75536 = UPPER BOUND
+> DATA = 716, HEAP = 208912, STACK = 5352
+> TOTAL(decode) = 210256 > 75536 = UPPER BOUND
+> DATA = 716, HEAP = 204828, STACK = 4712
+Error: STDOUT differs from expected
+  0 point   15. Storage <= 16*SIZE? (no flags): Doc/sylvie.1
+run './encode -m 15': cputime limit exceeded
+/c/cs323/Hwk4/Tests/t16: line 21: 16139 Done                    cat $FILE
+     16140 CPU time limit exceeded (core dumped) | $RUN ./encode $EFLAG > $EOUT
+/c/cs323/Hwk4/Tests/t16: line 33: 716 + /c/cs323/Hwk4/Tests/maxHeap: line 37: 16919 CPU time limit exceeded (core dumped) LD_PRELOAD=/c/cs323/Hwk4/Tests/libmaxM
+Can't open /tmp/maxStack-Report.kt525.17304: No such file or directory.: syntax error: operand expected (error token is "/c/cs323/Hwk4/Tests/maxHeap: line 37: 1
+Can't open /tmp/maxStack-Report.kt525.17304: No such file or directory.")
+/c/cs323/Hwk4/Tests/t16: line 34: test: too many arguments
+1a2
+> - /c/cs323/Doc/words differ: byte 141338, line 17125
+Error: STDERR should be empty
+  0 point   16. Storage <= 12*SIZE? (-m 11):    Doc/logic.1

@@ -1,0 +1,668 @@
+Newsgroups: comp.lang.perl.announce,comp.lang.perl.misc,comp.answers,news.answers
+Path: yale!news3.near.net!paperboy.wellfleet.com!news-feed-1.peachnet.edu!gatech!usenet.eel.ufl.edu!spool.mu.edu!howland.reston.ans.net!newsjunkie.ans.net!news.ptd.net!spp
+From: spp@peach.epix.net
+Subject: comp.lang.perl.* FAQ 3/5 - Programming Aids
+X-Nntp-Posting-Host: cs1-12.pcn.ptd.net
+Message-ID: <SPP.95Sep5192320@icarus.sunfire.com>
+Followup-To: poster
+Sender: news@postoffice.ptd.net (News Master)
+Organization: ProLog - PenTeleData, Inc.
+Date: Tue, 5 Sep 1995 23:23:20 GMT
+Approved: news-answers-request@MIT.EDU
+Lines: 654
+Xref: yale comp.lang.perl.announce:113 comp.lang.perl.misc:5111 comp.answers:13145 news.answers:49522
+
+
+
+Archive-name: perl-faq/part3
+Version: $Id: part3,v 2.7 1995/05/15 15:44:43 spp Exp spp $
+Posting-Frequency: bi-weekly
+Last Edited: Wed Aug 16 21:21:41 1995 by spp (Stephen P Potter) on temples.syrinx.com
+
+This posting contains answers to general information questions, mostly
+about programming aids.  
+
+
+3.1) How can I use Perl interactively?
+    
+    The easiest way to do this is to run Perl under its debugger.  If you
+    have no program to debug, you can invoke the debugger on an `empty'
+    program like this: 
+
+    	perl -de 0
+
+    (The more positive hackers prefer "perl -de 1". :-)
+
+    Now you can type in any legal Perl code, and it will be immediately
+    evaluated.  You can also examine the symbol table, get stack
+    backtraces, check variable values, and if you want to, set breakpoints
+    and do the other things you can do in a symbolic debugger. 
+
+
+3.2) Is there a Perl profiler?
+
+    While there isn't one included with the perl source distribution (yet) 
+    various folks have written packages that allow you to do at least some 
+    sort of profiling.  The strategy usually includes modifying the perl 
+    debugger to handle profiling.  Authors of these packages include 
+
+	Wayne Thompson 		<me@anywhere.EBay.Sun.COM>
+	Ray Lischner 		<lisch@sysserver1.mentor.com>
+	Kresten Krab Thorup 	<krab@iesd.auc.dk>  
+
+    The original articles by these folks containing their profilers are
+    available at ftp://convex.com/pub/perl/info/profiling.shar.
+
+    Recently, Dean Roerich* has written a profiler for version 5 that
+    likely will be distributed with the standard release.  For now, it
+    should be available through any of the extension archives as
+    DProf.tar.gz.
+
+
+3.3) Is there a yacc for Perl?
+
+    Yes!! It's a version of Berkeley yacc that outputs Perl code instead
+    of C code!  You can get this from
+    ftp://ftp.sterling.com/local/perl-byacc1.8.2.tar.Z, or send the author
+    mail for details. 
+
+
+3.4) Is there a pretty-printer (similar to indent(1)) for Perl?
+
+    That depends on what you mean.  If you want something that works like
+    vgrind on Perl programs, then the answer is "yes, nearly".  Here's a
+    vgrind entry for perl: 
+
+	PERL|perl|Perl:\
+	    :pb=^\d?(sub|package)\d\p\d:\
+	    :bb={:be=}:cb=#:ce=$:sb=":se=\e":lb=':\
+	    :le=\e':tl:\
+	    :id=_:\
+	    :kw=\
+	    if for foreach unless until while continue else elsif \
+	    do eval require \
+	    die exit \
+	    defined delete reset \
+	    goto last redo next dump \
+	    local undef return  \
+	    write format  \
+	    sub package
+
+    It doesn't actually do everything right; in particular, 
+    things like $#, $', s#/foo##, and $foo'bar all confuse it.
+
+    David Levine uses this:
+
+    # perl 4.x                    David Levine <levine@ics.uci.edu> 05 apr 1993
+    # Derived from Tom Christiansen's perl vgrindef.  I'd like to treat all  of
+    # perl's built-ins as  keywords,  but vgrind   fields are  limited  to 1024
+    # characters  and the built-ins overflow that (surprise  :-).  So, I didn't
+    # include the dbm*, end*, get*, msg*, sem*, set*,  and  shm* functions.   I
+    # couldn't come up with an easy way to  distinguish beginnings  of literals
+    # ('...') from package prefixes, so literals are not marked.
+    # Be sure to:
+    # 1) include whitespace between a subprogram name and its opening {
+    # 2) include whitespace before a comment (so that $# doesn't get
+    # interpreted as one).
+    perl4:\
+	    :pb=^\d?(sub|package)\d\p\d:\
+	    :id=$%@_:\
+	    :bb=\e{:be=\e}:cb=\d\e#:ce=$:sb=\e":se=\e":\
+	    :kw=accept alarm atan2 bind binmode caller chdir chmod chop \
+    chown chroot close closedir connect continue cos crypt defined delete \
+    die do dump each else elsif eof eval exec exit exp fcntl fileno flock \
+    for foreach fork format getc gmtime goto grep hex if include index int \
+    ioctl join keys kill last length link listen local localtime log lstat \
+    m mkdir next oct open opendir ord pack package pipe pop print printf \
+    push q qq qx rand read readdir readlink recv redo rename require reset \
+    return reverse rewinddir rindex rmdir s scalar seek seekdir select send \
+    shift shutdown sin sleep socket socketpair sort splice split sprintf \
+    sqrt srand stat study sub substr symlink syscall sysread system \
+    syswrite tell telldir time times tr truncate umask undef unless unlink \
+    unpack unshift until utime values vec wait waitpid wantarray warn while \
+    write y: 
+
+    If what you mean is whether there is a program that will reformat the
+    program much as indent(1) will do for C, then the answer is no.  The
+    complex feedback between the scanner and the parser (as in the things
+    that confuse vgrind) make it challenging at best to write a stand-alone
+    Perl parser. 
+
+    Of course, if you follow the guidelines in perlstyle(1), you shouldn't
+    need to reformat.
+
+
+3.5) How can I convert my perl scripts directly to C or compile them into
+     binary form?
+
+    The short answer is: "No, you can't compile perl into C.  Period."
+
+    However, having said that, it is believed that it would be possible to
+    write a perl to C translator, although it is a PhD thesis waiting to
+    happen.  Anyone need a good challenging thesis?
+
+    In the way of further, detailed explication, it seems that the reasons
+    people want to do this usaully break down into one or more of the
+    following:
+
+	A) speed
+	B) secrecy
+	C) maintainability
+
+    SPEED:
+
+    1)	You can't turn perl source code or perl intermediary code into
+	native machine code to make it run faster, and saving the perl
+	intermediary code doesn't really buy you as much as you'd like.
+	If you really must, check out the undump and unexec alternatives.
+	If your motivations are speed, then this may or may not help you
+	much.  
+
+	You might also look into autoloading functions on the fly, which
+	can greatly reduce start-up time.
+
+	If you have a few routines that are bogging you down, you just
+	possibly might wish to hand-translate just them into C, then
+	dynamically load these in.  See perlapi(1) for details.  Most
+	of the time, however, reorganizing your perl algorithm is the best
+	way to address this.
+
+
+    SOURCE-CODE SECRECY:
+
+    2)  If you're trying to stop people from seeing what you're doing,
+	you can shroud it, i.e. turn all the idents into silly stuff, 
+	rearrange strings, and remove redundant white space.  There's
+	a program out there called ShroudIt! that works on a number of
+    	languages, including Perl.  Note that it is a commercial product
+    	though.  Contact David Webber (webber@lnk.com) for more
+    	information.
+    	
+    3)  You might also look into the cryptswitch() stuff in the perl
+    	source, which would allow you to ship something in a form they
+    	can't read.  This isn't particulary well-documented.
+
+    4)  If you're worried about them using your software without licence,
+	you put some huge disclaimer at the top that says something like
+	the following.  This is actually the best solution, because only a
+	legal solution will really work if legality is what you're worried
+	about: trying to solve legal problems with technical solutions
+	is not worth the effort, and too easily circumvented.
+
+	    This is UNPUBLISHED PROPRIETARY SOURCE CODE of XYZZY, Inc.; the
+	    contents of this file may not be disclosed to third parties,
+	    copied or duplicated in any form, in whole or in part, without
+	    the prior written permission of XYZZY, Inc.
+
+	    Permission is hereby granted soley to the licencee for use of
+	    this source code in its unaltered state.  This source code may
+	    not be modified by licencee except under direction of XYZZY
+	    Inc.  Neither may this source code be given under any
+	    circumstances to non-licensees in any form, including source
+	    or binary.  Modification of this source constitutes breach of
+	    contract, which voids any potential pending support
+	    responsibilities by XYZZY Inc.  Divulging the exact or
+	    paraphrased contents of this source code to unlicensed parties
+	    either directly or indirectly constitutes violation of federal
+	    and international copyright and trade secret laws, and will be
+	    duly prosecuted to the fullest extent permitted under law.
+
+	    This software is provided by XYZZY Inc. ``as is'' and any
+	    express or implied warranties, including, but not limited to,
+	    the implied warranties of merchantability and fitness for a
+	    particular purpose are disclaimed.  In no event shall the
+	    regents or contributors be liable for any direct, indirect,
+	    incidental, special, exemplary, or consequential damages
+	    (including, but not limited to, procurement of substitute
+	    goods or services; loss of use, data, or profits; or business
+	    interruption) however caused and on any theory of liability,
+	    whether in contract, strict liability, or tort (including
+	    negligence or otherwise) arising in any way out of the use of
+	    this software, even if advised of the possibility of such
+	    damage.
+
+    MAINTAINABILITY:
+
+    5)  If you just want to stop people from changing it because you're
+	concerned about support issues, you can put in a big disclaimer at
+	the top that says that if they touch the file they void the
+	warranty, and then make them give you a size, checksum, and
+	version of the file before answering any questions about it.
+
+	If you maintain a central site that distributes software to
+	internal client machines, use rdist(1) to send around a proper
+	version periodically, perhaps using the -y option on the install
+	to flag destinations younger than the source.
+
+	Let it be noted than in the many, many years that Perl's author
+	has been releasing and supporting freely redistributable software,
+	he has NEVER ONCE been bitten by a bogus bug report generated by
+	someone breaking his code because they had access to it.  Rather,
+	he and many other open software provided (where open software
+	means that for which the source is provided, the only truly open
+	software) have saved themselves countless hours of labor thousands
+	of times over because they've allowed people to inspect the source
+	for themselves.  Proprietary source-code hoarding is its own
+    	headache. 
+
+	Thus, obscurity for the sake of maintainability would seem to be a
+	red herring.
+
+    6)  If you can't count on perl being installed at the destination
+    	customer, then by all means, merely ship it with your program.
+    	This is no hardship, since software providers are accustomed to
+    	shipping software in machine-specific binary form.  The basic idea
+    	is as simple as: 
+
+	    shar /usr/local/{lib,bin,man}/perl myprog
+
+	Just don't overwrite their own Perl installation if they have one!
+
+
+3.6) Where can I get a perl-mode for emacs?
+
+    Since Emacs version 19 patchlevel 22 or so, there has been both a
+    perl-mode.el and support for the perl debugger built in.  These should
+    come with the standard Emacs 19 distribution.
+
+    In the perl source directory, you'll find a directory called
+    "emacs", which contains several files that should help you.
+
+    Note that the perl-mode of emacs will have fits with "main'foo" (single
+    quote), and mess up the indentation and hilighting.  However, note that
+    in perl5, you should be using "main::foo".  By the way, did we mention
+    that you should upgrade?
+
+
+3.7) Is there a Perl shell? 
+    
+    Not really.  Perl is a programming language, not a command
+    interpreter.  There is a very simple one called "perlsh"
+    included in the Perl source distribution.  It just does this:
+
+	$/ = '';        # set paragraph mode
+	$SHlinesep = "\n";
+	while ($SHcmd = <>) {
+	    $/ = $SHlinesep;
+	    eval $SHcmd; print $@ || "\n";
+	    $SHlinesep = $/; $/ = '';
+	}
+
+    Not very interesting, eh?  
+
+    Daniel Smith <dls@best.com> is working on an interactive Perl shell
+    called SoftList.  It's currently at version 3.0b7a (beta).  SoftList 
+    3.0b7a has tcsh-like command line editing, can let you define a file of
+    aliases so that you can run chunks of perl or UNIX commands, and so
+    on.  You can pick up a copy at ftp.best.com in
+    /pub/dls/SoftList-3.0b7a.gz. 
+
+
+3.8) How can I use curses with perl?
+
+    In release 4 of perl, the only way to do this was was to build a
+    curseperl binary by linking in your C curses library as described in
+    the usub subdirectory of the perl sources.  This requires a modicum of
+    work, but it will be reasonably fast since it's all in C (assuming you
+    consider curses reasonably fast. :-) Programs written using this
+    method require the modified curseperl, not vanilla perl, to run.
+    While this is something of a disadvantage, experience indicates that
+    it's better to use curseperl than to try to roll your own using
+    termcap directly.
+
+    Fortunately, in version 5, Curses is a dynamically loaded extension
+    by William Setzer*.  You should be able to pick it up wherever you
+    get Perl 5 from, or at least these places (expect that the version may
+    change by the time you read this):
+
+	ftp://ftp.ncsu.edu/pub/math/wsetzer/cursperl5a6.tar.gz
+        ftp://ftp.metronet.com/pub/perlinfo/perl5/cursperl5a6.tar.gz
+        ftp://ftp.cs.ruu.nl/pub/PERL/perl5.0/cursperl5a6.tar.gz
+
+    For a good example of using curses with Perl, you might want to pick
+    up a copy of Steven L. Kunz's* "perl menus" package ("menu.pl") via
+    anonymous FTP from "ftp.iastate.edu".  It's in the directory /pub/perl
+    as:
+
+        menu.pl.v3.1.tar.Z
+
+    menu.pl is a complete menu front-end for perl+curses and demonstrates
+    a lot of things (plus it is useful to boot if you want full-screen
+    menu selection ability).  It provides full-screen menu selection
+    ability for three menu styles (single-selection, multiple-selection,
+    and "radio-button").  The "perl menus" package also includes routines
+    for full-screen data entry.  A "template" concept is implemented to
+    create a simple (yet flexible) perl interface for building data-entry
+    screens for registration, database, or other record-oriented tasks.
+
+    menu.pl is supported on Perl4/curseperl and Perl5/Curses.  Complete
+    user documentation is provided along with several demos and "beginner
+    applications".  A menu utility module is provided that is a collection
+    of useful Perl curses routines (such as "pop-up query boxes) that may
+    be called from your applications.
+
+    Another possibility is to use Henk Penning's cterm package, a curses
+    emulation library written in perl.  cterm is actually a separate
+    program with which you communicate via a pipe.  It is available from
+    ftp.cs.ruu.nl [131.211.80.17] via anonymous ftp. in the directory
+    pub/PERL.  You may also acquire the package via email in compressed,
+    uuencoded form by sending a message to mail-server@cs.ruu.nl
+    containing these lines:
+
+	begin
+	send PERL/cterm.shar.Z
+	end
+
+    See the question on retrieving perl via mail for more information on
+    how to retrieve other items of interest from the mail server
+    there.
+
+
+3.9) How can I use X or Tk with Perl?
+
+    Right now, you have several choices.  If you are still using perl4, use
+    the WAFE or STDWIN packages, or try to make your own usub binding.
+
+    However, if you've upgraded to version 5, you have several exciting
+    possibilities, with more popping up each day.  Right now, Tk and Sx
+    are the best known such extensions.
+
+    If you like the tk package, you should get the Tk extension kit,
+    written by Nick Ing-Simmons*.  The official distribution point is at
+
+    	ftp://ftp.wpi.edu/perl5/private/Tk-b8.tar.gz
+
+    but many of the major archive sites now have it in their /ext{entions}
+    directory also.  Depending upon your location, you may be better off
+    checking there.  Also, understand that the version number may have
+    changed by the time you read this.
+
+    This package replaced the tkperl5 project, by Malcolm Beattie*, which
+    was based on an older version of Tk, 3.6 as compared to the current
+    4.X.  This package was also known as nTk (new Tk) while it was in the
+    alpha stages, but has been changed to just Tk now that it is in beta.
+    Also, be advised that you need at least perl5.001 (preferably 5.002,
+    when it becomes available) and the official unofficial patches.
+
+    You may also use the old Sx package, (Athena & Xlib), written by
+    originally written by by Dominic Giampaolo*, then and rewritten for Sx
+    by Frederic Chauveau*.  It's available from these sites:
+
+        ftp://ftp.pasteur.fr/pub/Perl/Sx.tar.gz
+        ftp://ftp.khoros.unm.edu/pub/perl/extensions/Sx.tar.gz
+        ftp://ftp.metronet.com/pub/perlinfo/perl5/Sx.tar.gz
+ 
+    STDWIN is a library written by Guido van Rossum* (author of the Python
+    programming language) that is portable between Mac, Dos and X11.  One
+    could write a Perl agent to speak to this STDWIN server.
+
+    WAFE is a package that implements a symbolic interface to the Athena
+    widgets (X11R5). A typical Wafe application consists in our framework
+    of two parts: the front-end (we call it Wafe for Widget[Athena]front
+    end) and an application program running typically as a separate
+    process.  The application program can be implemented in an arbitrary
+    programming language and talks to the front-end via stdio.  Since Wafe
+    (the front-end) was developed using the extensible TCL shell (cite John
+    Ousterhout), an application program can dynamically submit requests to
+    the front-end to build up the graphical user interface; the
+    application can even down-load application specific procedures into
+    the front-end.  The distribution contains sample application programs
+    in Perl, GAWK, Prolog, TCL, and C talking to the same Wafe binary.
+    Many of the demo applications are implemented in Perl.  Wafe 0.9 can
+    be obtained via anonymous ftp from 
+	ftp.wu-wien.ac.at[137.208.3.5]:pub/src/X11/wafe-0.9.tar.Z
+
+    Alternatively, you could use wish from tcl. 
+
+    #!/usr/local/bin/perl
+    #####################################################################
+    #  An example of calling wish as a subshell under Perl and
+    #  interactively communicating with it through sockets.
+    #
+    #  The script is directly based on Gustaf Neumann's perlwafe script.
+    #
+    #  Dov Grobgeld dov@menora.weizmann.ac.il
+    #  1993-05-17
+    #####################################################################
+
+    $wishbin = "/usr/local/bin/wish";
+
+    die "socketpair unsuccessful: $!!\n" unless socketpair(W0,WISH,1,1,0);
+    if ($pid=fork) {
+	    select(WISH); $| = 1;
+	    select(STDOUT);
+
+	# Create some TCL procedures
+	    print WISH 'proc echo {s} {puts stdout $s; flush stdout}',"\n";
+
+	# Create the widgets
+	print WISH <<TCL;
+	# This is a comment "inside" wish
+
+	frame .f -relief raised -border 1 -bg green
+	pack append . .f {top fill expand}
+
+	button .f.button-pressme -text "Press me" -command {
+	    echo "That's nice."
+	}
+	button .f.button-quit -text quit -command {
+	    echo "quit"
+	}
+	pack append .f .f.button-pressme {top fill expand} \\
+		       .f.button-quit {top expand}
+
+TCL
+	;
+	# Here is the main loop which receives and sends commands
+	# to wish.
+	while (<WISH>) {
+	    chop;
+	    print "Wish sais: <$_>\n";
+	    if (/^quit/) { print WISH "destroy .\n"; last; }
+	}
+	    wait;
+    } elsif (defined $pid) {
+	open(STDOUT, ">&W0");
+	open(STDIN, ">&W0");
+	close(W0);
+	select(STDOUT); $| = 1;
+	exec "$wishbin --";
+    } else {
+	die "fork error: $!\n";
+    }
+
+
+3.10) Can I dynamically load C user routines?
+
+    Yes -- dynamic loading comes with the distribution.  That means that
+    you no longer need 18 different versions of fooperl floating around.
+    In fact, all of perl can be stuck into a libperl.so library and
+    then your /usr/local/bin/perl binary reduced to just 50k or so.
+    See DynLoader(3pm) for details.
+
+    In perl4, the answer was kinda.  One package has been released that does
+    this, by Roberto Salama*.  He writes:
+
+    Here is a version of dylperl, dynamic linker for perl. The code here is
+    based on Oliver Sharp's May 1993 article in Dr. Dobbs Journal (Dynamic
+    Linking under Berkeley UNIX). 
+
+	      dyl.h 
+	      dyl.c - code extracted from Oliver Sharp's article
+
+	      hash.h
+	      hash.c - Berkeley's hash functions, should use perl's but
+		       could not be bothered
+
+	   dylperl.c - perl usersubs
+	      user.c - userinit function
+
+	    sample.c - sample code to be dyl'ed
+	   sample2.c -          "
+	     test.pl - sample perl script that dyl's sample*.o
+
+    The Makefile assumes that uperl.o is in /usr/local/src/perl/... You
+    will probably have to change this to reflect your installation. Other
+    than that, just type 'make'...
+
+    The idea behind being able to dynamically link code into perl is that
+    the linked code should become perl functions, i.e. they can be invoked
+    as &foo(...).  For this to happen, the incrementally loaded code must
+    use the perl stack, look at sample.c to get a better idea.
+
+    The few functions that make up this package are outlined below.
+
+    &dyl("file.o"): dynamically link file.o. All functions and non-static
+		   variables become visible from within perl. This
+		   function returns a pointer to an internal hash table
+		   corresponding to the symbol table of the newly loaded
+		   code.
+
+		   eg: $ht = &dyl("sample.o")
+
+	   This function can also be called with the -L and -l ld options.
+
+		   eg: $ht = &dyl(""sample2.o", "-L/usr/lib", "-lm")
+		       will also pick up the math library if sample.o
+		       accesses any symbols there.
+
+    &dyl_find("func"): find symbol 'func' and return its symbol table entry
+
+    &dyl_functions($ht): print the contents of the internal hash table
+    &dyl_print_symbols($f): prints the contents of the symbol returned by
+    dyl_find() 
+
+    There is very little documentation, maybe something to do for a future
+    release.  The files sample.o, and sample2.o contain code to be
+    incrementally loaded, test.pl is the test perl script.
+
+    Comments are welcome. I submit this code for public consumption and,
+    basically, am not responsible for it in any way.
+
+
+3.11) What is undump and where can I get it?
+
+    The undump program comes from the TeX distribution.  If you have TeX,
+    then you may have a working undump.  If you don't, and you can't get
+    one, *AND* you have a GNU emacs working on your machine that can clone
+    itself, then you might try taking its unexec() function and compiling
+    Perl with -DUNEXEC, which will make Perl call unexec() instead of
+    abort().  You'll have to add unexec.o to the objects line in the
+    Makefile.  If you succeed, post to comp.lang.perl.misc about your
+    experience so others can benefit from it. 
+
+    If you have a version of undump that works with Perl, please submit
+    its anon-FTP whereabouts to the FAQ maintainer.
+
+
+3.12) How can I get '#!perl' to work under MS-DOS?
+
+    John Dallman* has written a program "#!perl.exe" which will do this.
+    It is available through anonymous ftp from ftp.ee.umanitoba.ca in the
+    directory /pub/msdos/perl/hbp_30.zip.  This program works by finding
+    the script and perl.exe, building a command line and running perl.exe
+    as a child process.  For more information on this, contact John
+    directly.
+
+3.13) Can I write useful perl programs on the command line?
+
+    Sure, if they're simple enough.  Of course, for most programs,
+    you'll enter them in a file and call perl on them from your
+    shell.  That way you can go into the hack/execute/debug cycle.
+    But there are plenty of useful one-liner: see below.  (Things
+    marked perl5 need to be run from v5.000 or better, but the
+    rest don't care.)
+
+    # what's octal value of random char (":" in this case)?
+    perl -e 'printf "%#o\n", ord(shift)' ":"
+
+    # sum first and last fields
+    perl -lane 'print $F[0] + $F[1]'
+
+    # strip high bits
+    perl -pe 'tr/\200-\377/\000-\177/'
+
+    # find text files
+    perl -le 'for(@ARGV) {print if -f && -T}' *
+
+    # trim newsrc
+    perl5 -i.old -pe 's/!.*?(\d+)$/! 1-$1/' ~/.newsrc
+
+    # cat a dbmfile
+    perl -e 'dbmopen(%f,shift,undef);while(($k,$v)=each%f){print "$k:\
+    	    $v\n"}' /etc/aliases 
+
+    # remove comments from C program
+    perl5 -0777 -pe 's{/\*.*?\*/}{}gs' foo.c
+
+    # make file a month younger than today, defeating reaper daemons
+    perl -e '$X=24*60*60; utime(time(),time() + 30 * $X,@ARGV)' *
+
+    # find first unused uid
+    perl5 -le '$i++ while getpwuid($i); print $i'
+
+    # find first unused uid after 100, even with perl4
+    perl -le '$i = 100; $i++ while ($x) = getpwuid($i); print $i'
+
+    # detect pathetically insecurable systems
+    perl5 -le 'use POSIX; print "INSECURE" unless sysconf(_PC_CHOWN_RESTRICTED)'
+
+    # display reasonable manpath
+    echo $PATH | perl5 -nl -072 -e '
+	s![^/+]*$!man!&&-d&&!$s{$_}++&&push@m,$_;END{print"@m"}'
+
+    Ok, the last one was actually an obfuscate perl entry. :-) 
+
+3.14) What's a "closure"?
+
+    (Larry wrote) This is a notion out of the Lisp world that says if you
+    define an anonymous function in a particular lexical context, it
+    pretends to run in that context even when it's called outside of the
+    context.
+
+    In human terms, it's a funny way of passing arguments to a subroutine
+    when you define it as well as when you call it.  It's useful for
+    setting up little bits of code to run later, such as callbacks.  You
+    can even do object-oriented stuff with it, though Perl provides a
+    different mechanism to do that already.
+
+    You can also think of it as a way to write a subroutine template without
+    using eval.
+
+    Here's a small example of how this works:
+
+	sub newprint {
+	    my $x = shift;
+	    return sub { my $y = shift; print "$x, $y!\n"; };
+	}
+	$h = newprint("Howdy");
+	$g = newprint("Greetings");
+
+	# Time passes...
+
+	&$h("world");
+	&$g("earthlings");
+
+    This prints:
+
+	Howdy, world!
+	Greetings, earthlings!
+
+    Note particularly that $x continues to refer to the value passed into
+    newprint() *despite* the fact that the "my $x" has seemingly gone out
+    of scope by the time the anonymous subroutine runs.  That's what
+    closure is all about.
+
+    This only applies to lexical variables, by the way.  Dynamic variables
+    continue to work as they have always worked.  Closure is not something
+    that most Perl programmers need trouble themselves about to begin with.
+
+
+
+
+
+--
+Stephen P Potter        Pencom Systems Administration         AMP Incorporated
+spp@peach.epix.net	spp@psa.pencom.com	          steve.potter@amp.com
+Home: 717-540-0131	Pager: 1-800-759-8888, 547-9561     Work: 717-986-5401
+                Systems Administation: It's a Kind of Magic

@@ -1,0 +1,247 @@
+Unix Review Column 2 (May 1995)
+
+Perl's initial claim to fame was being able to handle text conveniently.  And,
+even though it has grown quite a bit in the half-dozen years of its existance,
+text processing is still a favorite application for Perl.
+
+For example, let's have Perl count the number of lines in each file given on the
+command line.  I'll do this by executing a loop on the diamond read operator
+(<>) which automatically opens up each file on the command line.
+
+	#!/usr/bin/perl
+	while (<>) {
+		$count{$ARGV}++;
+	}
+	foreach $file (sort keys %count) {
+		print "$file has $count{$file} lines\n";
+	}
+
+The while loop iterates once per each line of each file given on the command
+line, or on standard input if no files are given.  For each line, an associative
+array element in %count is incremented.  The element is selected with a key of
+$ARGV, which happens to be the name of the file the diamond loop is currently
+examining.  (If no files were given, the filename is automatically "-",
+following the traditional UNIX convention of this name meaning standard input.)
+
+After the counts have been gathered, the foreach loop steps through the keys of
+the %count associative array -- the names of the files I've processed.  Just to
+be pretty, I sorted the names of the files in ascending-ASCII order with sort.
+Each time through the foreach loop, the name of the file gets stuffed into
+$file, which is then used to loop up the line-count for display via print.
+
+Suppose I need the counts sorted by line-count (say, I was looking for the
+longest file of a list of files).  No problem -- I just need to tell sort to do
+something besides its default behavior.
+
+	#!/usr/bin/perl
+	while (<>) {
+		$count{$ARGV}++;
+	}
+	foreach $file (sort by_count keys %count) {
+		print "$file has $count{$file} lines\n";
+	}
+	sub by_count {
+		$count{$b} <=> $count{$a};
+	}
+
+Here, I've added a sort subroutine which gives the sort operator a new rule to
+use when comparing two items of the list.  In this case, I have a list of keys
+of the %count associative array, and I want to sort not the keys, but the
+corresponding values of the elements.  When the sort subroutine by_count is
+called, it gets two of the list elements (two keys from %count) in $a and $b,
+and by_count's job is to return -1, 0, or +1 depending on whether the element of
+$a should be considered less than, equal to, or greater than the element of $b,
+respectively.  The spaceship operator (<=>) happens to do this exactly
+right for two numbers, and that's what I've used.
+
+I've swapped the $a and $b in by_count so that I get a descending order for
+sorting.  That way, the longest files will appear first.
+
+The number of lines is interesting, but what if I wanted the number of words?
+Let's define a word as any sequence of alphanumerics.  (Yes, most people don't
+use numbers in their words, but hey, this is only an example.)
+
+To count the words, I need to break each line up by words, and then add the
+number of words into the counter, not the number of lines.  Just a few tweaks
+will do it.
+
+	#!/usr/bin/perl
+	while (<>) {
+		@words = split(/\W+/);
+		$count{$ARGV} += @words;
+	}
+	foreach $file (sort by_count keys %count) {
+		print "$file has $count{$file} words\n";
+	}
+	sub by_count {
+		$count{$b} <=> $count{$a};
+	}
+
+The list @words gets created for each line by splitting the line up by the
+regular expression /\W+/.  This regular expression matches sequences of
+non-alphanumerics.  The split operator drags this regular expression through the
+string (in this case, the contents of $_, because I didn't specify anything
+else).  Every place the regular expression matches gets ripped out of the string
+as a delimiter -- everything else becomes an element of the list to be returned.
+
+Once I have a list in @words, I can add the length of the list to the count.
+The name @words in a scalar context is the length of array @words.  This will
+keep the elements of %count as a running total of words now, not lines.
+
+Now that I have words, I may be more interested in which word occurs most
+frequently, not just which files have the most words.  Let's invert the count a
+bit.
+
+	#!/usr/bin/perl
+	while (<>) {
+		@words = split(/\W+/);
+		foreach $word (@words) {
+			$count{$word}++;
+		}
+	}
+	foreach $word (sort by_count keys %count) {
+		print "$word occurs $count{$word} times\n";
+	}
+	sub by_count {
+		$count{$b} <=> $count{$a};
+	}
+
+Now, instead of merely noting the number of words on the line, I step through
+each word in a foreach loop inside the initial loop on the diamond read.  The
+body of this loop is executed once per word, and increments an element of the
+%count associative array.  Now, however, the key of the associative array is no
+longer a filename (as it was in previous snippets), but the word itself.  (I've
+lost all reference to the file, but hang in there, it'll come back soon.)
+
+After the diamond-read loop is finished, I step through the keys of the %count
+associative array, but this time, the keys represent words, so it's a bit
+different for the message.  The same sort subroutine by_count still works,
+though.
+
+The output of this program is a list of words, sorted in descending order by the
+number of occurrances of each word.
+
+As I noted above, I've lost the name of the file that the word appeared.
+Suppose I wanted a concordance instead of a mere count.  I'd need to grab the
+name of the file somehow.  Well, just a few more keystrokes, and I'll have it.
+
+	#!/usr/bin/perl
+	while (<>) {
+		@words = split(/\W+/);
+		foreach $word (@words) {
+			$count{$word}{$ARGV}++;
+		}
+	}
+	foreach $word (sort keys %count) {
+		foreach $file (sort keys %{$count{$word}}) {
+			print "$word occurs $count{$word}{$file}",
+				" times in $file\n";
+		}
+	}
+
+Ugh.  OK, more than a few keystrokes.  What happened here?  Well, I've now made
+%count into a two-dimensional associative array.  This wasn't supported in
+versions of Perl prior to 5.0, so if you're playing along at home, you'll need
+to make sure that you've got the latest version of Perl (easy, cuz it's free).
+The keys of %count are still words, but the values of %count are now individual
+anonymous associative arrays.  The keys of these second-level arrays are the
+filenames in which the words occur.  So $count{"fred"}{"hello.c"} ends up being
+the number of times that "fred" occurs in "hello.c".
+
+The printing loop has to change a bit as well.  I now need to iterate for each
+word (now in ascending ASCII order), and within each word, look at all the files
+in which this word appears.  The ugly syntax of %{$count{$word}} is needed to
+refer to the unnamed associative array at $count{$word}.  (It takes some getting
+used to, but can be quite natural once you've played with it a bit.) Note that
+even inside the double quotes I can use the nested-associative-array syntax to
+access the ultimate count.
+
+Hmm.  That output is a mite bit ugly.  What I'd really like is something that
+has the word on the left side, and a bunch of filenames and counts on the right.
+No problem -- let's just clean it up a bit.
+
+	#!/usr/bin/perl
+	while (<>) {
+		@words = split(/\W+/);
+		foreach $word (@words) {
+			$count{$word}{$ARGV}++;
+		}
+	}
+	foreach $word (sort keys %count) {
+		print "$word:",
+			join(", ",
+				map "$_: $count{$word}{$_}",
+				sort keys %{$count{$word}}),
+			"\n";
+	}
+
+Now I get a display that looks like:
+
+	bedrock: barney.c: 10, betty.c: 5, fred.c: 15
+	flintstone: barney.c: 3
+	rubble: barney.c: 5, betty.c: 2
+
+This works by transforming the keys from the inner associative array (the names
+of the files that a particular word appears in) into a string that contains the
+key name along with the value.  This is achieved with the cool map operator,
+which sets $_ to each element of the given list, and then collects the results
+from that into another list.  Once the mapping is complete, the join operator
+puts comma-space between elements, and this is all glued in after the name of
+the word using the print statement.
+
+Whew.  A lot of stuff in a little space.  It's still not completely pretty
+though.  Let's tidy it up just a bit using a format.
+
+	#!/usr/bin/perl
+	while (<>) {
+		@words = split(/\W+/);
+		foreach $word (@words) {
+			$count{$word}{$ARGV}++;
+		}
+	}
+	foreach $word (sort keys %count) {
+		$left = "$word:";
+		$right = join(", ",
+			map "$_: $count{$word}{$_}",
+			sort keys %{$count{$word}});
+		write;
+	}
+
+	format STDOUT =
+	@<<<<<<<<<<<<<< ^<<<<<<<<<<<<<<<<<<<<<<<
+	$left,          $right
+	  ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< ~~
+	  $right
+	.
+
+
+Now, I stuff the word to be printed in $left (followed by a colon), and the list
+of counts per file in the variable $right.  The format is invoked with the write
+operator, using the format defined later in the program.  This format puts the
+word label in a left-justified field.  The counts will be word-filled into the
+space on the right.  If there are more references than can fit on a line, the
+remaining references spill onto successive lines (outdented slightly from the
+previous stuff), thanks to the built-in word wrapping of the format operator.
+(The two tildes on the end of the line indicate that this format line needs to
+be repeated until the line would have otherwise printed blank).
+
+As you might notice, it's a long ways from a line count to a pretty concordance,
+but the program never really got that long (although it got a bit ugly).  Perl's
+text processing features make it pretty easy to do this sort of common but
+necessary task.
+
+
+Randal L. Schwartz has been a computer science professional for over 17 years.
+He has authored two books on Perl, and provides Unix consulting and Perl
+training throughout the United States.  He can be reached at
+merlyn@stonehenge.com or +1 503 777 0095, and welcomes questions or comments
+about Perl, downhill snow skiing, small planes, Unix, or Karaoke, but not
+necessarily in that order.  His World Wide Web homepage is located at
+http://www.teleport.com/~merlyn/.
+
+This text is copyright by Miller-Freeman, Inc, and is used with their
+permission.  Further distribution or use is not permitted.
+
+This text has appeared in an edited form in Unix Review magazine.  However, the
+version you are reading here is as the author originally submitted the article
+for publication, not after their editors applied their (ahem) creativity.
