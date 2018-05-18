@@ -5,8 +5,6 @@
 #include "Encode.h"
 
 #define MAX_BITS 12
-#define WARN(format,...) fprintf (stderr, "" format "\n", __VA_ARGS__)
-#define DIE(format,...)  WARN(format,__VA_ARGS__), exit (EXIT_FAILURE)
 
 int main(int argc, char** argv) {
    
@@ -14,24 +12,10 @@ int main(int argc, char** argv) {
     // setvbuf (stdin,  NULL, _IONBF, 0);    // Avoid malloc()ing buffers
     // setvbuf (stdout, NULL, _IONBF, 0);    // for stdin/stdout
     
+    // flags for maxbits, prune, and escape 
     bool p = 0, mb = 0, e = 0;
     int maxbits = MAX_BITS;
     
-    /*  Uncomment to test table 
-        
-        codeTable * table = createTable(12);
-        insertTable(table, 12, 12);
-        insertTable(table, 12, 12);
-        insertTable(table, 12, 12);
-        insertTable(table, 12, 12);
-        insertTable(table, 1, 12);
-        insertTable(table, 12, 11);
-        insertTable(table, 12, 10);
-        printf("index in table: %i\n", searchCode(table, 12,12));
-        printTable(table);
-        return 0;
-    
-    */
     // decode
     if(!(strcmp(argv[0], "./decode"))) {
          

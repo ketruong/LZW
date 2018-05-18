@@ -5,14 +5,25 @@
 #include <stdbool.h>
 #include <limits.h>
 
-// Empty, Escape, Prune, and Increase
+// Error Printing 
+#define WARN(format,...) fprintf (stderr, "" format "\n", __VA_ARGS__)
+#define DIE(format,...)  WARN(format,__VA_ARGS__), exit (EXIT_FAILURE)
+
+// Empty, Escape, Prune, Increase, and End
 #define EMP 0
 #define ESC 1
 #define PRU 2
 #define INC 3
+#define END 4
+
+// Starting number of bits 
+#define START 9
 
 // how many entries are in the table 
 extern int entries; 
+
+// how many bits needed to represent entries in the table 
+extern unsigned int entries_bits; 
 
 // size of the table
 extern int size; 
@@ -21,6 +32,7 @@ extern int size;
 typedef struct tab {
     unsigned int pref;
     unsigned int c;
+    unsigned int code;
 } tab;
 
 // code Table is represented as a hashTable and as an array
@@ -47,6 +59,12 @@ int searchCode(codeTable * table, unsigned int pref, unsigned int c);
 
 // inserts the pref and char into the hash table and array
 void insertTable(codeTable * table, unsigned int pref, unsigned int c);
+
+// check for KwKwK event
+int kwkwkTable(codeTable * table, unsigned int c); 
+
+// for decode: recursively prints out the characters instead of using stack 
+unsigned int printTableDecode(codeTable * table, unsigned int c); 
 
 // printing the array
 void printTable(codeTable * table); 

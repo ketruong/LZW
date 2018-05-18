@@ -5,6 +5,6 @@
 #include <string.h>
 #include "trie.h"
 #include "code.h"
-
+extern unsigned int bits;
 void decode();
 #endif

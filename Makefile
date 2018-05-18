@@ -10,10 +10,10 @@ ${PRGM}: lzw
 lzw: lzw.o code.o trie.o Decode.o Encode.o
 	 ${CC} ${CFLAGS} -o $@ $^
 
-Decode.o: Decode.h code.o trie.o
-Encode.o: Encode.h code.o trie.o
 code.o: code.h
 trie.o: trie.h
+Decode.o: Decode.h code.o trie.o
+Encode.o: Encode.h code.o trie.o
 
 clean: 
 	rm -if *.o *~

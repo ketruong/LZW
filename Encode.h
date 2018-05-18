@@ -32,7 +32,8 @@ extern unsigned int bits;
             character needs to be added in the table first
         4. Else 
             a. If there is space in the table, add the (Char,Code) pair in and 
-            set the code to be the (Code, Empty) pair 
+            set the code to be the (Code, Empty) pair
+        5. Else prune the table
    5. If the code is not empty
     a. send the code out 
    6. Output any lower bits left over

@@ -5,7 +5,7 @@
 #define REDUCE(h,size) ((h) & ((size)-1))           // Reduce to [0,SIZE-1)
 
 // printing debugger 
-#if 1 
+#if 0 
   #define Print(a) printf a
 #else
   #define Print(a) (void)0
@@ -31,7 +31,13 @@ codeTable * createTable(int maxbits, int escape) {
     codeTable * table = calloc(1, sizeof(codeTable));
     table->hashTable = calloc(size, sizeof(tab));
     table->array= calloc(size, sizeof(tab));
+    int i;
 
+    unsigned int max = (1 << 20) + 1; 
+    
+    // reserve table space for EMP, ESC, PRU, and INC  
+    for (i = 0; i<5; i++) insertTable(table, max + i, i);
+    
     // if the escape flag is specified 
     // do not add all 256 ASCII characters in the table
     // there is no prefix if the characters are added in
@@ -87,6 +93,7 @@ void insertTable(struct codeTable * table, unsigned int pref, unsigned int c) {
     table->hashTable[index] = calloc(1,sizeof(tab));
     table->hashTable[index]->pref = pref;
     table->hashTable[index]->c = c;
+    table->hashTable[index]->code  = entries;
 
     // add entry to array
     table->array[entries] = calloc(1,sizeof(tab));
@@ -105,14 +112,39 @@ int searchCode(codeTable * table, unsigned int pref, unsigned int c) {
     // loop until the right triple is found else return -1 to indicate not found
     while(table->hashTable[index]) {
         i++;
-        if(table->hashTable[index]->pref == pref && table->hashTable[index]->c == c) return index;
+        if(table->hashTable[index]->pref == pref && table->hashTable[index]->c == c) 
+            return table->hashTable[index]->code;
         else index = hash(pref, c, i); 
     }
     return -1;
 }
 
+// check for KwKwK event
+int kwkwkTable(codeTable * table, unsigned int c) {
+    // no KwKwK event
+    if (c < entries) return 1;
+    // KwKwK event
+    else if (c == entries) return 0;
+    // something bad happen
+    DIE("decode: %s", "corrupted file");
+}
+
+// for decode: recursively prints out the characters instead of using stack 
+unsigned int printTableDecode(codeTable * table, unsigned int code) {
+    int K;
+    
+    if (table->array[code]->pref == EMP) {
+        K = table->array[code]->c;
+        putchar(K);
+    } else {
+        K = printTableDecode(table, table->array[code]->pref);
+        putchar(table->array[code]->c);
+    }
+
+    return K;
+}
 // printing the array 
-void printTable(struct codeTable * table) {
+void printTable(codeTable * table) {
     for (int i = 0; i < entries; i++) {
         if(table->array[i]) 
             Print(("pref = %u, c = %u, i = %i\n", 
