@@ -26,34 +26,37 @@ int hash(unsigned int p, unsigned int c, int stepper) {
 }
 
 // creates table of size of 2^ MAXBITS with an array and hashTable 
-codeTable * createTable(int maxbits, int escape) {
+codeTable * createTable(int maxbits, int escape, int d) {
     size = 1 << (maxbits);
     
-    codeTable * table = calloc(1, sizeof(codeTable));
-    table->hashTable = calloc(size, sizeof(tab)); 
-    table->array= calloc(size, sizeof(tab ));
-    unsigned char i;
+    codeTable * table = malloc(sizeof(codeTable));
+    if(!d) table->hashTable = calloc(size, sizeof(tab)); 
+    else table->array= malloc(size * sizeof(tab ));
+    unsigned int i;
 
     // reserve table space for EMP, ESC, PRU, and INC  
     for (i = 0; i<=5; i++) {
-        table->array[entries] = calloc(1, sizeof(tab));
-        table->array[entries]->pref = size + i;
-        table->array[entries]->c = i;
-        table->array[entries]->code = entries;
-        entries++; 
+        if(d) {
+            table->array[entries] = calloc(1, sizeof(tab));
+            table->array[entries]->pref = size + i;
+            table->array[entries]->c = i;
+            table->array[entries]->code = entries;
+            entries++; 
+        } else insertTable(table, size+i, i, d);
     }
     
     // if the escape flag is specified 
     // do not add all 256 ASCII characters in the table
     // there is no prefix if the characters are added in
     if(!escape) for(i = 0; i < 255; i++) {
-        table->array[entries] = calloc(1, sizeof(tab));
-        table->array[entries]->pref = 0;
-        table->array[entries]->c = i;
-        table->array[entries]->code = entries;
-        entries++; 
+        if(d) {
+            table->array[entries] = malloc(sizeof(tab));
+            table->array[entries]->pref = 0;
+            table->array[entries]->c = i;
+            table->array[entries]->code = entries;
+            entries++;
+        } else insertTable(table, 0, i, d);
     }
-    
     return table;
 }
 
@@ -64,7 +67,7 @@ tab * searchPC(codeTable * table, int code) {
 }
 
 // for encode: insert into hashTable using double hashing 
-void insertTable(struct codeTable * table, unsigned int pref, unsigned int c) {
+void insertTable(struct codeTable * table, unsigned int pref, unsigned int c, int d) {
 
     //Print(("Attempting to insert new entry...\n"));
     
@@ -73,43 +76,45 @@ void insertTable(struct codeTable * table, unsigned int pref, unsigned int c) {
         //Print(("Table is full!\n"));
         return;
     }
-
-    // code already inserted
-    /*if(searchCode(table,pref,c) >= 0) {
-        // Print(("Code already inserted in\n"));
-        return;
-    }*/
-    
-    //get index from first hash
-    int index = hash(pref, c, 0); 
-    
-    //if collision occurs
-    if (table->hashTable[index] != NULL) {
+    if(!d) {
+        // code already inserted
+        /*if(searchCode(table,pref,c) >= 0) {
+            // Print(("Code already inserted in\n"));
+            return;
+        }*/
         
-        int i = 1;
-        // loop until there is an empty spot;
-        while (1) {
-            // get newIndex
-            index = hash(pref,c,i); 
+        //get index from first hash
+        int index = hash(pref, c, 0); 
+        
+        //if collision occurs
+        if (table->hashTable[index] != NULL) {
+            
+            int i = 1;
+            // loop until there is an empty spot;
+            while (1) {
+                // get newIndex
+                index = hash(pref,c,i); 
 
-            // if no collision occurs, store the key
-            if (!table->hashTable[index]) {
-                break;
+                // if no collision occurs, store the key
+                if (!table->hashTable[index]) {
+                    break;
+                }
+                i++;
             }
-            i++;
-        }
-    } 
-    
-    // add entry into hashTable 
-    table->hashTable[index] = calloc(1,sizeof(tab));
-    table->hashTable[index]->pref = pref;
-    table->hashTable[index]->c = c;
-    table->hashTable[index]->code  = entries;
-
-    // add entry to array
-    //table->array[entries] = calloc(1,sizeof(tab));
-    table->array[entries] = table->hashTable[index];
-    
+        } 
+        
+        // add entry into hashTable 
+        table->hashTable[index] = malloc(sizeof(tab));
+        table->hashTable[index]->pref = pref;
+        table->hashTable[index]->c = c;
+        table->hashTable[index]->code  = entries;
+    } else {
+        // add entry to array
+        table->array[entries] = malloc(sizeof(tab));
+        table->array[entries]->pref = pref; 
+        table->array[entries]->c =c; 
+        table->array[entries]->code = entries; 
+    }
     // update number of entries in the table
     entries++;
     //Print(("entries = %i\n", entries));
@@ -167,10 +172,10 @@ void printTable(codeTable * table) {
 
 // destroy the table 
 void destroyTable(struct codeTable * table) {
-    for (int i = 0; i < entries; i++) if(table->array[i]) free(table->array[i]);
-    free(table->hashTable);
-    free(table->array);
-    free(table);
+    // for (int i = 0; i < entries; i++) if(table->array[i]) free(table->array[i]);
+    // free(table->hashTable);
+    // free(table->array);
+    // free(table);
 }
 
 // prunes table when the table is full 

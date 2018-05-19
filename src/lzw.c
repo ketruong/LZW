@@ -22,8 +22,8 @@ int main(int argc, char** argv) {
         // too many command line arguments for decode
         if(argc > 1) DIE("usage: %s", "decode");
         
-        decode();
-    
+        codeTable * table = decode();
+        destroyTable(table);
     // encode 
     } else if(!strcmp(argv[0], "./encode")) {
         
@@ -61,9 +61,10 @@ int main(int argc, char** argv) {
             } else DIE("encode: %s", "invalid input");
             
         }
-        encode(maxbits, p, e);
+        codeTable * table = encode(maxbits, p, e);
+        destroyTable(table);
     // error 
     } else DIE("encode/decode: %s", "illegal command name");
     
-    return 0;
+    exit(0);
 }

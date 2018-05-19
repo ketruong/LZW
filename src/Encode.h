@@ -39,5 +39,5 @@ extern unsigned int bits;
    6. Output any lower bits left over
 
 */
-void encode(int maxbits, int p, int e);
+codeTable * encode(int maxbits, int p, int e);
 #endif

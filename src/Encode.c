@@ -14,12 +14,12 @@ void pruneHelper(codeTable * table) {
 // if there is no space and the prune flag is enabled, prune
 void addorPrune(codeTable * table, unsigned int pref, unsigned int c, int p) {
     if (isFull()) {if(p) pruneHelper(table);}
-    else insertTable(table, pref, c);
+    else insertTable(table, pref, c, 0);
 }
 
-void encode(int maxbits, int p, int e) {
+codeTable * encode(int maxbits, int p, int e) {
     // create table
-    codeTable * table = createTable(maxbits, e);
+    codeTable * table = createTable(maxbits, e, 0 );
     
     // code is empty at the beginning 
     unsigned int code = EMP;
@@ -92,4 +92,5 @@ void encode(int maxbits, int p, int e) {
     //printTable(table);
     flushBits();
     destroyTable(table);
+    return table;
 }

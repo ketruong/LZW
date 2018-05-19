@@ -46,7 +46,7 @@ int hash(unsigned int p, unsigned int c, int stepper);
 
 // creates the table with 2^maxbits entries 
 // allocates space for an array and hash table 
-codeTable * createTable(int maxbits, int escape);
+codeTable * createTable(int maxbits, int escape, int d);
 
 // searches the array for the entry at that index (code)
 tab * searchPC(codeTable * table, int code);
@@ -55,7 +55,7 @@ tab * searchPC(codeTable * table, int code);
 int searchCode(codeTable * table, unsigned int pref, unsigned int c);
 
 // inserts the pref and char into the hash table and array
-void insertTable(codeTable * table, unsigned int pref, unsigned int c);
+void insertTable(codeTable * table, unsigned int pref, unsigned int c, int d);
 
 // check for KwKwK event
 int kwkwkTable(codeTable * table, unsigned int c); 

@@ -8,7 +8,7 @@ void escape(codeTable * table, int * oldC){
     int c;
     if ((c = getBits(CHAR_BIT)) != EOF) {
         putchar(c);
-        insertTable(table, EMP, c);
+        insertTable(table, EMP, c, 1);
         oldC = EMP;
     }
 }
@@ -24,7 +24,7 @@ void prune(codeTable * table, int * oldC){
     pruneTable(table);
 }
 
-void decode() {
+codeTable * decode() {
 
     // get maxbits and the escape flag
     int maxbits = getBits(5);
@@ -32,7 +32,7 @@ void decode() {
     if (maxbits <= 8 || maxbits > 20) DIE("Decode: %s","corrupted file!"); 
     
     // create the table
-    codeTable * table = createTable(maxbits, e);
+    codeTable * table = createTable(maxbits, e, 1);
     
     // KwKwK problem flag;
     int kwkwk = 0;
@@ -77,20 +77,19 @@ void decode() {
         if (kwkwk) putchar(K);
         
         // add to the table if possible
-        if (*oldCode != EMP) insertTable(table,*oldCode, K);
+        if (*oldCode != EMP) insertTable(table,*oldCode, K, 1);
         
         *oldCode = *newCode;
     }
 
     // received END code
     exit_loop: ;
+    // did not receive END code
     // if (*Code != END) DIE("Decode: %s", "did not end with termination sequence");
 
     // free everything 
-    destroyTable(table);
     free(oldCode);
     free(newCode);
     free(Code);
-
-    // did not receive END code
+    return table; 
 }
