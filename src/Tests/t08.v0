@@ -1,0 +1,28 @@
+#!/bin/bash
+# size(-m 13) in [LOWER,UPPER]?
+
+RUN=/c/cs323/bin/run
+
+EFLAG="-m 13"
+FILE=/c/cs323/Doc/malloc.ps
+LOWER=34000
+UPPER=40000
+
+EOUT=/tmp/lzw.e.$USER.$$
+DOUT=/tmp/lzw.d.$USER.$$
+
+trap "/bin/rm -f $EOUT $DOUT" 0 1 2 3 9 15
+
+$RUN ./encode $EFLAG < $FILE > $EOUT
+$RUN ./decode        < $EOUT > $DOUT
+/usr/bin/cmp - $FILE < $DOUT
+
+ESIZE=`wc -c < $EOUT`
+
+if test $ESIZE -lt $LOWER -o -n "$DEBUG_SCRIPT" ; then
+  echo "size($EFLAG) = $ESIZE < $LOWER"
+fi
+
+if test $ESIZE -gt $UPPER -o -n "$DEBUG_SCRIPT" ; then
+  echo "size($EFLAG) = $ESIZE > $UPPER"
+fi

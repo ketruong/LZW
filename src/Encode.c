@@ -4,8 +4,13 @@
 unsigned int bits = START;
 
 void pruneHelper(codeTable * table) {
+    
     pruneTable(table);
-    putBits(bits, PRU); 
+    
+    // send PRU flag 
+    putBits(bits, PRU);
+
+    // update bits needed to represent entries 
     bits = 0;
     while((1 << ++bits) < entries);
 }
@@ -25,7 +30,7 @@ codeTable * encode(int maxbits, int p, int e) {
     unsigned int code = EMP;
 
     // input character
-    unsigned int c; 
+    int c; 
     
     // send number of bits and escape bit 
     putBits(5, maxbits);
@@ -36,7 +41,6 @@ codeTable * encode(int maxbits, int p, int e) {
 
         // if the number of entries is greater than 2^bits + 1, add another bit 
         // signal that the number of bits has increased
-
         if((entries >= ((1 << bits))) && ((bits + 1) <= maxbits)) {
             putBits(bits, INC);
             bits++;
@@ -61,9 +65,8 @@ codeTable * encode(int maxbits, int p, int e) {
             
                 continue;    
             // output the code
-            } else {
-                putBits(bits, code);
-            }
+            } else putBits(bits, code);
+            
             // check to see if (EMP, CHAR) is in the table     
             /*searched = 2;
             
@@ -76,21 +79,24 @@ codeTable * encode(int maxbits, int p, int e) {
             } else {*/
                 //searched = searchCode(table, EMP, c);
                 
-                // add (CODE, CHAR) to the table 
+            // add (CODE, CHAR) to the table 
             addorPrune(table, code, c, p);
                 
-                // code is associated with (EMP, CHAR) pair
+            /* code associated with (EMP, CHAR) pair */
+            
+            // prune 
             if(p) code = searchCode(table, EMP, c);
+            // no prune 
             else code = (c+6);
             //}
         }
     }
     
+    // print last code 
     if(code != EMP) putBits(bits, code);
-        
-    putBits(bits, END);
-    //printTable(table);
+    
+    // add an ending sequence 
+    putBits(bits, END); 
     flushBits();
-    destroyTable(table);
     return table;
 }

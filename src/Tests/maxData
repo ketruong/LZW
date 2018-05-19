@@ -1,0 +1,96 @@
+#!/usr/bin/perl
+#
+#   maxData [-v|-g N|-G N|-s N|-S N]* FILE
+#
+# Print to STDERR the sum of the sizes of the data and bss segments of
+# executable FILE.
+#
+# Options:
+#   -q:   Do not print the sum of the sizes of the data and bss segments
+#   -v:   Also print the sizes of the data and bss segments
+#   -g N: Also print the sizes of all global variables of size <= N
+#   -G N: Also print the sizes of all global arrays of size > N
+#   -s N: Also print the sizes of all static local variables of size < N
+#   -S N: Also print the sizes of all static local arrays of size > N
+
+# Extract arguments
+while ($file = shift(@ARGV)) {
+   if ($file eq "-q") {
+       $qFlag = $file;
+   } elsif ($file eq "-v") {
+       $vFlag = $file;
+   } elsif ($file eq "-g") {
+       $gFlag = shift;
+   } elsif ($file eq "-G") {
+       $GFlag = shift;
+   } elsif ($file eq "-s") {
+       $sFlag = shift;
+   } elsif ($file eq "-S") {
+       $SFlag = shift;
+   } else {
+       last;
+   }
+}
+
+(@ARGV == 0)
+   || die ("usage: maxData [-q|-v|-g N|-G N|-S N]* FILE\n");
+
+(-e $file)
+   || die ("$file does not exist\n");
+
+(-x $file)
+   || die ("$file is not executable\n");
+
+
+#####
+# Use size to print sizes of data and bss segments
+open (SIZE, "size $file |")
+   || die ("size $file failed\n");
+
+while (<SIZE>) {
+   if (m{\s*\d+\s+(\d+)\s+(\d+)}) {
+      ($data, $bss) = ($1, $2);
+      $total = $data + $bss;
+   }
+}
+
+print STDERR "$total\n"
+   if (! $qFlag);
+print STDERR "Total = $total = $data + $bss = data + bss\n"
+   if ($vFlag);
+
+#####
+# Use nm to print sizes of global and static local variables
+open (NM, "nm -S -t d $file |")
+   || die ("nm -S -t d $file failed\n");
+
+while (<NM>) {
+   chomp;
+   if (m{^(\d+) (\d+) (\w) (.*)$}) {
+      ($loc, $len, $type, $name) = ($1, 0+$2, $3, $4);
+   } elsif (m{^(\d+) (\w) (.*)$}) {
+      ($loc, $len, $type, $name) = ($1, 0,    $2, $3);
+   }
+											# B/b = uninitialized data section
+   next unless ($type =~ m{^[BbDd]$});              # B/b/D/d = data section
+   next unless ($len > 0);                          # Vars have positive length
+						     
+   next if ($name eq 'stdin@@GLIBC_2.2.5');         # Ignore specific files
+   next if ($name eq 'stdout@@GLIBC_2.2.5');
+   next if ($name eq 'stderr@@GLIBC_2.2.5');
+   next if ($name =~ m{^completed.\d+$} && 0+$len == 1);
+   next if ($name =~ m{^dtor_idx.\d+$} && 0+$len == 8);
+
+   if ($gFlag && $name =~ m{^[a-zA-Z0-9_]+$} && $len <= $gFlag) {
+      print STDERR "Global variable: $name <$len>\n";
+   }
+   if ($GFlag && $name =~ m{^[a-zA-Z0-9_]+$} && $len > $GFlag) {
+      print STDERR "Global array: $name <$len>\n";
+   }
+   if ($sFlag && $name =~ s{^([a-zA-Z0-9_]+)\.\d+$}{$1} && $len > $SFlag) {
+      print STDERR "Static local variable: $1 <$len>\n";
+   }
+   if ($SFlag && $name =~ s{^([a-zA-Z0-9_]+)\.\d+$}{$1} && $len > $SFlag) {
+      print STDERR "Static local array: $1 <$len>\n";
+   }
+}

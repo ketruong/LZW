@@ -2,7 +2,7 @@
 
 #define INIT(p,c) (p)                               // Initial slot
 #define STEP(p,c) (2 * (((p)<<CHAR_BIT)|(c)) + 1)   // Step to next slot
-#define REDUCE(h,size) ((h) & ((size)-1))           // Reduce to [0,SIZE-1)
+#define REDUCE(h,s) ((h) & ((s)-1))                 // Reduce to [0,SIZE-1)
 
 // printing debugger 
 #if 1 
@@ -17,66 +17,56 @@ int size = 0;
 
 // check if the codeTable is full 
 bool isFull() {
-    return (entries) == size; 
+    return entries >= ((0.99) * size); 
 }
-
-// for encode: hash function 
-int hash(unsigned int p, unsigned int c, int stepper) {
-    return REDUCE(INIT(p,c) + stepper * STEP(p,c), size);
+void updateArr(codeTable * table, unsigned int pref, int c){
+    table->array[entries].pref = pref;
+    table->array[entries].c = c;
+    table->array[entries].code = entries;
+    entries++;
 }
-
 // creates table of size of 2^ MAXBITS with an array and hashTable 
 codeTable * createTable(int maxbits, int escape, int d) {
     size = 1 << (maxbits);
     
+    int i;
     codeTable * table = malloc(sizeof(codeTable));
-    if(!d) table->hashTable = calloc(size, sizeof(tab)); 
-    else table->array= malloc(size * sizeof(tab ));
-    unsigned int i;
+    if(!d) {
+        table->hashTable = malloc(size * sizeof(tab)); 
+        for(int i = 0; i < size; i++) {
+            table->hashTable[i].pref = size + 7;
+        }
+    }
+    else table->array= malloc(size*sizeof(tab));
 
     // reserve table space for EMP, ESC, PRU, and INC  
     for (i = 0; i<=5; i++) {
-        if(d) {
-            table->array[entries] = calloc(1, sizeof(tab));
-            table->array[entries]->pref = size + i;
-            table->array[entries]->c = i;
-            table->array[entries]->code = entries;
-            entries++; 
-        } else insertTable(table, size+i, i, d);
+        if(d) updateArr(table, size+i, i); 
+        else insertTable(table, size+i, i, d);
     }
     
     // if the escape flag is specified 
     // do not add all 256 ASCII characters in the table
     // there is no prefix if the characters are added in
-    if(!escape) for(i = 0; i < 255; i++) {
-        if(d) {
-            table->array[entries] = malloc(sizeof(tab));
-            table->array[entries]->pref = 0;
-            table->array[entries]->c = i;
-            table->array[entries]->code = entries;
-            entries++;
-        } else insertTable(table, 0, i, d);
+    if(!escape)
+        for(i = 0; i < 256; i++) {
+            if(d) updateArr(table,0,i);
+            else insertTable(table, 0, i, d);
     }
     return table;
 }
 
- // for decode: find PREF and CHAR given the CODE for a nonempty string
- // uses the array in codeTable
-tab * searchPC(codeTable * table, int code) {
-    return table->array[code];
-}
-
 // for encode: insert into hashTable using double hashing 
-void insertTable(struct codeTable * table, unsigned int pref, unsigned int c, int d) {
-
-    //Print(("Attempting to insert new entry...\n"));
+void insertTable(struct codeTable * table, unsigned int pref, int c, int d) {
     
     // if is full
-    if(isFull()) {
-        //Print(("Table is full!\n"));
-        return;
-    }
-    if(!d) {
+    if(isFull()) return;
+    
+    // if decode, add to the array
+    if (d) updateArr(table, pref, c); 
+    
+    // if encode, add to the hashTable 
+    else { 
         // code already inserted
         /*if(searchCode(table,pref,c) >= 0) {
             // Print(("Code already inserted in\n"));
@@ -84,19 +74,22 @@ void insertTable(struct codeTable * table, unsigned int pref, unsigned int c, in
         }*/
         
         //get index from first hash
-        int index = hash(pref, c, 0); 
+        unsigned in = INIT(pref,c);
+        unsigned st = STEP(pref,c);
+        unsigned index = REDUCE(in, size); 
         
         //if collision occurs
-        if (table->hashTable[index] != NULL) {
+        if (table->hashTable[index].pref != (size + 7)) {
             
             int i = 1;
             // loop until there is an empty spot;
             while (1) {
                 // get newIndex
-                index = hash(pref,c,i); 
+                in += st; 
+                index = REDUCE(in, size); 
 
                 // if no collision occurs, store the key
-                if (!table->hashTable[index]) {
+                if (table->hashTable[index].pref == (size + 7)) {
                     break;
                 }
                 i++;
@@ -104,41 +97,32 @@ void insertTable(struct codeTable * table, unsigned int pref, unsigned int c, in
         } 
         
         // add entry into hashTable 
-        table->hashTable[index] = malloc(sizeof(tab));
-        table->hashTable[index]->pref = pref;
-        table->hashTable[index]->c = c;
-        table->hashTable[index]->code  = entries;
-    } else {
-        // add entry to array
-        table->array[entries] = malloc(sizeof(tab));
-        table->array[entries]->pref = pref; 
-        table->array[entries]->c =c; 
-        table->array[entries]->code = entries; 
-    }
-    // update number of entries in the table
-    entries++;
-    //Print(("entries = %i\n", entries));
+        table->hashTable[index].pref = pref;
+        table->hashTable[index].c = c;
+        table->hashTable[index].code  = entries;
+        entries++;
+    } 
 }
-
 // searches the hash table to see if the pref and char is already inserted 
-int searchCode(codeTable * table, unsigned int pref, unsigned int c) {
-    int index = hash(pref, c, 0);
-    int start = index;
-    int i = 0;
+int searchCode(codeTable * table, unsigned int pref, int c) {
+    unsigned int in = INIT(pref,c);
+    unsigned int st = STEP(pref,c);
+    unsigned int index = REDUCE(in, size); 
+    unsigned int start = index;
     
     // loop until the right triple is found else return -1 to indicate not found
-    while(table->hashTable[index] != NULL) {
-        i++;
-        if(table->hashTable[index]->pref == pref && table->hashTable[index]->c == c) 
-            return table->hashTable[index]->code;
-        index = hash(pref, c, i);
+    while(table->hashTable[index].pref != (size + 7)) {
+        if(table->hashTable[index].pref == pref && table->hashTable[index].c == c) 
+            return table->hashTable[index].code;
+        in += st;
+        index = REDUCE(in, size); 
         if(index == start) return -1;
     }
     return -1;
 }
 
 // check for KwKwK event
-int kwkwkTable(codeTable * table, unsigned int c) {
+int kwkwkTable(codeTable * table, int c) {
     // no KwKwK event
     if (c < entries) return 1;
     // KwKwK event
@@ -148,26 +132,18 @@ int kwkwkTable(codeTable * table, unsigned int c) {
 }
 
 // for decode: recursively prints out the characters instead of using stack 
-unsigned int printTableDecode(codeTable * table, unsigned int code) {
+unsigned int printTableDecode(codeTable * table, int code) {
     int K;
     
-    if (table->array[code]->pref == EMP) {
-        K = table->array[code]->c;
-        putchar(K);
+    if (table->array[code].pref == EMP) {
+        K = table->array[code].c;
+        putBits(8,K);
     } else {
-        K = printTableDecode(table, table->array[code]->pref);
-        putchar(table->array[code]->c);
+        K = printTableDecode(table, table->array[code].pref);
+        putBits(8,table->array[code].c);
     }
 
     return K;
-}
-// printing the array 
-void printTable(codeTable * table) {
-    for (int i = 0; i < entries; i++) {
-        if(table->array[i]) 
-            Print(("pref = %u, c = %u, code = %i\n", 
-                    table->array[i]->pref, table->array[i]->c, i));
-    }
 }
 
 // destroy the table 

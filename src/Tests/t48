@@ -1,0 +1,74 @@
+#!/bin/bash
+# Storage used < 12*SIZE?  Text (-m 12)
+
+ulimit -s 16384
+ulimit -s
+
+RUN=/c/cs323/bin/run
+TESTS=/c/cs323/Hwk4/Tests
+
+EFLAG="-m 12"
+FILE=/c/cs323/Doc/alice.1
+SIZE=4096
+
+UPPER=$((12 * $SIZE + 10000))
+
+EOUT=/tmp/lzw.e.$USER.$$
+DOUT=/tmp/lzw.d.$USER.$$
+
+ulimit -t 4
+trap "/bin/rm -f $EOUT $DOUT" 0 1 2 3 9 15
+
+
+#####
+# Check maximum size of data+heap+stack for encode
+
+DATA=`$TESTS/maxData   2>&1 ./encode`
+HEAP=`$TESTS/maxHeap   2>&1 ./encode $EFLAG < $FILE > $EOUT`
+STACK=`$TESTS/maxStack 2>&1 ./encode $EFLAG < $FILE > $EOUT`
+
+TOTAL=$(($DATA + $HEAP + $STACK))
+if test $TOTAL -gt $UPPER -o -v DEBUG_SCRIPT ; then
+  echo "TOTAL(encode) = $TOTAL > $UPPER = UPPER BOUND"
+  echo "DATA = $DATA, HEAP = $HEAP, STACK = $STACK"
+fi
+
+
+#####
+# Check maximum size of data+heap+stack for decode
+
+if test ! -e $EOUT ; then exit ; fi         # Exit if earlier command timed out
+
+DATA=`$TESTS/maxData   2>&1 ./decode`
+HEAP=`$TESTS/maxHeap   2>&1 ./decode < $EOUT > $DOUT`
+STACK=`$TESTS/maxStack 2>&1 ./decode < $EOUT > $DOUT`
+
+TOTAL=$(($DATA + $HEAP + $STACK))
+if test $TOTAL -gt $UPPER -o -v DEBUG_SCRIPT ; then
+  echo "TOTAL(decode) = $TOTAL > $UPPER = UPPER BOUND"
+  echo "DATA = $DATA, HEAP = $HEAP, STACK = $STACK"
+fi
+
+
+#####
+# Verify that decoded output is correct
+
+cat $DOUT | /usr/bin/cmp - $FILE
+
+
+#####
+# Verify that MAXBITS is obeyed
+
+declare -a SIZES
+SIZES=(`./encode -m  9 < $FILE | wc -c` \
+       `./encode -m 10 < $FILE | wc -c` \
+       `./encode -m 11 < $FILE | wc -c` \
+       `./encode -m 12 < $FILE | wc -c` \
+       `./encode -m 13 < $FILE | wc -c` \
+       `./encode -m 14 < $FILE | wc -c`)
+
+perl -e 'for (@M = (9..20), @S = @ARGV, $m = 1; $m <= $#S; $m++) {    '\
+     -e '  if (exists $ENV{DEBUG_SCRIPT} || $S[$m] > .99 * $S[$m-1]) {'\
+     -e '    print "Table size anomaly: size(-m $M[$m]) = $S[$m]";    '\
+     -e '    print " > .99 * $S[$m-1] = size(-m $M[$m-1])\n"; } }     '\
+     ${SIZES[*]}

@@ -1,0 +1,28 @@
+#!/bin/bash
+# Print histogram of maximum number of blocks allocated in various size ranges
+
+TESTS=/c/cs323/Hwk4/Tests
+
+EFLAG=
+FILE=/c/cs323/Doc/sylvie.1
+
+EOUT=/tmp/lzw.e.$USER.$$
+DOUT=/tmp/lzw.d.$USER.$$
+TOTAL=/tmp/lzw.t.$USER.$$                       # File for total
+TRACE=/tmp/lzw.f.$USER.$$                       # File for full trace
+
+trap "/bin/rm -f $EOUT $DOUT $TOTAL $TRACE" 0 1 2 3 9 15
+
+PRELOAD=$TESTS/libmaxMalloc.so
+export MAXMALLOC_TOTAL=$TOTAL
+export MAXMALLOC_TRACE=$TRACE
+
+cat $FILE | LD_PRELOAD=$PRELOAD ./encode $EFLAG > $EOUT
+/bin/echo -n 'encode: '
+$TESTS/binify 10 20 40 80 < $TRACE
+
+cat $EOUT | LD_PRELOAD=$PRELOAD ./decode        > $DOUT
+/bin/echo -n 'decode: '
+$TESTS/binify 10 20 40 80 < $TRACE
+
+cat $DOUT | /usr/bin/cmp - $FILE

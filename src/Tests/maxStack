@@ -1,0 +1,44 @@
+#!/bin/bash
+#
+#   maxStack [-v] COMMAND
+#
+# Print to STDERR the maximum size of the stack when COMMAND is executed.
+#
+# Options:
+#   -v:   Print the full report from stackusage instead
+#
+# stackusage log start ----------------------------------------------------
+#   pid  id    tid  requested     actual     maxuse  max%    dur  funcP
+# 15782   0  15782    8388608    8380416      13136     0      0  (nil)
+# stackusage log end ------------------------------------------------------
+
+REPORT=/tmp/maxStack-Report.$USER.$$
+TOTALS=/tmp/maxStack-Totals.$USER.$$
+
+trap "/bin/rm -f $REPORT $TOTALS" 0 1 2 3 9 15
+
+if [ "$1" == "-v" ] ; then
+   VFLAG=$1
+   shift
+fi
+
+# Use stackusage to compute size of stack segment
+export SU_FILE=$REPORT
+if [ -e $REPORT ] ; then
+   rm -f $REPORT
+fi
+
+# Execute the command and produce the report
+LIB=/c/cs323/bin/libstackusage.so
+LD_PRELOAD=$LIB $*
+
+# Compute totals over all threads
+perl -n -e '$total += $2 if (m{^\s*(\d+\s+){5}(\d+)});' \
+	-e 'print "$total\n"' $REPORT > $TOTALS
+	
+# Print results to standard error
+if [ -n "$VFLAG" ] ; then
+   cat $REPORT >&2
+else
+   tail -1 $TOTALS >&2
+fi

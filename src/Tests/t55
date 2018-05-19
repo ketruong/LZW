@@ -1,0 +1,30 @@
+#!/bin/bash
+# Repeated flags (last supersedes)
+
+RUN=/c/cs323/bin/run
+
+EFLAG="-m 12 -m 13"
+XFLAG="-m 13 -m 12"
+FILE=/c/cs323/Doc/logic.1
+
+EOUT=/tmp/lzw.e.$USER.$$
+DOUT=/tmp/lzw.d.$USER.$$
+XOUT=/tmp/lzw.x.$USER.$$
+
+ulimit -t 4
+trap "/bin/rm -f $EOUT $DOUT $XOUT" 0 1 2 3 9 15
+
+cat $FILE | $RUN ./encode $EFLAG > $EOUT
+cat $EOUT | $RUN ./decode        > $DOUT
+cat $DOUT | /usr/bin/cmp - $FILE
+
+cat $FILE | $RUN ./encode $XFLAG > $XOUT
+cat $XOUT | $RUN ./decode        > $DOUT
+cat $DOUT | /usr/bin/cmp - $FILE
+
+ESIZE=`wc -c < $EOUT`
+XSIZE=`wc -c < $XOUT`
+
+if test $ESIZE -ge $XSIZE -o -n "$DEBUG_SCRIPT" ; then
+  echo "size(file) = $ESIZE > $XSIZE"
+fi

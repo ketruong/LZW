@@ -1,0 +1,45 @@
+#!/bin/bash
+#
+#   maxHeap [-q|-v|-limit SIZE]* COMMAND
+#
+# Print to STDERR maximum amount of heap storage during execution of COMMAND
+#
+# Options:
+#   -q:          Do not print the maximum amount of heap storage
+#   -v:          Print the full trace from maxMalloc
+#   -limit SIZE:
+
+TOTAL=/tmp/maxHeap-Total.$USER.$$               # File for maximum used
+TRACE=/tmp/maxHeap-Trace.$USER.$$               # File for full trace
+
+trap "/bin/rm -f $TOTAL $TRACE" 0 1 2 3 9 15
+
+export MAXMALLOC_TOTAL=$TOTAL
+
+# Extract arguments
+while [ "$#" != "1" ] ; do
+   if [ "$1" == "-q" ] ; then
+      QFLAG=$1
+      shift
+   elif [ "$1" == "-v" ] ; then
+      VFLAG=$1
+      export MAXMALLOC_TRACE=$TRACE
+      shift
+   elif [ "$1" == "-limit" ] ; then
+      shift
+      export MAXMALLOC_LIMIT=$1
+      shift
+   else
+      break
+   fi
+done
+
+LD_PRELOAD=/c/cs323/Hwk4/Tests/libmaxMalloc.so $*
+
+# Print results to standard error
+if [ -n "$VFLAG" ] ; then
+   cat $TRACE >&2
+fi
+if [ ! -n "$QFLAG" ] ; then
+   cat $TOTAL >&2
+fi

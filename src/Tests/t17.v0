@@ -1,0 +1,68 @@
+#!/bin/bash
+# Storage used < 8*SIZE?  Text (-p -m 14)
+
+RUN=/c/cs323/bin/run
+TESTS=/c/cs323/Hwk4/Tests
+
+EFLAG="-p -m 14"
+FILE=/c/cs323/Doc/symbolic
+BOUND=180000
+SIZE=16384
+
+EOUT=/tmp/lzw.e.$USER.$$
+DOUT=/tmp/lzw.d.$USER.$$
+
+trap "/bin/rm -f $EOUT $DOUT" 0 1 2 3 9 15
+
+$RUN ./encode $EFLAG < $FILE > $EOUT
+$RUN ./decode        < $EOUT > $DOUT
+/usr/bin/cmp - $FILE < $DOUT
+
+
+#####
+# Check maximum size of heap
+
+UPPER=$((8 * $SIZE))
+
+if test -n "$DEBUG_SCRIPT" ; then
+  export MAXMALLOC_TRACE=true
+fi
+
+MAXMALLOC_LIMIT=$UPPER              \
+LD_PRELOAD=$TESTS/libmaxMalloc-old.so   \
+ ./encode $EFLAG < $FILE > /dev/null
+
+echo -----
+
+MAXMALLOC_LIMIT=$UPPER              \
+LD_PRELOAD=$TESTS/libmaxMalloc-old.so   \
+ ./decode        < $EOUT > /dev/null
+
+
+#####
+# Check size of data and bss segments
+
+UPPER=64
+
+$TESTS/sizeLimit -G $UPPER -S $UPPER ./encode
+$TESTS/sizeLimit -G $UPPER -S $UPPER ./decode
+
+
+#####
+# Run with limit on stack size
+
+UPPER=30000
+
+$TESTS/setrlimit $UPPER ./encode $EFLAG < $FILE > $EOUT
+$TESTS/setrlimit $UPPER ./decode        < $EOUT > $DOUT
+/usr/bin/cmp - $FILE < $DOUT
+
+
+#####
+# Verify that -p -m 14 is implemented correctly
+
+ESIZE=`wc -c < $EOUT`
+
+if test $ESIZE -gt $BOUND -o -n "$DEBUG_SCRIPT" ; then
+  echo "size($EFLAG) = $ESIZE > $BOUND"
+fi

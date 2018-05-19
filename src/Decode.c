@@ -6,10 +6,16 @@ unsigned int dbits = START;
 // escape and add to the table
 void escape(codeTable * table, int * oldC){
     int c;
+    // Get the next 8 bits 
     if ((c = getBits(CHAR_BIT)) != EOF) {
-        putchar(c);
+        
+        // output the letter 
+        putBits(8,c);
+        
+        // insert into the table 
         insertTable(table, EMP, c, 1);
-        oldC = EMP;
+        
+        *oldC = EMP;
     }
 }
 
@@ -20,15 +26,17 @@ void increment(int maxbits){
 
 // prune table 
 void prune(codeTable * table, int * oldC){
-    *oldC = EMP; 
     pruneTable(table);
+    *oldC = EMP; 
 }
 
 codeTable * decode() {
 
     // get maxbits and the escape flag
     int maxbits = getBits(5);
-    unsigned int e = getBits(1); 
+    int e = getBits(1); 
+    
+    // Something went wrong with encode
     if (maxbits <= 8 || maxbits > 20) DIE("Decode: %s","corrupted file!"); 
     
     // create the table
@@ -43,12 +51,17 @@ codeTable * decode() {
     newCode = calloc(1,sizeof(int)); 
     Code = calloc(1,sizeof(int)); 
     
+    // initially empty 
     *oldCode = EMP;
+    
     // for getting characters from the stream
-    unsigned int c, K; 
+    int c, K; 
     
     while((c = getBits(dbits)) != EOF) {
+        
         *newCode =  *Code = c;
+
+        // identify if flags have occurred
         switch(*Code) {
             case ESC:
                 escape(table, oldCode);
@@ -64,17 +77,21 @@ codeTable * decode() {
             default:
                 break;
         }
+        
         // KwKwK found - delay
         if (!kwkwkTable(table, *Code)) {             
             *Code = *oldCode;
             kwkwk = 1;
         }
+        
         // it's ok to print 
         else kwkwk = 0;
         
         // recursively print using the Code 
         K = printTableDecode(table, *Code);         
-        if (kwkwk) putchar(K);
+        
+        // print last letter because of KwKwK
+        if (kwkwk) putBits(8,K);
         
         // add to the table if possible
         if (*oldCode != EMP) insertTable(table,*oldCode, K, 1);
@@ -84,8 +101,6 @@ codeTable * decode() {
 
     // received END code
     exit_loop: ;
-    // did not receive END code
-    // if (*Code != END) DIE("Decode: %s", "did not end with termination sequence");
 
     // free everything 
     free(oldCode);

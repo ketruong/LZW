@@ -1,0 +1,16 @@
+#!/bin/bash
+# Text (large) correct?
+
+RUN=/c/cs323/bin/run
+
+EFLAG=
+FILE=/c/cs323/Doc/sylvie.1
+
+EOUT=/tmp/lzw.e.$USER.$$
+DOUT=/tmp/lzw.d.$USER.$$
+
+trap "/bin/rm -f $EOUT $DOUT" 0 1 2 3 9 15
+
+cat $FILE | $RUN ./encode $EFLAG > $EOUT
+cat $EOUT | $RUN ./decode        > $DOUT
+cat $DOUT | /usr/bin/cmp - $FILE

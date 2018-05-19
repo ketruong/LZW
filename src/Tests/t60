@@ -1,0 +1,42 @@
+#!/bin/bash
+# Reads all input before writes any output?
+
+RUN=/c/cs323/bin/run
+
+EFLAG=
+FILE=/c/cs323/Doc/sylvie.1
+
+SIZE=10000                      # #characters to read before creating SIGNAL
+SIGNAL=/tmp/lzw.s.$USER.$$
+MESSAGE="End of Test"
+
+ulimit -t 4
+trap "/bin/rm -f $SIGNAL" 0 1 2 3 9 15
+
+# Uses a pipeline with five stages:
+#
+# 1. Copy the contents of FILE to stdout, sleep, and, if SIGNAL exists,
+#    write MESSAGE to stdout.
+#
+# 2. Encode
+#
+# 3. Decode
+#
+# 4. Copy SIZE characters from stdin to stdout, create SIGNAL, and copy any
+#    characters remaining.
+#
+# 5. Count the number of characters in stdin
+#
+# If encode or decode tries to read the entire stdin before writing to stdout
+# (other than a prefix that passes options through the coded stream), it will
+# not see MESSAGE.  FILE must have at least one buffer-full more than SIZE
+# characters.
+
+(cat $FILE ; /usr/bin/sleep .25s ;               \
+ if test -e $SIGNAL ; then echo $MESSAGE ; fi) | \
+$RUN ./encode $EFLAG | $RUN ./decode           | \
+(head -c $SIZE ; touch $SIGNAL ; cat)          | wc -c
+
+# Result
+
+(cat $FILE ; echo $MESSAGE) | wc -c

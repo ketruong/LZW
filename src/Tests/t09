@@ -1,0 +1,85 @@
+#!/bin/bash
+# size(-m 16) = size(-m 14) << size(-m 9)?
+
+RUN=/c/cs323/bin/run
+
+EFLAG="-m 16"
+XFLAG="-m 14"
+YFLAG="-m 9"
+FILE=/c/cs323/Style/C-Pike
+FUDGE=80
+
+EOUT=/tmp/lzw.e.$USER.$$
+DOUT=/tmp/lzw.d.$USER.$$
+XOUT=/tmp/lzw.x.$USER.$$
+YOUT=/tmp/lzw.y.$USER.$$
+
+trap "/bin/rm -f $EOUT $DOUT $XOUT $YOUT" 0 1 2 3 9 15
+
+$RUN ./encode $EFLAG < $FILE > $EOUT
+$RUN ./decode        < $EOUT > $DOUT
+/usr/bin/cmp - $FILE < $DOUT
+
+$RUN ./encode $XFLAG < $FILE > $XOUT
+$RUN ./decode        < $XOUT > $DOUT
+/usr/bin/cmp - $FILE < $DOUT
+
+$RUN ./encode $YFLAG < $FILE > $YOUT
+$RUN ./decode        < $YOUT > $DOUT
+/usr/bin/cmp - $FILE < $DOUT
+
+ESIZE=`wc -c < $EOUT`
+XSIZE=`wc -c < $XOUT`
+YSIZE=`wc -c < $YOUT`
+
+LOWER=$(( 99 * $XSIZE / 100))
+UPPER=$((101 * $XSIZE / 100))
+BOUND=$(($FUDGE * $YSIZE / 100))
+
+if test $ESIZE -lt $LOWER -o $UPPER -lt $ESIZE -o -v DEBUG_SCRIPT ; then
+  echo "size($EFLAG) = $ESIZE != $XSIZE = size($XFLAG)"
+fi
+
+if test $ESIZE -gt $BOUND -o -v DEBUG_SCRIPT ; then
+  echo "size($EFLAG) = $ESIZE > $BOUND = .$FUDGE * $YSIZE = .$FUDGE * size($YFLAG)"
+fi
+
+#########################
+# Further tests of growth
+
+# size(-m 10) is (roughly) equal to size(-m 9) if encode never needs 10 bits
+
+EFLAG="-m 10"
+XFLAG="-m  9"
+LENGTH=300
+
+head -c $LENGTH $FILE | $RUN ./encode $EFLAG > $EOUT
+head -c $LENGTH $FILE | $RUN ./encode $XFLAG > $XOUT
+
+ESIZE=`wc -c < $EOUT`
+XSIZE=`wc -c < $XOUT`
+LOWER=$(( 99 * $XSIZE / 100))
+UPPER=$((101 * $XSIZE / 100))
+
+if test $ESIZE -lt $LOWER -o $UPPER -lt $ESIZE -o -v DEBUG_SCRIPT ; then
+  echo "size($EFLAG) = $ESIZE != $XSIZE = size($XFLAG)"
+fi
+
+
+# size(-m 10) is (roughly) larger than size(-m 9) before extra strings are used
+
+EFLAG="-m 10"
+XFLAG="-m  9"
+LENGTH=500
+
+head -c $LENGTH $FILE | $RUN ./encode $EFLAG > $EOUT
+head -c $LENGTH $FILE | $RUN ./encode $XFLAG > $XOUT
+
+ESIZE=`wc -c < $EOUT`
+XSIZE=`wc -c < $XOUT`
+
+LOWER=$((99 * $XSIZE / 100))
+
+if test $ESIZE -lt $LOWER -o -v DEBUG_SCRIPT ; then
+  echo "size($EFLAG) = $ESIZE < $XSIZE = size($XFLAG)"
+fi

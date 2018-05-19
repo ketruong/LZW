@@ -1,0 +1,16 @@
+#!/bin/bash
+# Text (small) correct?
+
+RUN="/usr/bin/valgrind -q"
+
+EFLAG=
+FILE=/c/cs323/Hwk4/Tests/t01x
+
+EOUT=/tmp/lzw.e.$USER.$$
+DOUT=/tmp/lzw.d.$USER.$$
+
+trap "/bin/rm -f $EOUT $DOUT" 0 1 2 3 9 15
+
+cat $FILE | $RUN ./encode $EFLAG > $EOUT
+cat $EOUT | $RUN ./decode        > $DOUT
+cat $DOUT | /usr/bin/cmp - $FILE

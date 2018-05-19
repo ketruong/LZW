@@ -1,0 +1,23 @@
+#!/bin/bash
+# Binary (medium): size(no flags) <= BOUND?
+
+RUN=/c/cs323/bin/run
+
+EFLAG=
+FILE=/bin/ln
+BOUND=54000
+
+EOUT=/tmp/lzw.e.$USER.$$
+DOUT=/tmp/lzw.d.$USER.$$
+
+trap "/bin/rm -f $EOUT $DOUT" 0 1 2 3 9 15
+
+cat $FILE | $RUN ./encode $EFLAG > $EOUT
+cat $EOUT | $RUN ./decode        > $DOUT
+cat $DOUT | /usr/bin/cmp - $FILE
+
+ESIZE=`wc -c < $EOUT`
+
+if test $ESIZE -gt $BOUND -o -n "$DEBUG_SCRIPT" ; then
+  echo "size() = $ESIZE > $BOUND"
+fi

@@ -1,0 +1,52 @@
+#!/bin/bash
+# size(-m 8) = size(-m 12) = size(-m 21) = size(no flags)?
+
+RUN=/c/cs323/bin/run
+
+EFLAG=
+XFLAG="-m 8"
+YFLAG="-m 12"
+ZFLAG="-m 21"
+FILE=/c/cs323/Doc/aesop
+
+EOUT=/tmp/lzw.e.$USER.$$
+DOUT=/tmp/lzw.d.$USER.$$
+XOUT=/tmp/lzw.x.$USER.$$
+YOUT=/tmp/lzw.y.$USER.$$
+ZOUT=/tmp/lzw.z.$USER.$$
+
+ulimit -t 4
+trap "/bin/rm -f $EOUT $DOUT $XOUT $YOUT $ZOUT" 0 1 2 3 9 15
+
+cat $FILE | $RUN ./encode $EFLAG > $EOUT
+cat $EOUT | $RUN ./decode        > $DOUT
+cat $DOUT | /usr/bin/cmp - $FILE
+
+cat $FILE | $RUN ./encode $XFLAG > $XOUT
+cat $XOUT | $RUN ./decode        > $DOUT
+cat $DOUT | /usr/bin/cmp - $FILE
+
+cat $FILE | $RUN ./encode $YFLAG > $YOUT
+cat $YOUT | $RUN ./decode        > $DOUT
+cat $DOUT | /usr/bin/cmp - $FILE
+
+cat $FILE | $RUN ./encode $ZFLAG > $ZOUT
+cat $ZOUT | $RUN ./decode        > $DOUT
+cat $DOUT | /usr/bin/cmp - $FILE
+
+ESIZE=`wc -c < $EOUT`
+XSIZE=`wc -c < $XOUT`
+YSIZE=`wc -c < $YOUT`
+ZSIZE=`wc -c < $ZOUT`
+
+if test $XSIZE -ne $ESIZE -o -v DEBUG_SCRIPT ; then
+  echo "size($XFLAG) = $XSIZE != $ESIZE = size(no flags)"
+fi
+
+if test $YSIZE -ne $ESIZE -o -v DEBUG_SCRIPT ; then
+  echo "size($YFLAG) = $YSIZE != $ESIZE = size(no flags)"
+fi
+
+if test $ZSIZE -ne $ESIZE -o -v DEBUG_SCRIPT ; then
+  echo "size($ZFLAG) = $ZSIZE != $ESIZE = size(no flags)"
+fi

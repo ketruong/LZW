@@ -1,0 +1,29 @@
+#!/bin/bash
+# size(-m 13) < size(no flags)?
+
+RUN=/c/cs323/bin/run
+
+EFLAG="-m 13"
+XFLAG=
+FILE=/c/cs323/Doc/logic.1
+
+EOUT=/tmp/lzw.e.$USER.$$
+DOUT=/tmp/lzw.d.$USER.$$
+XOUT=/tmp/lzw.x.$USER.$$
+
+trap "/bin/rm -f $EOUT $DOUT $XOUT" 0 1 2 3 9 15
+
+$RUN ./encode $EFLAG < $FILE > $EOUT
+$RUN ./decode        < $EOUT > $DOUT
+/usr/bin/cmp - $FILE < $DOUT
+
+$RUN ./encode $XFLAG < $FILE > $XOUT
+$RUN ./decode        < $XOUT > $DOUT
+/usr/bin/cmp - $FILE < $DOUT
+
+ESIZE=`wc -c < $EOUT`
+XSIZE=`wc -c < $XOUT`
+
+if test $ESIZE -ge $XSIZE -o -n "$DEBUG_SCRIPT" ; then
+  echo "size() = $ESIZE > $XSIZE"
+fi

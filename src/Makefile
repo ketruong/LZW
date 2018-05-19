@@ -1,17 +1,17 @@
 C = gcc
 CFLAGS = -g3 -std=c99 -pedantic -Wall
 PRGM = decode encode 
+Hwk = /c/cs323/Hwk4
 all: ${PRGM}
-
 ${PRGM}: lzw 
 	ln -f $< $@
 
-lzw: lzw.o code.o trie.o Decode.o Encode.o
+lzw: lzw.o ${Hwk}/code.o trie.o Decode.o Encode.o
 	 ${CC} ${CFLAGS} -o $@ $^
 
-trie.o: trie.h
-Decode.o: Decode.h code.o trie.o
-Encode.o: Encode.h code.o trie.o
+trie.o: trie.h ${Hwk}/code.o
+Decode.o: Decode.h ${Hwk}/code.o trie.o
+Encode.o: Encode.h ${Hwk}/code.o trie.o
 
 clean: 
 	rm -if *.o *~
